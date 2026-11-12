@@ -40,7 +40,7 @@ La matriz detallada está en `docs/diseno-api.md`. Los permisos se validan siemp
 
 | ID | Requisito | Prioridad | Criterio de aceptación |
 |---|---|---|---|
-| RF-UBI-01 | Administrar ubicaciones jerárquicas con código único. | Must | Se pueden crear sedes, almacenes, edificios, pisos, áreas y puntos; el código no se repite. |
+| RF-UBI-01 | Administrar ubicaciones con código único y jerarquía de dos niveles. | Must | Se pueden crear sedes y, dentro de ellas, almacenes, taller y áreas; el código lo genera el servidor y no se repite (D-02). |
 | RF-UBI-02 | Consultar el árbol de ubicaciones y sus hijos. | Must | La API devuelve la jerarquía paginada o en árbol; no se expone SQL ni errores internos. |
 | RF-UBI-03 | Validar que no se creen ciclos en la jerarquía. | Must | Intentar asignar un descendiente como padre devuelve 422 y no modifica datos. |
 | RF-UBI-04 | Desactivar ubicaciones sin borrar historial. | Must | Una ubicación referenciada no se elimina; se desactiva y no puede recibir nuevos movimientos. |

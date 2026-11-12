@@ -9,7 +9,7 @@ Este es un modelo lógico de partida. Debe revisarse antes de generar la migraci
 | `users` | id, name, email, password_hash, active, created_at | Usuarios del sistema. |
 | `roles` | id, code, name | Roles funcionales. |
 | `user_roles` | user_id, role_id | Relación usuario-rol. |
-| `locations` | id, code, name, type, parent_id, active | Sedes, almacenes, edificios y áreas jerárquicas. |
+| `locations` | id, code, name, type, parent_id, active | Sedes, almacenes, taller y áreas; jerarquía de dos niveles (D-02). |
 | `extinguisher_types` | id, name, agent, capacity_unit, description | Tipos/clases configurables. |
 | `extinguishers` | id, asset_code, serial_number, type_id, brand, model, capacity, manufacture_date, acquired_at, commissioned_at, manufacturer_expiry_date, logistics_status, technical_condition, current_location_id, active | Ficha individual del equipo. |
 | `external_parties` | id, name, party_type, contact, active | Proveedores/talleres/contrapartes externas. |

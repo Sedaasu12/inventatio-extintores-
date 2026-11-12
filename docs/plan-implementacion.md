@@ -24,7 +24,7 @@
 | 0 | Preparación, decisiones y entorno | Aprobación de documentos | S | Repositorio, apps vacías, CI, configuración, MySQL. |
 | 1 | Modelo de datos y migración inicial | Fase 0 + D-01/02/15/26 | M | Esquema Prisma, migración, constraints, seed. |
 | 2 | Autenticación, RBAC y auditoría base | Fase 1 + D-06/07/27 | M | Login, refresh, permisos, auditoría. |
-| 3 | Ubicaciones y catálogos | Fase 2 + D-02 | M | CRUD de sedes/almacenes/áreas, tipos y proveedores. |
+| 3 | Ubicaciones y catálogos | Fase 2 + D-02 | M | CRUD de sedes y de sus almacenes, taller y áreas (dos niveles), tipos y proveedores. |
 | 4 | Extintores, código, QR y alta inicial | Fase 3 + D-03/04/05/16 | L | Ficha, código, QR, etiqueta, `INGRESO` inicial. |
 | 5 | Motor de movimientos | Fase 4 + D-08/09/17 | L | Salida, traslado, retorno, baja, ajuste, historial. |
 | 6 | Mantenimiento, inspecciones y fechas | Fase 5 + D-10/18/28 | L | Órdenes, servicios, retornos, inspecciones, `due_dates`. |
@@ -157,12 +157,12 @@ Materializar el ERD aprobado en Prisma/MySQL, con restricciones, índices y dato
 ### Dependencias
 
 - Fase 0.
-- D-01 (single/multi-tenant), D-02 (ubicaciones), D-15 (zona horaria), D-26 (enum de condición).
+- D-01 (single/multi-tenant), D-02 (ubicaciones, aprobada), D-15 (zona horaria), D-26 (enum de condición).
 
 ### Alcance
 
 - `schema.prisma` con todas las entidades del MVP: usuarios, roles, permisos, refresh tokens, idempotencia, ubicaciones, tipos, proveedores, extintores, movimientos, órdenes, servicios, inspecciones, fechas objetivo, umbrales, auditoría, contadores.
-- Cambios aprobados a incluir: `LocationType.TALLER`, `movements.entry_source`, `maintenance_orders.provider_id` nullable + `workshop_location_id` con `CHECK` de exclusividad.
+- Cambios aprobados a incluir: `LocationType` del MVP reducido a `SEDE`, `ALMACEN`, `AREA` y `TALLER`; dos niveles con nombre único por sede (D-02); `movements.entry_source`, `maintenance_orders.provider_id` nullable + `workshop_location_id` con `CHECK` de exclusividad (D-31).
 - Enums y relaciones.
 - Migración inicial.
 - SQL manual para `CHECK`, columna generada `active_key` y índices especiales.
@@ -295,11 +295,11 @@ Permitir configurar la estructura física y los catálogos que usan los activos 
 ### Dependencias
 
 - Fase 2.
-- D-02 (estructura real).
+- D-02 (estructura real, aprobada).
 
 ### Alcance
 
-- CRUD de ubicaciones con jerarquía, tipos, activación y validación de ciclos.
+- CRUD de ubicaciones con jerarquía de dos niveles, tipos, activación y validación de profundidad y del tipo del padre.
 - CRUD de tipos de extintor.
 - CRUD de contrapartes externas.
 - Listados paginados/filtrados.

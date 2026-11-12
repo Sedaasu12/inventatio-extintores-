@@ -46,7 +46,7 @@
 | Estado logístico | Colocación | Condición adicional |
 |---|---|---|
 | `EN_ALMACEN` | `INTERNAL` | `current_location_id` apunta a una ubicación activa de tipo `ALMACEN`. |
-| `ASIGNADO` | `INTERNAL` | `current_location_id` apunta a una ubicación activa de tipo distinto de `ALMACEN` (sede, edificio, piso, área o punto). |
+| `ASIGNADO` | `INTERNAL` | `current_location_id` apunta a una ubicación activa de tipo `AREA`. |
 | `EN_MANTENIMIENTO` | `INTERNAL` o `EXTERNAL` | Si es `INTERNAL`, `current_location_id` apunta a una ubicación activa de tipo `TALLER`; si es `EXTERNAL`, `current_external_party_id` apunta a una contraparte activa. En ambos casos existe una orden de mantenimiento activa. |
 | `DADO_DE_BAJA` | `NONE` | `current_location_id` y `current_external_party_id` son nulos; `retired_at` no es nulo. |
 
@@ -58,10 +58,16 @@
 | BR-022A | `EN_MANTENIMIENTO` con colocación `INTERNAL` exige una ubicación activa de tipo `TALLER` y ninguna contraparte externa. (D-31 aprobada) | `CHECK` + validación de tipo. |
 | BR-023 | `NONE` exige ambas referencias nulas y solo es válido para `DADO_DE_BAJA`. | `CHECK` + validación. |
 | BR-024 | Solo una ubicación de tipo `ALMACEN` produce `EN_ALMACEN`. | Validación de destino; no se infiere por el nombre. |
+| BR-024A | `ASIGNADO` exige una ubicación activa de tipo `AREA`; una `SEDE` nunca aloja un extintor. (D-02 aprobada) | Validación de destino; prueba de integración. |
 | BR-025 | Una ubicación inactiva no puede ser destino de un movimiento nuevo. | Validación + estado `active`. |
 | BR-026 | Una contraparte inactiva no puede recibir un envío nuevo. | Validación + estado `active`. |
 | BR-027 | La jerarquía de ubicaciones no puede tener ciclos. | Validación de ancestros en servicio; prueba. |
-| BR-028 | Cambiar el tipo de una ubicación con activos asignados requiere validación. | Rechazo o migración controlada; auditoría. |
+| BR-027A | La jerarquía del MVP tiene máximo dos niveles: `SEDE` es la raíz y `ALMACEN`, `TALLER` y `AREA` son sus hijos. No se anidan áreas ni ubicaciones entre sí. (D-02 aprobada) | Validación en servicio; prueba de integración. |
+| BR-027B | `SEDE` exige `parent_id` nulo; `ALMACEN`, `TALLER` y `AREA` exigen un padre activo de tipo `SEDE`. | Validación en servicio; `CHECK` no puede consultar el tipo del padre. |
+| BR-027C | El código de ubicación lo genera el servidor (`UBI-000001`), es único e inmutable; no se acepta del cliente ni se importa. (D-02 aprobada) | Generador de códigos; DTO sin `code`. |
+| BR-027D | El nombre de la ubicación es único dentro de su sede, sin distinguir mayúsculas; puede repetirse en sedes distintas. (D-02 aprobada) | `UNIQUE(parent_id, name)` para hijas; validación para sedes. |
+| BR-027E | Las ubicaciones no se eliminan físicamente; se desactivan y conservan su historial. | `active`; FK `RESTRICT`. |
+| BR-028 | Cambiar el tipo de una ubicación con activos o historial requiere validación; si el cambio altera el significado operativo, se rechaza y se crea otra ubicación. | Rechazo o migración controlada; auditoría. |
 | BR-029 | `current_since` refleja la fecha del último movimiento confirmado. | Actualización transaccional; no editable. |
 | BR-030 | La proyección actual nunca se modifica desde un formulario de edición. | DTO sin campos de proyección; endpoint dedicado de movimientos. |
 | BR-031 | Si la proyección y el historial discrepan, se corrige con `AJUSTE`, no con un `UPDATE` silencioso. | Procedimiento administrativo auditado. |
@@ -374,7 +380,10 @@ stateDiagram-v2
 | `DATE_IN_FUTURE` | 422 | Fecha del hecho supera la tolerancia. |
 | `DATE_BEFORE_EVENT` | 422 | Fecha anterior a un hito válido. |
 | `PRESCRIPTION_INVALID` | 422 | Próxima fecha no posterior al evento. |
-| `LOCATION_CYCLE` | 422 | Ciclo en jerarquía. |
+| `LOCATION_CYCLE` | 422 | Ciclo en jerarquía (defensa; no aplica con dos niveles). |
+| `LOCATION_DEPTH` | 422 | Se intentó anidar una ubicación bajo un área, almacén o taller (D-02). |
+| `LOCATION_PARENT_TYPE` | 422 | El padre no es una `SEDE` activa, o una `SEDE` recibió `parentId`. |
+| `LOCATION_NAME_DUPLICATE` | 409 | Ya existe una ubicación con ese nombre en la misma sede. |
 | `RATE_LIMITED` | 429 | Límite de intentos. |
 | `INTERNAL_ERROR` | 500 | Error no controlado; sin detalles internos. |
 

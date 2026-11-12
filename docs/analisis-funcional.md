@@ -90,7 +90,7 @@ Los nombres definitivos y la separación exacta de permisos deben confirmarse co
 **Incluido:**
 
 - Autenticación local, usuarios, roles y permisos.
-- Ubicaciones jerárquicas simples (sede, almacén, área/punto) y contrapartes externas.
+- Ubicaciones jerárquicas simples (sede, almacén, taller, área) y contrapartes externas.
 - Ficha individual del extintor con código único, datos técnicos y fechas documentadas.
 - QR estable por activo, lectura por cámara, lector USB 2D en modo teclado y entrada manual.
 - Movimientos: ingreso, salida, traslado, retorno al almacén, envío a mantenimiento, retorno de mantenimiento, baja y ajuste excepcional.
@@ -129,7 +129,7 @@ Los nombres definitivos y la separación exacta de permisos deben confirmarse co
 |---|---|---|
 | **Extintor / activo** | Unidad física individual con ficha propia. | Una cantidad agregada o un tipo de extintor. |
 | **`asset_code`** | Código interno legible, único e inmutable (ej. `EXT-000125`). | Número de serie del fabricante, que puede faltar o repetirse por error. |
-| **Ubicación** | Nodo de la jerarquía interna (sede, almacén, edificio, piso, área, punto). | Estado logístico o condición técnica. |
+| **Ubicación** | Nodo de la jerarquía interna: sede, almacén, taller o área. | Estado logístico o condición técnica. |
 | **Contraparte externa** | Proveedor, taller u organización que recibe temporalmente el equipo. | Ubicación interna simulada. |
 | **Colocación actual** | `INTERNAL` (ubicación interna), `EXTERNAL` (contraparte) o `NONE` (dado de baja). | Texto libre “ubicación” en la ficha. |
 | **Estado logístico** | `EN_ALMACEN`, `ASIGNADO`, `EN_MANTENIMIENTO`, `DADO_DE_BAJA`. | Condición técnica. |
@@ -204,7 +204,7 @@ Cada flujo indica disparador, actor, precondiciones, pasos, validaciones, result
 
 ### 5.3 Traslado entre ubicaciones internas
 
-**Disparador:** el equipo cambia de área, piso, edificio o almacén.
+**Disparador:** el equipo cambia de área, almacén o taller.
 
 **Actor:** `ALMACEN` o usuario autorizado.
 
@@ -417,28 +417,29 @@ Se registran como supuestos explícitos; no son reglas aprobadas. El detalle y l
 
 | ID | Supuesto |
 |---|---|
-| S-01 | Una sola organización en el MVP, con varias sedes y almacenes. |
+| S-01 | Una sola organización en el MVP, con varias sedes; el almacén central y el taller dependen de una sede (D-02). |
 | S-02 | Zona horaria de operación `America/Lima`; eventos en UTC y fechas calendario sin hora. |
 | S-03 | Operación en línea; sin modo offline en el MVP. |
 | S-04 | Autenticación local con correo/contraseña; sin SSO en el MVP. |
 | S-05 | Un movimiento por activo; los lotes se evalúan en segunda fase. |
 | S-06 | Un extintor puede registrarse inicialmente en almacén o en un área interna, con `entry_source` y motivo (aprobado D-03). |
-| S-07 | El código se genera en servidor con prefijo `EXT-` y secuencia de 6 dígitos; se permite importación controlada. |
+| S-07 | El código se genera en servidor con prefijo `EXT-` y secuencia de 6 dígitos; no se importan códigos (D-04). |
 | S-08 | El QR contiene solo el código estable, no una URL con datos ni datos personales. |
 | S-09 | El número de serie es opcional y no único por defecto. |
 | S-10 | Los umbrales de alerta se configuran después de la instalación; no hay valor por defecto. |
-| S-11 | La condición técnica no cambia automáticamente por una inspección; sí por el resultado de un servicio de mantenimiento según el mapeo propuesto. |
+| S-11 | La condición técnica no cambia automáticamente por una inspección ni por el resultado de un servicio; el cambio es explícito y auditado (D-10). |
 | S-12 | No se permite dar de baja un activo en mantenimiento externo; primero debe retornar o resolverse con un ajuste administrativo. |
 | S-13 | Los documentos/certificados se registran como referencia textual en el MVP; los archivos quedan para la segunda fase. |
 | S-14 | El sistema será usado por menos de 100 usuarios y un inventario del orden de 10 000 extintores; confirmar volumen. |
 | S-15 | Interfaz en español; no se requiere i18n en el MVP. |
 
-### 9.1 Realidad operativa declarada (levantamiento 2026-11-10)
+### 9.1 Realidad operativa declarada (levantamiento 2026-11-10; precisión D-02 el 2026-11-11)
 
 Hechos aportados por el propietario. **No son reglas aprobadas**; el detalle y las preguntas están en `docs/levantamiento-procesos.md`.
 
 | Tema | Realidad declarada | Efecto en el diseño |
 |---|---|---|
+| Estructura de ubicaciones | Sede → área; sin edificios ni pisos. El almacén central y el taller propio están dentro de una sede. Sedes y áreas se identifican solo por nombre. | Jerarquía de dos niveles con tipos `SEDE`, `ALMACEN`, `AREA` y `TALLER`; código interno generado; nombre único por sede (D-02). |
 | Ruta de ingreso | No hay procedimiento fijo. Conviven almacén central, compra local directa, retorno de mantenimiento directo y traslado directo entre sedes. | El alta debe registrar la ubicación real con una fuente/motivo; "todo por almacén" no describe la práctica. |
 | Evidencia de recepción | No hay estándar; varía. | Se fijó un mínimo por decisión: nombre del receptor + referencia documental. |
 | Solicitud de equipos | Verbal o por llamada. | No hay rastro previo; `requested_by` se captura al despachar. Un módulo de solicitudes sería funcionalidad nueva. |
@@ -459,20 +460,18 @@ Hechos aportados por el propietario. **No son reglas aprobadas**; el detalle y l
 
 ## 10. Decisiones que requieren respuesta antes de implementar
 
-> **Levantamiento en curso (2026-11-10):** el propietario indicó que no existe un procedimiento uniforme de ingreso de equipos nuevos; varía por sede, proyecto o persona que recibe. El registro de hechos y preguntas pendientes está en `docs/levantamiento-procesos.md`. Mientras el levantamiento esté abierto, los supuestos S-06, S-07 y S-08 no se aplican como si fueran la práctica real.
+> **Estado al 2026-11-11:** el levantamiento está cerrado y las decisiones D-01 a D-05, D-07, D-09, D-10, D-15, D-16, D-17, D-24 y D-31 están aprobadas. El registro completo está en `docs/decisiones-pendientes.md`. Lo que sigue son las decisiones abiertas que bloquean fases concretas.
 
-Las más importantes:
+1. **D-06 — Autenticación:** ¿login local con correo/contraseña o SSO corporativo? Bloquea la fase 2.
+2. **D-26 — Condición técnica:** ¿enum fijo o catálogo administrable? Bloquea la fase 1.
+3. **D-27 — Permisos sobre la condición:** ¿quién puede cambiarla y con qué evidencia? Bloquea la fase 2.
+4. **D-28 — Inspecciones y condición:** ¿una inspección puede cambiarla automáticamente? Bloquea la fase 6.
+5. **D-12 — Vencimiento del equipo:** ¿qué significa y de qué documento procede? Bloquea las fechas objetivo.
+6. **D-11 — Umbrales de alerta:** ¿qué intervalos y anticipaciones están aprobados? Bloquea la fase 7.
+7. **D-08b — Flujo de aprobación:** ¿basta la evidencia textual o se requiere aprobación en la aplicación? Bloquea la fase 5.
+8. **D-13/D-14/D-19/D-20/D-21/D-22/D-23/D-25/D-29/D-30:** adjuntos, operación sin internet, reportes, notificaciones, retención, volumen, despliegue, lotes, costos e idioma.
 
-1. **D-03 — Ubicación inicial:** ¿todo extintor debe ingresar primero a un almacén, o se permite registrar equipos ya instalados en áreas?
-2. **D-04 — Codificación:** ¿se aceptan códigos existentes/manuales o solo la secuencia generada por el sistema?
-3. **D-05 — QR:** ¿código plano o URL estable? Si es URL, ¿cuál es el dominio definitivo?
-4. **D-07 — Roles y autorizaciones:** ¿quién puede dar de baja, enviar a mantenimiento, cambiar condición técnica y configurar umbrales?
-5. **D-08 — Evidencia de autorización:** ¿basta un nombre/documento o se requiere aprobación de otro usuario dentro del sistema?
-6. **D-10/D-11 — Criterio técnico:** ¿qué resultados habilitan `OPERATIVO` y de qué documentos se obtienen las próximas fechas e intervalos?
-7. **D-17 — Baja en mantenimiento:** ¿se permite o se exige primero el retorno?
-8. **D-24 — Datos existentes:** ¿hay inventario previo que importar? ¿En qué formato?
-
-El resto está en `docs/decisiones-pendientes.md`, con recomendación y supuesto por defecto.
+El detalle, la recomendación y el supuesto de cada una está en `docs/decisiones-pendientes.md`.
 
 ---
 

@@ -297,7 +297,7 @@ erDiagram
 
 | Enum | Valores | Nota |
 |---|---|---|
-| `LocationType` | `SEDE`, `ALMACEN`, `EDIFICIO`, `PISO`, `AREA`, `PUNTO`, `TALLER` | Solo `ALMACEN` produce `EN_ALMACEN`; `TALLER` aloja equipos en mantenimiento interno. |
+| `LocationType` | `SEDE`, `ALMACEN`, `AREA`, `TALLER` | D-02 aprobada: `SEDE` es la raíz; `ALMACEN`, `TALLER` y `AREA` son hijos de una sede. Sin edificios, pisos ni puntos en el MVP. Solo `ALMACEN` produce `EN_ALMACEN`; `TALLER` aloja equipos en mantenimiento interno. |
 | `LogisticsStatus` | `EN_ALMACEN`, `ASIGNADO`, `EN_MANTENIMIENTO`, `DADO_DE_BAJA` | `EN_TRANSITO` reservado, no se usa en MVP. |
 | `TechnicalCondition` | `OPERATIVO`, `OBSERVADO`, `NO_OPERATIVO`, `PENDIENTE_INSPECCION` | Catálogo administrable en fase 2. |
 | `PlacementType` | `INTERNAL`, `EXTERNAL`, `NONE` | Mutuamente excluyente con las FKs. |
@@ -367,17 +367,17 @@ erDiagram
 | Columna | Tipo | Nulo | Nota |
 |---|---|---:|---|
 | `id` | `CHAR(36)` | No | PK. |
-| `code` | `VARCHAR(30)` | No | Único; estable. |
-| `name` | `VARCHAR(150)` | No | |
-| `type` | `ENUM(LocationType)` | No | |
-| `parent_id` | `CHAR(36)` | Sí | FK `locations.id`; sin ciclos. |
+| `code` | `VARCHAR(30)` | No | Único; generado por el servidor (`UBI-000001`), inmutable y no aceptado del cliente (D-02). |
+| `name` | `VARCHAR(150)` | No | Único dentro de la sede, sin distinguir mayúsculas; puede repetirse entre sedes. |
+| `type` | `ENUM(LocationType)` | No | `SEDE`, `ALMACEN`, `AREA` o `TALLER`. |
+| `parent_id` | `CHAR(36)` | Sí | FK `locations.id`. Nulo solo para `SEDE`; en los demás tipos debe apuntar a una `SEDE` activa. Sin ciclos y sin anidar áreas. |
 | `address` | `VARCHAR(255)` | Sí | |
-| `active` | `TINYINT(1)` | No | Default 1. |
+| `active` | `TINYINT(1)` | No | Default 1. Baja lógica; nunca se borra una ubicación con historial. |
 | `created_by` | `CHAR(36)` | Sí | FK `users.id`. |
 | `created_at` | `DATETIME(3)` | No | |
 | `updated_at` | `DATETIME(3)` | No | |
 
-Índices: `UNIQUE(code)`, `INDEX(parent_id)`, `INDEX(type)`, `INDEX(active)`.
+Índices: `UNIQUE(code)`, `UNIQUE(parent_id, name)` para las ubicaciones hijas, `INDEX(parent_id)`, `INDEX(type)`, `INDEX(active)`. La unicidad de nombre de las sedes se valida en servicio porque MySQL permite varios `NULL` en un índice único. Las sedes no alojan activos directamente.
 
 ### 4.5 `extinguisher_types` y `external_parties`
 
@@ -652,6 +652,8 @@ No se siembran valores de días por defecto. La instalación crea las filas con 
 | C-13 | Una fecha objetivo por activo/categoría | `UNIQUE(extinguisher_id, event_type)` |
 | C-14 | No hay dos órdenes con el mismo movimiento de envío/retorno | `UNIQUE(sent_movement_id)`, `UNIQUE(return_movement_id)` |
 | C-15 | Una orden de mantenimiento es interna o externa, no ambas | `CHECK ((provider_id IS NULL) <> (workshop_location_id IS NULL))` |
+| C-16 | Jerarquía de ubicaciones de máximo dos niveles | Validación de servicio: `SEDE` con `parent_id` nulo; `ALMACEN`, `TALLER` y `AREA` con padre de tipo `SEDE`; prohibido anidar hijos. |
+| C-17 | Nombre de ubicación único dentro de su sede | `UNIQUE(parent_id, name)` para hijas; validación de servicio para sedes (varios `NULL` no se comparan en MySQL). Sin distinguir mayúsculas por la colación. |
 
 > MySQL no permite `CHECK` con subconsultas (por ejemplo, validar que la ubicación sea de tipo `ALMACEN`). Esa coherencia se valida en el servicio y se cubre con pruebas de integración; opcionalmente se puede añadir un trigger, que debe documentarse y probarse.
 
@@ -660,7 +662,7 @@ No se siembran valores de días por defecto. La instalación crea las filas con 
 | ID | Invariante |
 |---|---|
 | I-01 | `EN_ALMACEN` ⇒ colocación interna en ubicación activa de tipo `ALMACEN`. |
-| I-02 | `ASIGNADO` ⇒ colocación interna en ubicación activa de tipo distinto de `ALMACEN`. |
+| I-02 | `ASIGNADO` ⇒ colocación interna en ubicación activa de tipo `AREA`. |
 | I-03 | `EN_MANTENIMIENTO` ⇒ orden activa y, o bien colocación interna en ubicación activa de tipo `TALLER`, o bien colocación externa en proveedor activo. |
 | I-04 | `DADO_DE_BAJA` ⇒ colocación `NONE`, sin FKs actuales y `retired_at` no nulo. |
 | I-05 | Todo activo existente tiene al menos un movimiento (`INGRESO` inicial). |

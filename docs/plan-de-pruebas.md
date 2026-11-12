@@ -55,13 +55,14 @@
 
 ### 3.2 Ubicaciones
 
-- `SEDE-LIMA` (SEDE)
-- `ALM-CENTRAL` (ALMACEN, hija de SEDE-LIMA)
-- `SEDE-NORTE` (SEDE)
-- `EDIF-A` (EDIFICIO, hija de SEDE-NORTE)
-- `PISO-1` (PISO, hijo de EDIF-A)
-- `AREA-PROD` (AREA, hija de PISO-1)
-- `PUNTO-EXT-01` (PUNTO, hijo de AREA-PROD)
+Estructura D-02: `SEDE` es la raíz; `ALMACEN`, `TALLER` y `AREA` son hijos. Los códigos los genera el servidor.
+
+- `Sede Lima` (SEDE, `UBI-000001`)
+- `Almacén central` (ALMACEN, hija de Sede Lima, `UBI-000002`)
+- `Taller propio` (TALLER, hija de Sede Lima, `UBI-000003`)
+- `Sede Norte` (SEDE, `UBI-000004`)
+- `Área de producción` (AREA, hija de Sede Norte, `UBI-000005`)
+- `Área de administración` (AREA, hija de Sede Norte, `UBI-000006`)
 
 ### 3.3 Catálogos
 
@@ -104,13 +105,19 @@
 
 | ID | Nivel | Acción | Resultado esperado | Requisito |
 |---|---|---|---|---|
-| T-UBI-01 | Integración | Crear jerarquía SEDE→ALMACEN→AREA | 201; relaciones correctas. | RF-UBI-01 |
-| T-UBI-02 | Integración | Crear código duplicado | 409; no se crea. | RF-UBI-01 |
-| T-UBI-03 | Integración | Asignar un descendiente como padre | 422 `LOCATION_CYCLE`; sin cambios. | RF-UBI-03 |
+| T-UBI-01 | Integración | Crear SEDE y luego un AREA hija | 201; dos niveles; relaciones correctas. | RF-UBI-01 / D-02 |
+| T-UBI-02 | Integración | Crear código duplicado | El código lo genera el servidor; el cliente no puede enviarlo. | RF-UBI-01 / D-02 |
+| T-UBI-03 | Integración | Asignar un área como padre de otra área | 422 `LOCATION_DEPTH`; sin cambios. | BR-027A |
 | T-UBI-04 | Integración | Desactivar ubicación con activos | 409 o desactivación controlada; no deja activos apuntando a ubicación inactiva sin regla. | RF-UBI-04 |
 | T-UBI-05 | Integración | Mover activo a ubicación inactiva | 422; sin cambios. | BR-025 |
 | T-UBI-06 | Integración | Crear tipo/proveedor con código duplicado | 409. | RF-UBI-05/06 |
 | T-UBI-07 | Integración | Enviar a proveedor inactivo | 422 `PROVIDER_INVALID`. | BR-026 |
+| T-UBI-08 | Integración | Crear ALMACEN, TALLER o AREA sin `parentId` | 422; el padre es obligatorio. | BR-027B |
+| T-UBI-09 | Integración | Crear SEDE con `parentId` | 422; la sede es raíz. | BR-027B |
+| T-UBI-10 | Integración | Repetir nombre dentro de la misma sede | 409; sin cambios. | BR-027D |
+| T-UBI-11 | Integración | Repetir nombre en sedes distintas | 201; se permite. | BR-027D |
+| T-UBI-12 | Integración | Enviar o intentar cambiar `code` | 422 o campo ignorado; el código es generado e inmutable. | BR-027C |
+| T-UBI-13 | Integración | Usar una SEDE como ubicación actual de un extintor | 422; solo almacén, taller o área alojan activos. | BR-027A |
 
 ### 4.3 Alta, ficha y código
 
@@ -286,7 +293,9 @@ Repetir para fallo después de actualizar el extintor y antes de insertar la aud
 Después de cada operación, ejecutar consultas de verificación:
 
 - `EN_ALMACEN` ⇒ ubicación tipo `ALMACEN`.
-- `ASIGNADO` ⇒ ubicación no `ALMACEN`.
+- `ASIGNADO` ⇒ ubicación tipo `AREA`.
+- `EN_MANTENIMIENTO` interno ⇒ ubicación tipo `TALLER`.
+- Una `SEDE` no puede ser ubicación actual de un extintor.
 - `EN_MANTENIMIENTO` ⇒ contraparte externa + orden activa.
 - `DADO_DE_BAJA` ⇒ `placement_type='NONE'`, FKs nulas, `retired_at` no nulo.
 - Secuencia de movimientos sin huecos.

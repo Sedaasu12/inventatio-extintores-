@@ -13,7 +13,7 @@ Desarrollar una aplicación web que permita registrar y controlar individualment
 
 ## 4. Objetivos específicos
 - Registrar cada extintor con código único y ficha técnica.
-- Organizar almacenes, sedes, edificios y áreas.
+- Organizar sedes, almacenes, taller y áreas.
 - Registrar ingresos, salidas, traslados, envíos a mantenimiento, retornos y bajas.
 - Consultar el historial cronológico de cada activo.
 - Identificar equipos mediante QR, con cámara o lector 2D.

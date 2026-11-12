@@ -23,21 +23,23 @@
 
 ## 2. Decisiones bloqueantes prioritarias
 
-| Orden | ID | Tema | Recomendación | Bloquea |
-|---:|---|---|---|---|
-| 1 | D-03 | Ubicación inicial: almacén vs área | Permitir ambas con regla clara; por defecto, almacén si se exige cadena de custodia estricta. | Fase 4 |
-| 2 | D-04 | Códigos existentes/manuales vs generados | Generar en servidor; permitir importación controlada de códigos existentes. | Fase 4 |
-| 3 | D-05 | Contenido del QR: código vs URL | Código `EXT-000125` en MVP; URL estable solo si hay dominio definitivo. | Fase 4/9 |
-| 4 | D-07 | Roles y quién autoriza cada operación | Aprobar matriz de cuatro roles y permisos granulares. | Fase 2 |
-| 5 | D-08 | Evidencia de autorización/recepción | Nombre + documento en MVP; aprobación en app en fase 2. | Fase 5 |
-| 6 | D-10 | Condición técnica tras mantenimiento | Mapeo aprobado/observaciones/rechazado; solo Seguridad declara operativo. | Fase 6 |
-| 7 | D-11 | Intervalos y umbrales de alerta | Sin valores por defecto; configurar desde política aprobada. | Fase 7 |
-| 8 | D-17 | Baja de un activo en mantenimiento | Prohibir hasta el retorno; ajuste administrativo excepcional. | Fase 6 |
-| 9 | D-06 | Autenticación local vs SSO corporativo | Local en MVP; OIDC si la organización ya tiene SSO obligatorio. | Fase 2 |
-| 10 | D-02 | Estructura real de sedes/almacenes/áreas | Jerarquía configurable; cargar estructura real antes de la fase 3. | Fase 3 |
-| 11 | D-24 | Inventario existente para importar | Definir formato y responsable; dry-run obligatorio. | Fase 4 (si aplica) |
-| 12 | D-15 | Zona horaria | `America/Lima`; eventos UTC, fechas calendario. | Fase 1 |
-| 13 | D-16 | Unicidad del número de serie | No único por defecto; advertir duplicados. | Fase 4 |
+Estado al 2026-11-11. El registro formal de aprobaciones está en §2.2 a §2.4; esta tabla resume el estado vigente.
+
+| Orden | ID | Tema | Decisión / recomendación vigente | Estado | Bloquea |
+|---:|---|---|---|---|---|
+| 1 | D-03 | Ubicación inicial: almacén vs área | Alta en la ubicación real + `entry_source` y motivo (B+). | Aprobada | Fase 4 |
+| 2 | D-04 | Códigos existentes/manuales vs generados | Solo generado por el servidor; sin importación en el MVP. | Aprobada | Fase 4 |
+| 3 | D-05 | Contenido del QR: código vs URL | Código plano `EXT-000125`. | Aprobada | Fase 4/9 |
+| 4 | D-07 | Roles y quién autoriza cada operación | Cuatro roles como semilla, permisos granulares. | Aprobada | Fase 2 |
+| 5 | D-08 | Evidencia de autorización/recepción | Nombre del receptor + referencia documental; aprobación en app pendiente (D-08b). | Parcial | Fase 5 |
+| 6 | D-10 | Condición técnica tras mantenimiento | Resultado como evidencia; cambio explícito y auditado. | Aprobada | Fase 6 |
+| 7 | D-11 | Intervalos y umbrales de alerta | Sin valores por defecto; configurar desde política aprobada. | Abierta | Fase 7 |
+| 8 | D-17 | Baja de un activo en mantenimiento | Prohibida con orden activa; ajuste excepcional de `ADMIN`. | Aprobada | Fase 6 |
+| 9 | D-06 | Autenticación local vs SSO corporativo | Local en MVP; OIDC si la organización ya tiene SSO obligatorio. | Abierta | Fase 2 |
+| 10 | D-02 | Estructura real de sedes/almacenes/áreas | Sede → almacén/taller/área; dos niveles, código generado y nombre único por sede. | Aprobada | Fase 3 |
+| 11 | D-24 | Inventario existente para importar | Conciliación por sede + verificación física, con dry-run. | Aprobada | Fase 4 |
+| 12 | D-15 | Zona horaria | `America/Lima`; eventos UTC, fechas calendario `DATE`. | Aprobada | Fase 1 |
+| 13 | D-16 | Unicidad del número de serie | No único; advertir y reportar duplicados. | Aprobada | Fase 4 |
 
 ---
 
@@ -106,6 +108,7 @@ El propietario revisó las decisiones una por una y **confirmó** las once, sin 
 |---|---|
 | D-01 | A — single-tenant |
 | D-15 | A — zona única `America/Lima` |
+| D-02 | A — Sede → (Almacén/Taller/Área), código generado y nombre único por sede (2026-11-11) |
 
 ---
 
@@ -147,9 +150,25 @@ El propietario revisó las decisiones una por una y **confirmó** las once, sin 
 
 **Recomendación:** A. Permite empezar simple y crecer sin cambiar el modelo. Cargar la estructura real antes de la fase 3.
 
-**Si no se responde:** se usan SEDE, ALMACEN y AREA, con jerarquía opcional; los nombres concretos se cargan como datos, no como código.
+**Si no se responde:** no se aplica ningún supuesto; la estructura se mantiene en levantamiento.
 
-**Bloquea:** fase 3 (ubicaciones) y reportes. **Estado:** abierta.
+**Hechos confirmados (2026-11-11):**
+
+- Los niveles reales son **Sede → área**; no se usan edificios, pisos ni puntos.
+- El **almacén central está dentro de una sede**; no es una ubicación independiente.
+- El **taller propio está dentro de una sede**.
+- Las sedes y áreas se identifican **solo por nombre**; no hay códigos existentes.
+
+**Decisión aprobada (2026-11-11):** opción **A**, con alcance acotado al MVP:
+
+- `SEDE` es la raíz (`parent_id` nulo).
+- `ALMACEN`, `TALLER` y `AREA` son hijos de una sede; no se anidan entre sí.
+- El enum `LocationType` del MVP queda en `SEDE`, `ALMACEN`, `AREA`, `TALLER`.
+- El código de ubicación lo genera el servidor (`UBI-000001`), es único e inmutable.
+- El nombre es único dentro de su sede, sin distinguir mayúsculas; puede repetirse entre sedes.
+- La baja de ubicaciones es lógica; no se borran ubicaciones con historial.
+
+**Bloquea:** fase 1 (modelo de `locations`), fase 3 (ubicaciones) y reportes. **Estado:** aprobada.
 
 ---
 
@@ -764,7 +783,7 @@ El propietario revisó las decisiones una por una y **confirmó** las once, sin 
 | S-04 | Auth local con JWT + refresh. | D-06 |
 | S-05 | Un movimiento por activo; sin cabecera de lote. | D-25 |
 | S-06 | Alta en almacén o área interna. | D-03 |
-| S-07 | Código generado `EXT-` + 6 dígitos; importación controlada. | D-04 |
+| S-07 | Código generado `EXT-` + 6 dígitos; sin importación de códigos (D-04). | D-04 |
 | S-08 | QR con código plano. | D-05 |
 | S-09 | Serie opcional y no única. | D-16 |
 | S-10 | Umbrales sin valor por defecto. | D-11 |
@@ -802,20 +821,25 @@ Estas decisiones se usaron para escribir los documentos, pero **no están aproba
 
 ## 6. Orden recomendado para responder (una por una)
 
-Para no bloquear el diseño, se propone esta secuencia. Cada respuesta se registra en este documento y se refleja en el modelo/API antes de avanzar.
+Para no bloquear el diseño, se propone esta secuencia. Solo figuran las decisiones **abiertas** al 2026-11-11; las aprobadas están en §2.2 y ya se reflejaron en los documentos. Cada respuesta se registra aquí y se refleja en el modelo/API antes de avanzar.
 
-1. **D-03:** ¿alta solo en almacén o también en área?
-2. **D-04:** ¿códigos existentes o solo generados?
-3. **D-05:** ¿QR con código o URL?
-4. **D-07:** ¿matriz de roles y autorizaciones?
-5. **D-08:** ¿evidencia de autorización/recepción?
-6. **D-10:** ¿mapeo de condición tras mantenimiento?
-7. **D-11/D-12:** ¿política de fechas, intervalos y umbrales?
-8. **D-17:** ¿baja en mantenimiento?
-9. **D-06:** ¿auth local o SSO?
-10. **D-02:** ¿estructura real de ubicaciones?
-11. **D-24:** ¿datos existentes?
-12. **D-15/D-16:** zona horaria y unicidad de serie.
+1. **D-06:** ¿autenticación local o SSO corporativo? (fase 2)
+2. **D-26:** ¿condición técnica como enum o catálogo administrable? (fase 1)
+3. **D-27:** ¿quién puede cambiar la condición técnica? (fase 2)
+4. **D-28:** ¿una inspección cambia automáticamente la condición? (fase 6)
+5. **D-12:** ¿qué significa "vencimiento del equipo" y de qué documento procede? (fase 1/6)
+6. **D-11:** ¿intervalos y umbrales de alerta aprobados? (fase 7)
+7. **D-08b:** ¿se requiere flujo de aprobación en la aplicación? (fase 5)
+8. **D-13:** ¿adjuntos, fotos o firmas en el MVP? (fase 6)
+9. **D-19:** ¿qué formatos de reporte se necesitan? (fase 7)
+10. **D-20:** ¿qué notificaciones se requieren? (fase 7)
+11. **D-21:** ¿cuánto tiempo se conserva el historial y la auditoría? (transversal)
+12. **D-22:** ¿cuál es el volumen esperado? (transversal)
+13. **D-23:** ¿dónde se despliega y cuál es el objetivo de respaldo? (transversal)
+14. **D-14:** ¿se requiere operación sin internet? (transversal)
+15. **D-25:** ¿se necesitan movimientos por lote? (fase 5)
+16. **D-29:** ¿se registran costos de mantenimiento? (fase 6)
+17. **D-30:** ¿idioma y localización? (transversal)
 
 ---
 

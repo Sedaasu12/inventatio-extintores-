@@ -203,11 +203,11 @@ Los roles son una agrupación de permisos; el backend verifica permisos, no nomb
 | Método | Ruta | Permiso | Descripción |
 |---|---|---|---|
 | GET | `/locations` | `locations.read` | Lista o árbol; `tree=true`, `active`. |
-| POST | `/locations` | `locations.manage` | Crea ubicación. |
-| GET | `/locations/:id` | `locations.read` | Detalle con ancestros/hijos. |
-| PATCH | `/locations/:id` | `locations.manage` | Nombre, padre, dirección; valida ciclos. |
-| POST | `/locations/:id/deactivate` | `locations.manage` | Desactiva si no hay dependencias incompatibles. |
-| GET | `/locations/:id/extinguishers` | `extinguishers.read` | Inventario de la ubicación y descendientes. |
+| POST | `/locations` | `locations.manage` | Crea ubicación; `parentId` obligatorio salvo para `SEDE`; el código lo genera el servidor. |
+| GET | `/locations/:id` | `locations.read` | Detalle con padre e hijos. |
+| PATCH | `/locations/:id` | `locations.manage` | Nombre, dirección y, si no hay activos ni historial, el padre. Tipo y código son inmutables. |
+| POST | `/locations/:id/deactivate` | `locations.manage` | Desactiva si no hay activos ni dependencias incompatibles. |
+| GET | `/locations/:id/extinguishers` | `extinguishers.read` | Inventario de la ubicación; en una sede incluye sus almacenes, taller y áreas. |
 | GET | `/extinguisher-types` | `catalogs.read` | Tipos activos/inactivos. |
 | POST | `/extinguisher-types` | `catalogs.manage` | Crea tipo. |
 | PATCH | `/extinguisher-types/:id` | `catalogs.manage` | Edita/desactiva. |
@@ -271,7 +271,7 @@ Idempotency-Key: 4e8d0c2a-9f2b-4c1a-8f3e-1b2c3d4e5f60
     "logisticsStatus": "EN_ALMACEN",
     "technicalCondition": "OPERATIVO",
     "placementType": "INTERNAL",
-    "currentLocation": { "id": "2d9a...", "code": "ALM-CENTRAL", "name": "Almacén central" },
+    "currentLocation": { "id": "2d9a...", "code": "UBI-000002", "name": "Almacén central" },
     "currentSince": "2026-11-10T20:30:00.000Z"
   },
   "movement": {
@@ -329,7 +329,7 @@ Idempotency-Key: 0b0d...
     "type": "SALIDA",
     "assetSequence": 4,
     "origin": { "kind": "LOCATION", "id": "2d9a...", "label": "Almacén central" },
-    "destination": { "kind": "LOCATION", "id": "7e4c...", "label": "Sede Lima - Piso 2" },
+    "destination": { "kind": "LOCATION", "id": "7e4c...", "label": "Sede Lima - Área de producción" },
     "movedAt": "2026-11-10T20:30:00.000Z",
     "createdAt": "2026-11-10T20:31:02.000Z"
   },
@@ -451,7 +451,7 @@ GET /api/v1/alerts?eventType=INSPECCION&status=POR_VENCER&page=1&pageSize=20
     {
       "extinguisherId": "a1b2...",
       "assetCode": "EXT-000125",
-      "location": { "id": "7e4c...", "name": "Sede Lima - Piso 2" },
+      "location": { "id": "7e4c...", "name": "Sede Lima - Área de producción" },
       "eventType": "INSPECCION",
       "dueDate": "2026-11-25",
       "status": "POR_VENCER",
@@ -506,6 +506,19 @@ Todos los reportes usan filtros de servidor y paginación; los totales se calcul
 - `rowVersion` entero ≥ 1 en actualizaciones/movimientos cuando se envía.
 - `Idempotency-Key` UUID; máximo 64 caracteres; se rechaza si falta en POST críticos.
 - No se aceptan `createdBy`, `createdAt`, `currentLocationId`, `currentExternalPartyId`, `logisticsStatus`, `placementType`, `technicalCondition` (salvo el endpoint dedicado) ni `rowVersion` manipulable fuera de los DTOs previstos.
+
+### 5.1a DTO de ubicación
+
+| Campo | Tipo | Obligatorio | Regla |
+|---|---|:---:|---|
+| `name` | string | Sí | 2–150; recortado; único dentro de la sede, sin distinguir mayúsculas (D-02). |
+| `type` | enum | Sí | `SEDE`, `ALMACEN`, `AREA` o `TALLER`. Inmutable después de crear. |
+| `parentId` | UUID | Según tipo | Nulo/prohibido para `SEDE`; obligatorio y de tipo `SEDE` para los demás. |
+| `address` | string | No | Máximo 255. |
+| `code` | — | No | Lo genera el servidor (`UBI-000001`); no se acepta del cliente. |
+| `active` | — | No | Se cambia solo por `/locations/:id/deactivate`; no se borra. |
+
+Reglas de actualización: `PATCH` acepta `name`, `address` y, solo si la ubicación no tiene activos ni historial, `parentId`. Cambiar `type` exige crear otra ubicación; no se permite reinterpretar un área como almacén.
 
 ### 5.2 DTO de alta
 

@@ -40,14 +40,7 @@
 | P-09 | Baja definitiva de un extintor | D-17, D-07 | Respondida |
 | P-10 | Etiquetas y códigos existentes | D-04, D-05 | Respondida |
 | P-11 | Listado de inventario existente | D-24 | Respondida |
-| P-03 | Salida de almacén a área | D-07, D-08, D-09 | Pendiente |
-| P-04 | Traslado entre sedes | D-02, D-09 | Pendiente |
-| P-05 | Asignación a un responsable | modelo de datos | Pendiente |
-| P-06 | Devolución al almacén | D-03, D-09 | Pendiente |
-| P-07 | Envío a mantenimiento | D-17, D-18 | Pendiente |
-| P-08 | Retorno de mantenimiento y condición | D-10 | Pendiente |
-| P-09 | Baja | D-17, D-08 | Pendiente |
-| P-10 | Códigos y etiquetas existentes | D-04, D-05 | Pendiente |
+| P-12 | Estructura real de ubicaciones | D-02 | Respondida y aplicada |
 
 ---
 
@@ -551,13 +544,45 @@
 
 ---
 
+### P-12 — Estructura real de ubicaciones
+
+**Pregunta:** ¿Qué niveles de ubicación existen dentro de una sede? ¿Dónde están el almacén central y el taller propio? ¿Sedes y áreas tienen códigos?
+
+**Respuesta del propietario (2026-11-11):**
+
+- Los niveles reales son **Sede → área**; no se usan edificios, pisos ni puntos.
+- El **almacén central está dentro de una sede**, no es una ubicación independiente.
+- El **taller propio está dentro de una sede**.
+- Sedes y áreas se identifican **solo por nombre**; no hay códigos existentes.
+
+**Lectura:**
+
+- La jerarquía necesaria es de dos niveles: una `SEDE` raíz y ubicaciones hijas de tipo `ALMACEN`, `TALLER` o `AREA`.
+- Un área no contiene otra área ni un almacén contiene áreas.
+- El código de ubicación es interno: lo puede generar el sistema sin pedir nomenclatura al usuario.
+- La unicidad relevante es el nombre dentro de la sede, no el nombre global.
+
+**Qué NO se concluye todavía:**
+
+- Cuántas sedes existen y cómo se llaman.
+- Si una sede puede tener más de un almacén; no se declaró, así que no se impone un límite.
+- Si en el futuro se necesitarán edificios o pisos; el modelo queda preparado para añadirlos con migración.
+
+**Implicaciones:** D-02 se aprueba con jerarquía de dos niveles, tipos `SEDE`, `ALMACEN`, `AREA` y `TALLER`, código generado y nombre único por sede. El taller de D-31 y el almacén central se representan como hijos de su sede.
+
+**Decisiones afectadas:** D-02 (aprobada), D-03, D-31.
+
+**Documentos actualizados:** este registro (P-12, H-17, H-18), `decisiones-pendientes.md`, `reglas-de-negocio.md` (BR-027A a BR-027E), `modelo-entidad-relacion.md`, `diseno-api.md`, `plan-de-pruebas.md` y `analisis-funcional.md`.
+
+---
+
 ## 4. Contradicciones y hallazgos
 
 | ID | Hallazgo | Efecto |
 |---|---|---|
 | H-01 | La organización no tiene un procedimiento uniforme de ingreso. | D-03 no puede resolverse observando la práctica; requiere una decisión de política. |
 | H-02 | El supuesto S-06 ("alta en almacén o área") no está respaldado por un hecho declarado. | Se mantiene como supuesto técnico, no como descripción de la realidad. |
-| H-03 | Existe un único almacén central; no hay almacén por sede. | "Todo pasa por almacén" es físicamente viable, pero obliga a definir la ruta de traslados entre sedes y las excepciones. |
+| H-03 | Existe un único almacén central, ubicado dentro de una sede; no hay almacén por sede. | "Todo pasa por almacén" es físicamente viable, pero obliga a definir la ruta de traslados entre sedes y las excepciones. |
 | H-04 | La ruta de ingreso no es única: compras locales directas, retornos de mantenimiento directos y traslados directos entre sedes evitan el almacén central. | D-03 opción A no describe la realidad. El sistema debe registrar el ingreso en la ubicación real con una fuente/motivo verificable. |
 | H-05 | No hay estándar de evidencia de recepción en el almacén central. | D-08 no puede resolverse con el supuesto "nombre + documento"; hay que fijar un mínimo exigible por el sistema. |
 | H-06 | No hay regla establecida para autorizar salidas del almacén central. | D-09 y la parte de aprobación de D-08 requieren una propuesta de mínimo de control, no una descripción de la práctica. |
@@ -571,9 +596,11 @@
 | H-14 | No hay una autoridad formal constante para autorizar bajas. | D-17 y el permiso `extinguishers.retire` requieren una definición explícita; `authorized_by` obligatorio puede ser inviable tal como está. |
 | H-15 | Los equipos solo tienen número de serie de fábrica; no hay código interno ni etiqueta propia. | No hay códigos que importar; todos los equipos requieren etiqueta nueva. El serial es el único dato para emparejar la carga inicial. |
 | H-16 | Existe un listado de inventario, pero desactualizado. | La carga inicial requiere conciliación y verificación física; el archivo no es fuente de verdad. |
+| H-17 | La estructura real es Sede → área, sin edificios ni pisos; el almacén central y el taller propio están dentro de una sede. | D-02: jerarquía de dos niveles con tipos `SEDE`, `ALMACEN`, `AREA` y `TALLER`; las sedes no alojan activos directamente. |
+| H-18 | No existen códigos de sede ni de área; solo nombres. | D-02: código interno generado por el servidor; nombre único dentro de la sede y repetible entre sedes. |
 
 ---
 
 ## 5. Próxima pregunta
 
-Levantamiento cerrado el 2026-11-10. Pendiente: presentar las decisiones al propietario y definir el alcance de la fase 0. No se inicia implementación funcional.
+Levantamiento cerrado el 2026-11-10 y ampliado con D-02 el 2026-11-11. No queda ninguna pregunta de ubicaciones pendiente. La siguiente decisión abierta por impacto es **D-06 (autenticación)**, seguida de **D-26 (condición técnica)** y **D-27 (quién cambia la condición)**. No se inicia implementación funcional sin aprobación.
