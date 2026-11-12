@@ -1,0 +1,46 @@
+openapi: 3.0.3
+info:
+  title: SITE API
+  description: Inventario y trazabilidad de extintores. Documento inicial de la fase 0.
+  version: 0.1.0
+servers:
+  - url: http://localhost:3000/api/v1
+    description: Desarrollo local
+tags:
+  - name: health
+    description: Estado del servicio
+paths:
+  /health:
+    get:
+      tags: [health]
+      operationId: getHealth
+      summary: Estado del servicio
+      description: Comprueba que el backend está en ejecución. No consulta la base de datos.
+      responses:
+        '200':
+          description: El servicio está en ejecución.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+components:
+  schemas:
+    HealthResponse:
+      type: object
+      required: [status, service, environment, timestamp, uptimeSeconds]
+      properties:
+        status:
+          type: string
+          example: ok
+        service:
+          type: string
+          example: site-backend
+        environment:
+          type: string
+          enum: [development, test, production]
+        timestamp:
+          type: string
+          format: date-time
+        uptimeSeconds:
+          type: number
+          example: 12

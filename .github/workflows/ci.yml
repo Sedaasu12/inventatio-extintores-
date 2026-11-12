@@ -1,0 +1,92 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: site
+          MYSQL_USER: site
+          MYSQL_PASSWORD: site
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -u site -psite --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+    env:
+      NODE_ENV: test
+      TZ: America/Lima
+      DATABASE_URL: mysql://site:site@127.0.0.1:3306/site
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            backend/package-lock.json
+            frontend/package-lock.json
+
+      - name: Backend - instalar dependencias
+        working-directory: backend
+        run: npm ci
+
+      - name: Backend - lint
+        working-directory: backend
+        run: npm run lint
+
+      - name: Backend - typecheck
+        working-directory: backend
+        run: npm run typecheck
+
+      - name: Backend - pruebas unitarias
+        working-directory: backend
+        run: npm run test
+
+      - name: Backend - pruebas e2e
+        working-directory: backend
+        run: npm run test:e2e
+
+      - name: Backend - build
+        working-directory: backend
+        run: npm run build
+
+      - name: Backend - validar esquema Prisma
+        working-directory: backend
+        run: npm run prisma:validate
+
+      - name: Base de datos - comprobar conexión
+        working-directory: backend
+        run: printf 'SELECT 1;\n' | npx prisma db execute --stdin --schema prisma/schema.prisma
+
+      - name: Frontend - instalar dependencias
+        working-directory: frontend
+        run: npm ci
+
+      - name: Frontend - lint
+        working-directory: frontend
+        run: npm run lint
+
+      - name: Frontend - typecheck
+        working-directory: frontend
+        run: npm run typecheck
+
+      - name: Frontend - pruebas
+        working-directory: frontend
+        run: npm run test:ci
+
+      - name: Frontend - build
+        working-directory: frontend
+        run: npm run build
