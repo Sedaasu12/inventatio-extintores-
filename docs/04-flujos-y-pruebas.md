@@ -53,7 +53,7 @@
 | PT-09 | Registrar retorno | Se conserva envío previo, servicio y retorno. |
 | PT-10 | Próxima fecha dentro del umbral | Se genera alerta en la categoría correcta. |
 | PT-11 | Fecha ya superada | Se marca vencida para esa categoría. |
-| PT-12 | Equipo sin fecha documentada | No se inventa fecha; queda indicado como sin configurar. |
+| PT-12 | Equipo sin fecha documentada ni vida útil calculable | No se inventa fecha; queda indicado como sin configurar (D-12). |
 | PT-13 | Dar de baja | Equipo no aparece como operativo, pero conserva historial. |
 | PT-14 | Doble clic o lectura duplicada | No se crea movimiento repetido sin control. |
 | PT-15 | Cámara denegada | Se ofrece código manual/lector externo. |

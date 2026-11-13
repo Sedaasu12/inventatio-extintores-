@@ -133,6 +133,7 @@ erDiagram
         string agent
         decimal nominal_capacity
         enum capacity_unit
+        int useful_life_years
         boolean active
     }
 
@@ -385,7 +386,7 @@ erDiagram
 
 | Tabla | Columnas | Restricciones |
 |---|---|---|
-| `extinguisher_types` | `id`, `code` UK, `name`, `agent`, `nominal_capacity`, `capacity_unit`, `description`, `active`, timestamps | `agent` texto configurable (PQS, CO2, agua, espuma, etc.); no contiene periodos. |
+| `extinguisher_types` | `id`, `code` UK, `name`, `agent`, `nominal_capacity`, `capacity_unit`, `useful_life_years`, `description`, `active`, timestamps | `agent` texto configurable (PQS, CO2, agua, espuma, etc.); `useful_life_years` entero opcional, sin valor por defecto (D-12); el resto no contiene periodos. |
 | `external_parties` | `id`, `code` UK, `name`, `party_type`, `tax_id`, `contact_name`, `phone`, `email`, `address`, `active`, `notes`, timestamps | Proveedor/taller; desactivación lógica. |
 
 Índices: `UNIQUE(code)`, `INDEX(active)`, `INDEX(party_type)`, `INDEX(name)`.
@@ -405,7 +406,7 @@ erDiagram
 | `manufacture_date` | `DATE` | Sí | No futura. |
 | `acquired_at` | `DATE` | Sí | No anterior a fabricación. |
 | `commissioned_at` | `DATE` | Sí | No anterior a adquisición. |
-| `manufacturer_expiry_date` | `DATE` | Sí | Solo documentada; no calculada. |
+| `manufacturer_expiry_date` | `DATE` | Sí | Documentada por el fabricante; la categoría `EQUIPO` usa la más temprana entre esta y la calculada (D-12). |
 | `logistics_status` | `ENUM(LogisticsStatus)` | No | |
 | `technical_condition` | `ENUM(TechnicalCondition)` | No | |
 | `placement_type` | `ENUM(PlacementType)` | No | |
@@ -676,6 +677,7 @@ No se siembran valores de días por defecto. La instalación crea las filas con 
 | I-09 | Una orden cerrada tiene movimiento de retorno y al menos un servicio. |
 | I-10 | Una fecha objetivo apunta a una fuente existente y coherente con su categoría. |
 | I-11 | `ASIGNADO` ⇒ `technical_condition <> 'NO_OPERATIVO'` (D-26b). Un equipo no operativo nunca está instalado en un área. |
+| I-12 | La fecha objetivo `EQUIPO` es la más temprana entre `manufacturer_expiry_date` y `manufacture_date + useful_life_years` cuando ambas existen; nunca se inventa una fecha (D-12). |
 
 ---
 
@@ -704,7 +706,7 @@ Con 10 000 activos y 100 000 movimientos, los listados deben paginarse y filtrar
 
 | Categoría | Fuente | Regla |
 |---|---|---|
-| `EQUIPO` | `extinguishers.manufacturer_expiry_date` | Se crea/actualiza/elimina al crear o editar la ficha; auditoría. |
+| `EQUIPO` | `extinguishers.manufacturer_expiry_date` y cálculo `manufacture_date + extinguisher_types.useful_life_years` | Se usa la fecha más temprana disponible; si falta la documentada o faltan los años/fecha de fabricación, se usa la que exista; si no hay ninguna, se elimina la fila (D-12). |
 | `INSPECCION` | Última `inspection` por `inspected_at` (desempate `created_at`) | `due_date = next_due_date`; si es nula, se elimina la fila. |
 | `MANTENIMIENTO` | Último `maintenance_service` de tipo `MANTENIMIENTO` | Solo actualiza esa categoría. |
 | `RECARGA` | Último `maintenance_service` de tipo `RECARGA` | Solo actualiza esa categoría. |

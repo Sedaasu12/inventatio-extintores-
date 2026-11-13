@@ -362,7 +362,7 @@ Entregar el primer flujo vertical completo: crear un activo individual, generar 
 ### Dependencias
 
 - Fase 3.
-- D-03 (ubicación inicial), D-04 (código), D-05 (QR), D-16 (serie), D-26b (efecto de la condición).
+- D-03 (ubicación inicial), D-04 (código), D-05 (QR), D-12 (vencimiento del equipo), D-16 (serie), D-26b (efecto de la condición).
 
 ### Alcance
 
@@ -372,7 +372,7 @@ Entregar el primer flujo vertical completo: crear un activo individual, generar 
 - Registro de idempotencia para el alta (`POST /extinguishers`), reutilizable por los flujos posteriores.
 - Ficha, listado, búsqueda y filtros.
 - Edición de campos descriptivos/técnicos con `rowVersion`; rechazo de ubicación/estado.
-- Actualización de `due_dates` al editar la fecha de vencimiento documentada del equipo.
+- Actualización de `due_dates` al editar la fecha documentada del equipo o la vida útil de su tipo (D-12).
 - Cambio de condición técnica auditado.
 - Generación de QR (PNG/SVG) y etiqueta HTML.
 - Resolución por código.
@@ -587,11 +587,11 @@ Convertir las fechas documentadas en información operativa, sin inventar period
 ### Dependencias
 
 - Fase 6.
-- D-11 (umbrales), D-12 (vencimiento del equipo), D-19 (formatos).
+- D-11 (umbrales), D-12 (vencimiento del equipo, aprobada: documentada + vida útil por tipo), D-19 (formatos).
 
 ### Alcance
 
-- Cálculo de alertas por categoría/estado.
+- Cálculo de alertas por categoría/estado; para `EQUIPO`, la fecha más temprana entre documentada y calculada (D-12).
 - Configuración de umbrales.
 - Resumen por categoría/estado.
 - Dashboard.
@@ -957,7 +957,7 @@ Cada puerta requiere evidencia de pruebas y revisión de los documentos actualiz
 
 | Riesgo | Probabilidad | Impacto | Mitigación | Responsable |
 |---|---|---|---|---|
-| Reglas técnicas no confirmadas | Alta | Alto | D-10/D-11/D-12; no inventar; configuración explícita. | Propietario/seguridad |
+| Reglas técnicas no confirmadas | Media | Alto | D-11 pendiente; D-10/D-12 aprobadas; no inventar; configuración explícita. | Propietario/seguridad |
 | Datos existentes de baja calidad | Media | Alto | D-24; dry-run; reporte de errores. | Almacén/administración |
 | Permisos ambiguos | Media | Alto | D-07; matriz; pruebas 403. | Propietario |
 | Concurrencia/doble envío | Media | Alto | Bloqueo, versión, idempotencia, pruebas. | Desarrollo |

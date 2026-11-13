@@ -46,6 +46,7 @@
 | P-15 | Política de contraseñas y acceso | D-06b | Respondida y aplicada |
 | P-16 | Efecto operativo de la condición técnica | D-26b | Respondida y aplicada |
 | P-17 | Inspección y cambio de condición | D-28 | Respondida y aplicada |
+| P-18 | Vencimiento del equipo y vida útil | D-12 | Respondida y aplicada |
 
 ---
 
@@ -700,13 +701,39 @@
 **Qué NO se concluye todavía:**
 
 - Si más adelante se añadirá una sugerencia con confirmación en la misma pantalla; queda como mejora posterior.
-- La política de frecuencia de inspecciones: D-11/D-12.
+- La política de frecuencia de inspecciones: D-11.
 
 **Implicaciones:** D-28 se aprueba con opción A. La inspección no escribe `technical_condition`; el cambio usa el endpoint de D-27.
 
 **Decisiones afectadas:** D-28 (aprobada), D-10, D-27, D-11.
 
 **Documentos actualizados:** este registro (P-17, H-23), `decisiones-pendientes.md`, `reglas-de-negocio.md` (BR-103/BR-103A), `modelo-entidad-relacion.md`, `diseno-api.md`, `plan-de-pruebas.md`, `plan-implementacion.md`, `requerimientos.md` y `analisis-funcional.md`.
+
+---
+
+### P-18 — Vencimiento del equipo y vida útil
+
+**Pregunta:** ¿La fecha de vencimiento del equipo es la del fabricante, la de una vida útil calculada, la de un certificado, o no aplica para todos los tipos? ¿Qué documento la respalda?
+
+**Respuesta del propietario (2026-11-12):** el extintor trae una fecha documentada por el fabricante y la organización también aplica una vida útil calculada que varía por tipo de extintor.
+
+**Lectura:**
+
+- Hay dos fuentes válidas y no deben mezclarse: la fecha documentada y la calculada.
+- La vida útil no es universal; se configura por tipo y no se fija en código.
+- Si falta un dato, el sistema no debe inventar una fecha.
+- Para una alerta de seguridad, la fecha más restrictiva (la más temprana) es la adecuada para la categoría `EQUIPO`.
+
+**Qué NO se concluye todavía:**
+
+- Los años concretos de cada tipo: los define la organización en el catálogo, no el sistema.
+- La frecuencia de inspecciones y los umbrales de alerta: D-11.
+
+**Implicaciones:** D-12 se aprueba con opción A ampliada. `extinguisher_types.useful_life_years` es opcional; la categoría `EQUIPO` usa la más temprana entre documentada y calculada; cambiar los años recalcula y audita.
+
+**Decisiones afectadas:** D-12 (aprobada), D-11.
+
+**Documentos actualizados:** este registro (P-18, H-24), `decisiones-pendientes.md`, `reglas-de-negocio.md` (BR-107 a BR-107E), `modelo-entidad-relacion.md`, `diseno-api.md`, `plan-de-pruebas.md`, `plan-implementacion.md`, `requerimientos.md` y `analisis-funcional.md`.
 
 ---
 
@@ -737,9 +764,10 @@
 | H-21 | No existía una política de contraseñas ni segundo factor definidos. | D-06b: 12–128 caracteres, sin composición ni caducidad, rechazo de comunes, reset por `ADMIN` y sin MFA en el MVP. |
 | H-22 | No había una regla sobre si la condición técnica impide instalar un equipo. | D-26b: `NO_OPERATIVO` no puede estar en un área; solo almacén, taller o proveedor. `OBSERVADO` y `PENDIENTE_INSPECCION` se permiten con advertencia. |
 | H-23 | No había una regla sobre el efecto de una inspección en la condición técnica. | D-28: la inspección no cambia la condición; el resultado es evidencia y el cambio es una acción aparte (D-27). |
+| H-24 | No había una regla única sobre el vencimiento del equipo: existe fecha documentada del fabricante y vida útil variable por tipo. | D-12: se registran ambas fuentes; `EQUIPO` usa la más temprana; sin datos no se inventa fecha. |
 
 ---
 
 ## 5. Próxima pregunta
 
-Levantamiento cerrado el 2026-11-10 y ampliado con D-02, D-06, D-06b, D-26, D-26b, D-27 y D-28. No quedan preguntas de ubicaciones, identidad, política de acceso, condición técnica ni inspecciones pendientes. La siguiente decisión abierta por impacto es **D-12 (vencimiento del equipo)**, seguida de **D-11 (umbrales de alerta)** y **D-08b (flujo de aprobación)**. No se inicia implementación funcional sin aprobación.
+Levantamiento cerrado el 2026-11-10 y ampliado con D-02, D-06, D-06b, D-12, D-26, D-26b, D-27 y D-28. No quedan preguntas de ubicaciones, identidad, política de acceso, condición técnica, inspecciones ni vencimiento del equipo pendientes. La siguiente decisión abierta por impacto es **D-11 (umbrales de alerta)**, seguida de **D-08b (flujo de aprobación)** y **D-13 (adjuntos)**. No se inicia implementación funcional sin aprobación.

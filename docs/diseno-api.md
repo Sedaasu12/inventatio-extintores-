@@ -214,7 +214,7 @@ Los roles son una agrupación de permisos; el backend verifica permisos, no nomb
 | GET | `/locations/:id/extinguishers` | `extinguishers.read` | Inventario de la ubicación; en una sede incluye sus almacenes, taller y áreas. |
 | GET | `/extinguisher-types` | `catalogs.read` | Tipos activos/inactivos. |
 | POST | `/extinguisher-types` | `catalogs.manage` | Crea tipo. |
-| PATCH | `/extinguisher-types/:id` | `catalogs.manage` | Edita/desactiva. |
+| PATCH | `/extinguisher-types/:id` | `catalogs.manage` | Edita/desactiva; cambiar `usefulLifeYears` recalcula `EQUIPO` y audita (D-12). |
 | GET | `/external-parties` | `catalogs.read` | Proveedores/talleres. |
 | POST | `/external-parties` | `catalogs.manage` | Crea contraparte. |
 | PATCH | `/external-parties/:id` | `catalogs.manage` | Edita/desactiva. |
@@ -472,6 +472,8 @@ GET /api/v1/alerts?eventType=INSPECCION&status=POR_VENCER&page=1&pageSize=20
 
 `status` admitido: `VENCIDO`, `POR_VENCER`, `VIGENTE`, `SIN_FECHA_CONFIGURADA`. `eventType`: `EQUIPO`, `INSPECCION`, `MANTENIMIENTO`, `RECARGA`, `PRUEBA_HIDROSTATICA`.
 
+> Para `EQUIPO`, la fecha objetivo es la más temprana entre la documentada (`manufacturerExpiryDate`) y la calculada (`manufactureDate + usefulLifeYears`) cuando ambas existen (D-12). Si no hay ninguna, la categoría queda `SIN_FECHA_CONFIGURADA`.
+
 ### 4.7 Reportes
 
 | Método | Ruta | Permiso | Descripción |
@@ -524,6 +526,21 @@ Todos los reportes usan filtros de servidor y paginación; los totales se calcul
 
 Reglas de actualización: `PATCH` acepta `name`, `address` y, solo si la ubicación no tiene activos ni historial, `parentId`. Cambiar `type` exige crear otra ubicación; no se permite reinterpretar un área como almacén.
 
+### 5.1b DTO de tipo de extintor
+
+| Campo | Tipo | Obligatorio | Regla |
+|---|---|---|:---:|---|
+| `code` | string | Sí | Único; 2–20; no se reutiliza. |
+| `name` | string | Sí | 2–100. |
+| `agent` | string | Sí | Texto configurable (PQS, CO2, agua, espuma, etc.). |
+| `nominalCapacity` | decimal | Sí | > 0. |
+| `capacityUnit` | enum | Sí | `KG`, `L`, `LB`. |
+| `usefulLifeYears` | int/null | No | Entero positivo, sin valor por defecto (D-12). Si es nulo, el tipo no genera fecha calculada. |
+| `description` | string | No | Máx. 500. |
+| `active` | boolean | No | Desactivación lógica; no se borra un tipo con equipos. |
+
+Al cambiar `usefulLifeYears`, el servidor recalcula la fecha objetivo `EQUIPO` de los equipos del tipo dentro de la misma transacción y registra auditoría (D-12 / BR-107E).
+
 ### 5.2 DTO de alta
 
 | Campo | Tipo | Obligatorio | Regla |
@@ -537,7 +554,7 @@ Reglas de actualización: `PATCH` acepta `name`, `address` y, solo si la ubicaci
 | `manufactureDate` | date | No | No futura. |
 | `acquiredAt` | date | No | ≥ fabricación. |
 | `commissionedAt` | date | No | ≥ adquisición. |
-| `manufacturerExpiryDate` | date | No | ≥ fabricación; documentada. |
+| `manufacturerExpiryDate` | date | No | ≥ fabricación; documentada por el fabricante. La categoría `EQUIPO` usa la más temprana entre esta y la calculada con `usefulLifeYears` (D-12). |
 | `initialLocationId` | UUID | Sí | Activa, interna. Si no es `ALMACEN`, exige `entrySource` y motivo. |
 | `entrySource` | enum | Sí | `COMPRA_CENTRAL`, `COMPRA_LOCAL`, `CARGA_INICIAL`, `RETORNO_MANTENIMIENTO`, `TRASLADO` (D-03). |
 | `initialReason` | string | Sí | 5..500; motivo del ingreso y de la ubicación inicial. |

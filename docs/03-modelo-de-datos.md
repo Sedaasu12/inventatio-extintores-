@@ -10,7 +10,7 @@ Este es un modelo lógico de partida. Debe revisarse antes de generar la migraci
 | `roles` | id, code, name | Roles funcionales. |
 | `user_roles` | user_id, role_id | Relación usuario-rol. |
 | `locations` | id, code, name, type, parent_id, active | Sedes, almacenes, taller y áreas; jerarquía de dos niveles (D-02). |
-| `extinguisher_types` | id, name, agent, capacity_unit, description | Tipos/clases configurables. |
+| `extinguisher_types` | id, name, agent, capacity_unit, useful_life_years, description | Tipos/clases configurables; vida útil opcional por tipo (D-12). |
 | `extinguishers` | id, asset_code, serial_number, type_id, brand, model, capacity, manufacture_date, acquired_at, commissioned_at, manufacturer_expiry_date, logistics_status, technical_condition, current_location_id, active | Ficha individual del equipo. |
 | `external_parties` | id, name, party_type, contact, active | Proveedores/talleres/contrapartes externas. |
 | `movements` | id, extinguisher_id, movement_type, origin_location_id, destination_location_id, external_party_id, moved_at, requested_by, authorized_by, delivered_by, received_by, reason, document_ref, notes, created_by, created_at | Historial inmutable de movimientos. |

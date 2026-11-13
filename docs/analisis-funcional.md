@@ -173,7 +173,7 @@ Cada flujo indica disparador, actor, precondiciones, pasos, validaciones, result
 - `asset_code` único, formato válido e inmutable.
 - Si se permite código manual para migración, no debe existir ni haberse usado antes.
 - La fecha de fabricación no puede ser futura; la de adquisición no puede ser anterior a la de fabricación; la puesta en servicio no puede ser anterior a la adquisición, salvo justificación autorizada.
-- La fecha de vencimiento del fabricante solo se registra si está documentada; no se calcula.
+- La fecha de vencimiento documentada del fabricante se registra solo si existe respaldo; la calculada se obtiene de fabricación + vida útil del tipo. La categoría `EQUIPO` usa la más temprana y no se inventa una fecha (D-12).
 - La ubicación inicial debe estar activa y ser compatible con el estado inicial.
 - Si la ubicación es un almacén, el estado es `EN_ALMACEN`; si es un área interna, `ASIGNADO`. Esta política debe confirmarse (D-03).
 
@@ -283,11 +283,12 @@ Cada flujo indica disparador, actor, precondiciones, pasos, validaciones, result
 
 **Actor:** cualquier rol con `alerts.read`; configuración solo `ADMIN` (y eventualmente `SEGURIDAD`).
 
-**Categorías independientes:** `EQUIPO` (vida útil/vencimiento documentado), `INSPECCION`, `MANTENIMIENTO`, `RECARGA`, `PRUEBA_HIDROSTATICA`.
+**Categorías independientes:** `EQUIPO` (vencimiento documentado del fabricante y vida útil calculada por tipo), `INSPECCION`, `MANTENIMIENTO`, `RECARGA`, `PRUEBA_HIDROSTATICA`.
 
 **Cálculo:**
 
-- Sin fecha objetivo documentada → `SIN_FECHA_CONFIGURADA`.
+- Sin fecha documentada ni calculable → `SIN_FECHA_CONFIGURADA`.
+- Para `EQUIPO`, si existen ambas, se usa la más temprana (D-12).
 - Fecha anterior a hoy → `VENCIDO`.
 - Fecha dentro del umbral configurado → `POR_VENCER`.
 - Fecha fuera del umbral → `VIGENTE`.
@@ -428,6 +429,7 @@ Se registran como supuestos explícitos; no son reglas aprobadas. El detalle y l
 | S-15 | Interfaz en español; no se requiere i18n en el MVP. |
 | S-16 | Contraseñas de 12–128 caracteres, sin composición obligatoria, caducidad ni MFA en el MVP; el reset es solo administrativo (D-06b). |
 | S-17 | Un extintor `NO_OPERATIVO` no puede estar asignado a un área; solo se ubica en almacén, taller o proveedor (D-26b). |
+| S-18 | El vencimiento del equipo combina la fecha documentada del fabricante y la vida útil calculada por tipo; la categoría `EQUIPO` usa la más temprana y no se inventan fechas (D-12). |
 
 ### 9.1 Realidad operativa declarada (levantamiento 2026-11-10; precisión D-02 el 2026-11-11)
 
@@ -456,12 +458,11 @@ Hechos aportados por el propietario. **No son reglas aprobadas**; el detalle y l
 
 ## 10. Decisiones que requieren respuesta antes de implementar
 
-> **Estado al 2026-11-11:** el levantamiento está cerrado y las decisiones D-01 a D-05, D-07, D-09, D-10, D-15, D-16, D-17, D-24 y D-31 están aprobadas. El registro completo está en `docs/decisiones-pendientes.md`. Lo que sigue son las decisiones abiertas que bloquean fases concretas.
+> **Estado al 2026-11-12:** el levantamiento está cerrado y las decisiones aprobadas figuran en `docs/decisiones-pendientes.md` (§2.2 y §2.4), incluida D-12. Lo que sigue son las decisiones abiertas que bloquean fases concretas.
 
-1. **D-12 — Vencimiento del equipo:** ¿qué significa y de qué documento procede? Bloquea las fechas objetivo.
-2. **D-11 — Umbrales de alerta:** ¿qué intervalos y anticipaciones están aprobados? Bloquea la fase 7.
-3. **D-08b — Flujo de aprobación:** ¿basta la evidencia textual o se requiere aprobación en la aplicación? Bloquea la fase 5.
-4. **D-13/D-14/D-19/D-20/D-21/D-22/D-23/D-25/D-29/D-30:** adjuntos, operación sin internet, reportes, notificaciones, retención, volumen, despliegue, lotes, costos e idioma.
+1. **D-11 — Umbrales de alerta:** ¿qué intervalos y anticipaciones están aprobados? Bloquea la fase 7.
+2. **D-08b — Flujo de aprobación:** ¿basta la evidencia textual o se requiere aprobación en la aplicación? Bloquea la fase 5.
+3. **D-13/D-14/D-19/D-20/D-21/D-22/D-23/D-25/D-29/D-30:** adjuntos, operación sin internet, reportes, notificaciones, retención, volumen, despliegue, lotes, costos e idioma.
 
 El detalle, la recomendación y el supuesto de cada una está en `docs/decisiones-pendientes.md`.
 
@@ -484,7 +485,7 @@ El detalle, la recomendación y el supuesto de cada una está en `docs/decisione
 
 ## 12. Próximo paso
 
-1. Completar las decisiones abiertas de `decisiones-pendientes.md` (siguiente: D-12, D-11 y D-08b).
+1. Completar las decisiones abiertas de `decisiones-pendientes.md` (siguiente: D-11, D-08b y D-13).
 2. Cerrar el alcance de la fase 1 (esquema y migración inicial) con las decisiones ya aprobadas.
 3. Autorizar la fase 1 antes de escribir módulos funcionales.
 

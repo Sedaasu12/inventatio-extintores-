@@ -148,6 +148,10 @@ Estructura D-02: `SEDE` es la raíz; `ALMACEN`, `TALLER` y `AREA` son hijos. Los
 | T-EXT-15 | Integración | Alta en área con `NO_OPERATIVO` | 422 `CONDITION_NOT_ASSIGNABLE`; no se crea el activo. | D-26b / BR-014A |
 | T-EXT-16 | Integración | Alta en almacén con `NO_OPERATIVO` | 201; estado `EN_ALMACEN`. | D-26b / BR-014B |
 | T-EXT-17 | Integración | Alta en área con `OBSERVADO` | 201; se permite con advertencia. | D-26b / BR-014C |
+| T-EXT-18 | Unitario | Tipo con `usefulLifeYears = 10` y fabricación 2015-01-01 | Fecha calculada `2025-01-01`. | D-12 / BR-107B |
+| T-EXT-19 | Unitario | Tipo sin `usefulLifeYears` o activo sin `manufactureDate` | No se calcula fecha; no se inventa un periodo. | D-12 / BR-107B |
+| T-EXT-20 | Integración | Fecha documentada 2028 y calculada 2025 | La categoría `EQUIPO` usa 2025 (la más temprana). | D-12 / BR-107C |
+| T-EXT-21 | Integración | Cambiar `usefulLifeYears` de un tipo | Recalcula `EQUIPO` de sus equipos; auditoría; no toca otras categorías. | D-12 / BR-107E |
 
 ### 4.4 QR y escaneo
 
@@ -247,6 +251,9 @@ Estructura D-02: `SEDE` es la raíz; `ALMACEN`, `TALLER` y `AREA` son hijos. Los
 | T-ALE-10 | Unitario | Borde de zona horaria | El cálculo usa `America/Lima`; no cambia por UTC del servidor. | RNF/BR-109 |
 | T-ALE-11 | Integración | Cambiar umbral | Reclasifica; no cambia fechas fuente; auditoría. | RF-ALE-03 |
 | T-ALE-12 | Integración | Umbral negativo | 422. | BR-129 |
+| T-ALE-13 | Unitario | `EQUIPO` con documentada y calculada | Se usa la más temprana; el estado se calcula sobre esa fecha. | D-12 / BR-107C |
+| T-ALE-14 | Integración | `EQUIPO` solo con calculada | Alerta correcta desde `manufactureDate + usefulLifeYears`. | D-12 / BR-107B |
+| T-ALE-15 | Integración | `EQUIPO` sin documentada ni calculable | `SIN_FECHA_CONFIGURADA`; no se inventa fecha. | D-12 / RF-ALE-08 |
 
 ### 4.9 Dashboard, reportes y auditoría
 
@@ -445,7 +452,7 @@ Verificar `EXPLAIN` de las consultas principales y que se usen los índices defi
 | Retorno almacén | RF-MOV-04 | T-MOV-06 |
 | Mantenimiento | RF-MAN-01..09, RF-MOV-05/06 | T-MAN-01..15, E2E-01 |
 | Inspección | RF-INS-01..06 | T-INS-01..06 |
-| Alertas | RF-ALE-01..09 | T-ALE-01..12 |
+| Alertas | RF-ALE-01..09 | T-ALE-01..15 |
 | Baja | RF-MOV-07 | T-MOV-21/22/23, E2E-01 |
 | Ajuste | RF-MOV-08 | T-MOV-19/20 |
 | QR | RF-QR-01..06 | T-QR-01..10 |

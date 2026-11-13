@@ -55,15 +55,17 @@ La matriz detallada está en `docs/diseno-api.md`. Los permisos se validan siemp
 |---|---|---|---|
 | RF-EXT-01 | Crear un extintor como activo individual. | Must | Cada alta genera una ficha con ID interno y `asset_code` únicos. |
 | RF-EXT-02 | Generar `asset_code` único, con formato estable e inmutable. | Must | El código no se puede editar después del alta; dos altas concurrentes no producen el mismo código. |
-| RF-EXT-03 | Registrar datos técnicos y fechas documentadas. | Must | Tipo, marca, modelo, serie opcional, capacidad, fechas de fabricación/adquisición/puesta en servicio/vencimiento documentado. |
-| RF-EXT-04 | Validar coherencia básica de fechas. | Must | Fechas imposibles se rechazan o requieren confirmación autorizada según la regla. |
+| RF-EXT-03 | Registrar datos técnicos y fechas documentadas. | Must | Tipo, marca, modelo, serie opcional, capacidad, fechas de fabricación/adquisición/puesta en servicio/vencimiento documentado por el fabricante. |
+| RF-EXT-04 | Validar coherencia básica de fechas. | Must | Fechas imposibles se rechazan o requieren confirmación autorizada según la regla; la fecha calculada no se persiste como fecha documentada. |
 | RF-EXT-05 | Consultar ficha con ubicación, estado, condición y alertas resumidas. | Must | La ficha muestra la colocación actual y no permite editarla directamente. |
 | RF-EXT-06 | Buscar y filtrar por código, serie, tipo, ubicación, estado, condición y fechas. | Must | Filtros y paginación se ejecutan en servidor; resultados consistentes. |
 | RF-EXT-07 | Editar campos descriptivos y técnicos sin afectar ubicación/estado. | Must | Un payload con `currentLocationId` o `logisticsStatus` es rechazado o ignorado explícitamente; el cambio queda auditado. |
 | RF-EXT-08 | Cambiar la condición técnica mediante acción auditada. | Must | Se exige motivo; solo `SEGURIDAD` y `ADMIN` (D-27); no cambia la ubicación. |
-| RF-EXT-09 | Impedir que un extintor `NO_OPERATIVO` se asigne a un área. | Must | El alta y el movimiento a área devuelven 422; almacén, taller y proveedor están permitidos (D-26b). |
 | RF-EXT-09 | Generar la etiqueta QR del activo. | Must | El QR contiene solo el código estable o una URL estable aprobada; la etiqueta muestra el código legible. |
+| RF-EXT-09A | Impedir que un extintor `NO_OPERATIVO` se asigne a un área. | Must | El alta y el movimiento a área devuelven 422; almacén, taller y proveedor están permitidos (D-26b). |
 | RF-EXT-10 | Resolver un código escaneado a la ficha autenticada. | Must | Código existente devuelve ficha; inexistente devuelve 404; dado de baja devuelve ficha con estado y sin acciones ordinarias. |
+| RF-EXT-11 | Configurar la vida útil por tipo de extintor y calcular el vencimiento del equipo. | Must | `usefulLifeYears` opcional por tipo; calculada = fabricación + años; sin datos no se inventa fecha (D-12). |
+| RF-EXT-12 | Usar la fecha más temprana para la categoría `EQUIPO`. | Must | Se compara la documentada y la calculada; la ficha muestra ambas por separado (D-12). |
 | RF-EXT-11 | Imprimir etiquetas sin datos sensibles. | Must | La etiqueta no incluye ubicación, fechas, nombres ni datos personales. |
 | RF-EXT-12 | Importar inventario existente de forma controlada. | Should | Proceso validado, idempotente, con reporte de errores; no crea duplicados ni reutiliza códigos. |
 
@@ -120,8 +122,8 @@ La matriz detallada está en `docs/diseno-api.md`. Los permisos se validan siemp
 
 | ID | Requisito | Prioridad | Criterio de aceptación |
 |---|---|---|---|
-| RF-ALE-01 | Mantener categorías separadas: equipo, inspección, mantenimiento, recarga y prueba hidrostática. | Must | Cada categoría tiene su propia fecha y fuente; no existe un único campo `fecha_vencimiento`. |
-| RF-ALE-02 | Calcular estado `VENCIDO`, `POR_VENCER`, `VIGENTE` o `SIN_FECHA_CONFIGURADA`. | Must | El cálculo usa la fecha objetivo, la fecha actual y el umbral configurado. |
+| RF-ALE-01 | Mantener categorías separadas: equipo, inspección, mantenimiento, recarga y prueba hidrostática. | Must | Cada categoría tiene su propia fecha y fuente; `EQUIPO` combina documentada y calculada, y no existe un único campo `fecha_vencimiento` (D-12). |
+| RF-ALE-02 | Calcular estado `VENCIDO`, `POR_VENCER`, `VIGENTE` o `SIN_FECHA_CONFIGURADA`. | Must | El cálculo usa la fecha objetivo (para `EQUIPO`, la más temprana disponible), la fecha actual y el umbral configurado. |
 | RF-ALE-03 | Configurar umbrales por categoría. | Must | `days_before` configurable; sin valor por defecto inventado; cambios auditados. |
 | RF-ALE-04 | Mostrar la fecha fuente y los días restantes/atraso. | Must | Cada alerta indica categoría, fecha, días y activo. |
 | RF-ALE-05 | Excluir activos dados de baja por defecto. | Must | No aparecen en alertas operativas; se pueden incluir con filtro explícito. |

@@ -23,7 +23,7 @@
 
 ## 2. Decisiones bloqueantes prioritarias
 
-Estado al 2026-11-11. El registro formal de aprobaciones está en §2.2 a §2.4; esta tabla resume el estado vigente.
+Estado al 2026-11-12. El registro formal de aprobaciones está en §2.2 a §2.4; esta tabla resume el estado vigente.
 
 | Orden | ID | Tema | Decisión / recomendación vigente | Estado | Bloquea |
 |---:|---|---|---|---|---|
@@ -34,12 +34,13 @@ Estado al 2026-11-11. El registro formal de aprobaciones está en §2.2 a §2.4;
 | 5 | D-08 | Evidencia de autorización/recepción | Nombre del receptor + referencia documental; aprobación en app pendiente (D-08b). | Parcial | Fase 5 |
 | 6 | D-10 | Condición técnica tras mantenimiento | Resultado como evidencia; cambio explícito y auditado. | Aprobada | Fase 6 |
 | 7 | D-11 | Intervalos y umbrales de alerta | Sin valores por defecto; configurar desde política aprobada. | Abierta | Fase 7 |
-| 8 | D-17 | Baja de un activo en mantenimiento | Prohibida con orden activa; ajuste excepcional de `ADMIN`. | Aprobada | Fase 6 |
-| 9 | D-06 | Autenticación local vs SSO corporativo | Local con `AuthProvider` desacoplado; sin SSO obligatorio confirmado. | Aprobada | Fase 2 |
-| 10 | D-02 | Estructura real de sedes/almacenes/áreas | Sede → almacén/taller/área; dos niveles, código generado y nombre único por sede. | Aprobada | Fase 3 |
-| 11 | D-24 | Inventario existente para importar | Conciliación por sede + verificación física, con dry-run. | Aprobada | Fase 4 |
-| 12 | D-15 | Zona horaria | `America/Lima`; eventos UTC, fechas calendario `DATE`. | Aprobada | Fase 1 |
-| 13 | D-16 | Unicidad del número de serie | No único; advertir y reportar duplicados. | Aprobada | Fase 4 |
+| 8 | D-12 | Vencimiento del equipo | Documentada del fabricante + vida útil por tipo; `EQUIPO` usa la más temprana. | Aprobada | Fase 4/7 |
+| 9 | D-17 | Baja de un activo en mantenimiento | Prohibida con orden activa; ajuste excepcional de `ADMIN`. | Aprobada | Fase 6 |
+| 10 | D-06 | Autenticación local vs SSO corporativo | Local con `AuthProvider` desacoplado; sin SSO obligatorio confirmado. | Aprobada | Fase 2 |
+| 11 | D-02 | Estructura real de sedes/almacenes/áreas | Sede → almacén/taller/área; dos niveles, código generado y nombre único por sede. | Aprobada | Fase 3 |
+| 12 | D-24 | Inventario existente para importar | Conciliación por sede + verificación física, con dry-run. | Aprobada | Fase 4 |
+| 13 | D-15 | Zona horaria | `America/Lima`; eventos UTC, fechas calendario `DATE`. | Aprobada | Fase 1 |
+| 14 | D-16 | Unicidad del número de serie | No único; advertir y reportar duplicados. | Aprobada | Fase 4 |
 
 ---
 
@@ -115,6 +116,7 @@ El propietario revisó las decisiones una por una y **confirmó** las once, sin 
 | D-06b | A — contraseña de 12–128, sin caducidad ni MFA; reset por `ADMIN` (2026-11-12) |
 | D-26b | B — `NO_OPERATIVO` bloquea la asignación a áreas (2026-11-12) |
 | D-28 | A — la inspección no cambia la condición automáticamente (2026-11-12) |
+| D-12 | A ampliada — fecha documentada + vida útil por tipo; `EQUIPO` usa la más temprana (2026-11-12) |
 
 ---
 
@@ -427,9 +429,19 @@ El propietario revisó las decisiones una por una y **confirmó** las once, sin 
 
 **Recomendación:** A. Si la organización usa vida útil calculada, definir la regla y la fuente antes de implementarla.
 
-**Si no se responde:** A; si no hay documento, queda `SIN_FECHA_CONFIGURADA`.
+**Hecho confirmado (2026-11-12):** el extintor trae una fecha de vencimiento o vida útil documentada por el fabricante. La organización también aplica una vida útil calculada que **varía por tipo de extintor**.
 
-**Bloquea:** fase 4/7. **Estado:** abierta.
+**Decisión aprobada (2026-11-12):** opción **A ampliada** (documentada + calculada por tipo):
+
+- Se registra `manufacturer_expiry_date` cuando existe y está respaldada por documentación (placa, etiqueta, certificado o ficha del fabricante). Es opcional.
+- Se configura `useful_life_years` **por tipo de extintor** (`extinguisher_types`), entero opcional y sin valor por defecto. No se fija un periodo en código ni en la migración.
+- Fecha calculada = `manufacture_date` + `useful_life_years`.
+- La fecha de la categoría `EQUIPO` es la **más temprana** entre la documentada y la calculada cuando ambas existen.
+- Si falta `manufacture_date`, falta `useful_life_years` o no hay fecha documentada, no se calcula ni se inventa una fecha; la categoría queda `SIN_FECHA_CONFIGURADA`.
+- Cambiar `useful_life_years` de un tipo exige auditoría y recalcula las fechas objetivo `EQUIPO` de los equipos de ese tipo.
+- La fecha documentada y la calculada se muestran por separado en la ficha; no se sobrescribe el dato del fabricante.
+
+**Bloquea:** fase 4/7. **Estado:** aprobada.
 
 ---
 
@@ -891,6 +903,7 @@ El propietario revisó las decisiones una por una y **confirmó** las once, sin 
 | S-18 | Sin notificaciones por correo en MVP. | D-20 |
 | S-19 | Retención indefinida por defecto. | D-21 |
 | S-20 | Un solo `ADMIN` puede ajustar; Seguridad puede baja/condición. | D-07/D-27 |
+| S-21 | El vencimiento del equipo combina fecha documentada y vida útil calculada por tipo; sin datos queda sin fecha. | D-12 |
 
 **Tras la aprobación del 2026-11-10**, S-06, S-07, S-08, S-09, S-11 y S-12 dejan de ser supuestos y pasan a decisiones aprobadas (ver 2.2). S-11 se ajusta: **no** existe mapeo automático de resultado a condición. El resto sigue siendo supuesto.
 
@@ -915,21 +928,20 @@ Estas decisiones se usaron para escribir los documentos, pero **no están aproba
 
 ## 6. Orden recomendado para responder (una por una)
 
-Para no bloquear el diseño, se propone esta secuencia. Solo figuran las decisiones **abiertas** al 2026-11-11; las aprobadas están en §2.2 y ya se reflejaron en los documentos. Cada respuesta se registra aquí y se refleja en el modelo/API antes de avanzar.
+Para no bloquear el diseño, se propone esta secuencia. Solo figuran las decisiones **abiertas** al 2026-11-12; las aprobadas están en §2.2 y §2.4, y ya se reflejaron en los documentos. Cada respuesta se registra aquí y se refleja en el modelo/API antes de avanzar.
 
-1. **D-12:** ¿qué significa "vencimiento del equipo" y de qué documento procede? (fase 1/6)
-2. **D-11:** ¿intervalos y umbrales de alerta aprobados? (fase 7)
-3. **D-08b:** ¿se requiere flujo de aprobación en la aplicación? (fase 5)
-4. **D-13:** ¿adjuntos, fotos o firmas en el MVP? (fase 6)
-5. **D-19:** ¿qué formatos de reporte se necesitan? (fase 7)
-6. **D-20:** ¿qué notificaciones se requieren? (fase 7)
-7. **D-21:** ¿cuánto tiempo se conserva el historial y la auditoría? (transversal)
-8. **D-22:** ¿cuál es el volumen esperado? (transversal)
-9. **D-23:** ¿dónde se despliega y cuál es el objetivo de respaldo? (transversal)
-10. **D-14:** ¿se requiere operación sin internet? (transversal)
-11. **D-25:** ¿se necesitan movimientos por lote? (fase 5)
-12. **D-29:** ¿se registran costos de mantenimiento? (fase 6)
-13. **D-30:** ¿idioma y localización? (transversal)
+1. **D-11:** ¿intervalos y umbrales de alerta aprobados? (fase 7)
+2. **D-08b:** ¿se requiere flujo de aprobación en la aplicación? (fase 5)
+3. **D-13:** ¿adjuntos, fotos o firmas en el MVP? (fase 6)
+4. **D-19:** ¿qué formatos de reporte se necesitan? (fase 7)
+5. **D-20:** ¿qué notificaciones se requieren? (fase 7)
+6. **D-21:** ¿cuánto tiempo se conserva el historial y la auditoría? (transversal)
+7. **D-22:** ¿cuál es el volumen esperado? (transversal)
+8. **D-23:** ¿dónde se despliega y cuál es el objetivo de respaldo? (transversal)
+9. **D-14:** ¿se requiere operación sin internet? (transversal)
+10. **D-25:** ¿se necesitan movimientos por lote? (fase 5)
+11. **D-29:** ¿se registran costos de mantenimiento? (fase 6)
+12. **D-30:** ¿idioma y localización? (transversal)
 
 ---
 

@@ -218,7 +218,12 @@ stateDiagram-v2
 | BR-104 | La última inspección por fecha de evento define la fecha objetivo de inspección. | Proyección; desempate por `created_at`. |
 | BR-105 | Una inspección sin próxima fecha deja la categoría `SIN_FECHA_CONFIGURADA`. | Proyección se elimina. |
 | BR-106 | Las fechas de equipo, inspección, mantenimiento, recarga y prueba son independientes. | `due_dates` por `event_type`. |
-| BR-107 | La fecha de vencimiento del equipo solo se registra si está documentada. | Campo opcional; no se calcula. |
+| BR-107 | La fecha de vencimiento del equipo combina la fecha documentada del fabricante y la vida útil calculada (D-12 aprobada). | `manufacturer_expiry_date` opcional + cálculo desde `manufacture_date` y `useful_life_years`. |
+| BR-107A | La vida útil se configura por tipo de extintor en `extinguisher_types.useful_life_years` (entero opcional, sin valor por defecto). No se fija un periodo en código ni en la migración. | Catálogo de tipos; validación de entero positivo. |
+| BR-107B | La fecha calculada es `manufacture_date + useful_life_years`. Si falta la fecha de fabricación o los años del tipo, no se calcula y no se inventa una fecha. | Servicio de cálculo; pruebas de datos faltantes. |
+| BR-107C | La fecha objetivo `EQUIPO` es la más temprana entre la documentada y la calculada cuando ambas existen. | Proyección `due_dates`; comparación de fechas. |
+| BR-107D | La fecha documentada y la calculada se muestran por separado en la ficha; la documentada no se sobrescribe con la calculada. | DTO de ficha; dos campos derivados. |
+| BR-107E | Cambiar `useful_life_years` de un tipo exige auditoría y recalcula las fechas objetivo `EQUIPO` de los equipos de ese tipo dentro de la misma transacción. | Servicio de catálogo; recálculo y auditoría. |
 | BR-108 | No se inventan intervalos ni fechas de próxima atención. | Sin valores por defecto; configuración aprobada. |
 | BR-109 | Las fechas calendario se almacenan como `DATE`; los eventos como `DATETIME(3)` UTC. | Esquema y configuración de zona. |
 | BR-110 | Una fecha objetivo se puede corregir solo con un nuevo registro técnico o una edición auditada de la fecha documentada del equipo. | Historial y auditoría. |
@@ -413,6 +418,7 @@ stateDiagram-v2
 | `LOCATION_PARENT_TYPE` | 422 | El padre no es una `SEDE` activa, o una `SEDE` recibió `parentId`. |
 | `LOCATION_NAME_DUPLICATE` | 409 | Ya existe una ubicación con ese nombre en la misma sede. |
 | `CONDITION_NOT_ASSIGNABLE` | 422 | Un extintor `NO_OPERATIVO` no puede asignarse a un área (D-26b). |
+| `USEFUL_LIFE_INVALID` | 422 | `useful_life_years` no es un entero positivo o excede el máximo admitido (D-12). |
 | `RATE_LIMITED` | 429 | Límite de intentos. |
 | `INTERNAL_ERROR` | 500 | Error no controlado; sin detalles internos. |
 
