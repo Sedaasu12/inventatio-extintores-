@@ -112,6 +112,7 @@ El propietario revisó las decisiones una por una y **confirmó** las once, sin 
 | D-06 | C — autenticación local con `AuthProvider` desacoplado para OIDC posterior (2026-11-11) |
 | D-26 | A — condición técnica como enum fijo de cuatro valores (2026-11-12) |
 | D-27 | A — `SEGURIDAD` y `ADMIN` cambian la condición con motivo (2026-11-12) |
+| D-06b | A — contraseña de 12–128, sin caducidad ni MFA; reset por `ADMIN` (2026-11-12) |
 
 ---
 
@@ -266,11 +267,38 @@ El propietario revisó las decisiones una por una y **confirmó** las once, sin 
 - Contraseñas con hash Argon2id (o bcrypt costo 12); nunca texto plano.
 - Sesión con JWT de acceso corto y refresh rotativo en cookie `HttpOnly`; la reutilización de un refresh revoca la familia.
 - No hay autorregistro: los usuarios los crea un `ADMIN` y el primer ingreso exige cambio de contraseña.
-- La política exacta de contraseñas y recuperación de acceso queda como **D-06b**.
+- La política exacta de contraseñas, recuperación y doble factor se aprobó en **D-06b** (ver abajo).
 
-**Derivada abierta — D-06b:** longitud y complejidad de contraseñas, caducidad, recuperación de acceso y doble factor. Bloquea la fase 2. No se aplican valores por defecto no aprobados.
+**Derivada resuelta — D-06b:** longitud y complejidad, caducidad, recuperación y doble factor se aprobaron el 2026-11-12 (ver la decisión D-06b a continuación).
 
-**Bloquea:** fase 2. **Estado:** aprobada (D-06); derivada D-06b abierta.
+**Bloquea:** fase 2. **Estado:** aprobada.
+
+---
+
+### D-06b — ¿Qué política de contraseñas, recuperación y doble factor se aplica?
+
+**Pregunta:** ¿Qué longitud y reglas debe cumplir una contraseña? ¿Caduca? ¿Cómo se recupera el acceso? ¿Se exige un segundo factor?
+
+**Por qué importa:** define el validador del backend, las pruebas de autenticación y el soporte. Una política mal calibrada produce contraseñas débiles o fricción innecesaria.
+
+**Opciones:**
+
+- A. Política moderna: mínimo 12, sin composición ni caducidad, rechazo de contraseñas comunes; sin MFA.
+- B. Política tradicional: mínimo 8 con 3 de 4 clases y caducidad cada 90 días; sin MFA.
+- C. Política moderna + TOTP obligatorio para `ADMIN`.
+
+**Recomendación:** A.
+
+**Decisión aprobada (2026-11-12):** opción **A**.
+
+- Longitud mínima 12 y máxima 128; sin reglas de composición obligatorias ni caducidad forzada.
+- Se rechazan contraseñas comunes o triviales mediante una lista local versionada.
+- El usuario cambia su contraseña con la actual (`/auth/change-password`).
+- El reset administrativo lo ejecuta `ADMIN` con `users.manage` y obliga cambio en el siguiente ingreso.
+- Sin autoservicio de recuperación por correo hasta que D-20 defina el canal; sin MFA en el MVP.
+- No se almacenan pistas de contraseña ni historial de contraseñas en el MVP.
+
+**Bloquea:** fase 2. **Estado:** aprobada.
 
 ---
 
@@ -853,22 +881,21 @@ Estas decisiones se usaron para escribir los documentos, pero **no están aproba
 
 Para no bloquear el diseño, se propone esta secuencia. Solo figuran las decisiones **abiertas** al 2026-11-11; las aprobadas están en §2.2 y ya se reflejaron en los documentos. Cada respuesta se registra aquí y se refleja en el modelo/API antes de avanzar.
 
-1. **D-06b:** ¿política de contraseñas, recuperación de acceso y doble factor? (fase 2)
-2. **D-26b:** ¿qué efecto operativo tiene cada condición? (fase 5)
-3. **D-28:** ¿una inspección cambia automáticamente la condición? (fase 6)
-4. **D-12:** ¿qué significa "vencimiento del equipo" y de qué documento procede? (fase 1/6)
-5. **D-11:** ¿intervalos y umbrales de alerta aprobados? (fase 7)
-6. **D-08b:** ¿se requiere flujo de aprobación en la aplicación? (fase 5)
-7. **D-13:** ¿adjuntos, fotos o firmas en el MVP? (fase 6)
-8. **D-19:** ¿qué formatos de reporte se necesitan? (fase 7)
-9. **D-20:** ¿qué notificaciones se requieren? (fase 7)
-10. **D-21:** ¿cuánto tiempo se conserva el historial y la auditoría? (transversal)
-11. **D-22:** ¿cuál es el volumen esperado? (transversal)
-12. **D-23:** ¿dónde se despliega y cuál es el objetivo de respaldo? (transversal)
-13. **D-14:** ¿se requiere operación sin internet? (transversal)
-14. **D-25:** ¿se necesitan movimientos por lote? (fase 5)
-15. **D-29:** ¿se registran costos de mantenimiento? (fase 6)
-16. **D-30:** ¿idioma y localización? (transversal)
+1. **D-26b:** ¿qué efecto operativo tiene cada condición? (fase 5)
+2. **D-28:** ¿una inspección cambia automáticamente la condición? (fase 6)
+3. **D-12:** ¿qué significa "vencimiento del equipo" y de qué documento procede? (fase 1/6)
+4. **D-11:** ¿intervalos y umbrales de alerta aprobados? (fase 7)
+5. **D-08b:** ¿se requiere flujo de aprobación en la aplicación? (fase 5)
+6. **D-13:** ¿adjuntos, fotos o firmas en el MVP? (fase 6)
+7. **D-19:** ¿qué formatos de reporte se necesitan? (fase 7)
+8. **D-20:** ¿qué notificaciones se requieren? (fase 7)
+9. **D-21:** ¿cuánto tiempo se conserva el historial y la auditoría? (transversal)
+10. **D-22:** ¿cuál es el volumen esperado? (transversal)
+11. **D-23:** ¿dónde se despliega y cuál es el objetivo de respaldo? (transversal)
+12. **D-14:** ¿se requiere operación sin internet? (transversal)
+13. **D-25:** ¿se necesitan movimientos por lote? (fase 5)
+14. **D-29:** ¿se registran costos de mantenimiento? (fase 6)
+15. **D-30:** ¿idioma y localización? (transversal)
 
 ---
 

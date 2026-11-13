@@ -225,12 +225,13 @@ Permitir acceso seguro y sentar la base de autorización y trazabilidad que usar
 ### Dependencias
 
 - Fase 1.
-- D-06 (auth, aprobada: local con `AuthProvider` desacoplado), D-06b (política de contraseñas, abierta), D-07 (roles, aprobada), D-27 (condición, aprobada: `SEGURIDAD` y `ADMIN`).
+- D-06 (auth, aprobada: local con `AuthProvider` desacoplado), D-06b (política de contraseñas, aprobada: 12–128, sin caducidad ni MFA), D-07 (roles, aprobada), D-27 (condición, aprobada: `SEGURIDAD` y `ADMIN`).
 
 ### Alcance
 
 - Login, refresh rotativo, logout, `/me`, cambio de contraseña.
 - Interfaz `AuthProvider` con implementación `LOCAL`; sin endpoints de SSO en el MVP.
+- Validador de contraseñas: 12–128 caracteres, sin composición obligatoria, rechazo de contraseñas comunes.
 - Hash Argon2id o bcrypt costo ≥12.
 - Usuarios, roles, permisos y asignación.
 - Guards de autenticación y permisos.
@@ -262,10 +263,11 @@ backend/test/rbac.e2e-spec.ts
 - Rate limit de login funciona.
 - Auditoría de login, cambios de usuario/rol y permisos.
 - La sesión y los permisos no dependen del proveedor de identidad; sustituirlo por un doble en pruebas no cambia el resultado.
+- La política de contraseñas de D-06b se aplica en el backend, no solo en el formulario.
 
 ### Pruebas
 
-- T-AUT-01 a T-AUT-13.
+- T-AUT-01 a T-AUT-18.
 - T-SEC-01, T-SEC-02, T-SEC-06, T-SEC-07, T-SEC-11, T-SEC-12, T-SEC-13.
 - Unitarias de permisos y hash.
 

@@ -104,6 +104,10 @@ Estructura D-02: `SEDE` es la raíz; `ALMACEN`, `TALLER` y `AREA` son hijos. Los
 | T-AUT-12 | Integración | Sin sesión | `POST /users` | 401/403; no existe autorregistro. | BR-175 |
 | T-AUT-13 | Integración | Usuario desactivado con access token vigente | `GET /auth/me` | 401; el token deja de ser aceptado. | BR-169/BR-178 |
 | T-AUT-14 | Integración | `almacen.test` | `POST /extinguishers/:id/condition` | 403; la condición no cambia. | D-27 / BR-167 |
+| T-AUT-15 | Unitario | Contraseña de 11 caracteres | Crear/cambiar contraseña | 422; se exige mínimo 12. | D-06b / BR-179A |
+| T-AUT-16 | Unitario | Contraseña común de la lista | Crear/cambiar contraseña | 422; se rechaza. | D-06b / BR-179B |
+| T-AUT-17 | Integración | Contraseña de 12 caracteres sin símbolos | Crear/cambiar contraseña | 200; no se exige composición. | D-06b / BR-179A |
+| T-AUT-18 | Integración | `ADMIN` resetea contraseña | Siguiente login del usuario | Acceso permitido y cambio obligatorio; auditoría sin contraseña. | D-06b / BR-179C |
 
 ### 4.2 Ubicaciones y catálogos
 

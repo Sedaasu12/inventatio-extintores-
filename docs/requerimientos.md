@@ -29,7 +29,7 @@ La matriz detallada está en `docs/diseno-api.md`. Los permisos se validan siemp
 |---|---|---|---|
 | RF-AUT-01 | Iniciar sesión con correo y contraseña. | Must | Credenciales válidas devuelven token de acceso y perfil; inválidas devuelven 401 sin revelar si el correo existe. |
 | RF-AUT-02 | Mantener sesión con refresh token rotativo y cerrar sesión. | Must | El refresh renueva el acceso; el logout revoca el refresh; un refresh revocado devuelve 401. |
-| RF-AUT-03 | Cambiar contraseña propia. | Must | Se exige contraseña actual; la nueva cumple política; el hash se actualiza y las sesiones previas se revocan según política. |
+| RF-AUT-03 | Cambiar contraseña propia. | Must | Se exige contraseña actual; la nueva tiene 12–128 caracteres y no es común (D-06b); el hash se actualiza y las sesiones previas se revocan según política. |
 | RF-AUT-04 | Administrar usuarios y asignar roles. | Must | Solo `ADMIN`; un usuario desactivado no puede iniciar sesión; no se borra físicamente. |
 | RF-AUT-05 | Administrar roles y permisos. | Must | Los permisos efectivos se calculan en servidor; cambios quedan auditados. |
 | RF-AUT-06 | Aplicar autorización por permiso en cada endpoint. | Must | Un usuario sin permiso recibe 403 aunque invoque la API directamente. |

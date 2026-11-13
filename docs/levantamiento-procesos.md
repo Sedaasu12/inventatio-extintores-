@@ -43,6 +43,7 @@
 | P-12 | Estructura real de ubicaciones | D-02 | Respondida y aplicada |
 | P-13 | Proveedor de identidad corporativo | D-06 | Respondida y aplicada |
 | P-14 | Vocabulario de condición técnica | D-26 | Respondida y aplicada |
+| P-15 | Política de contraseñas y acceso | D-06b | Respondida y aplicada |
 
 ---
 
@@ -594,12 +595,12 @@
 
 **Qué NO se concluye todavía:**
 
-- La política de contraseñas, caducidad, recuperación y doble factor (D-06b).
+- La política de contraseñas, caducidad, recuperación y doble factor: resuelta en D-06b (2026-11-12).
 - Si en el futuro la organización adoptará identidad corporativa; el diseño queda preparado.
 
 **Implicaciones:** D-06 se aprueba con opción C. El MVP implementa el proveedor `LOCAL`; el servicio de sesión (tokens, permisos, auditoría) es independiente del proveedor, de modo que un OIDC posterior no rehace el módulo.
 
-**Decisiones afectadas:** D-06 (aprobada), D-06b (abierta), D-07.
+**Decisiones afectadas:** D-06 (aprobada), D-06b (aprobada el 2026-11-12), D-07.
 
 **Documentos actualizados:** este registro (P-13, H-19), `decisiones-pendientes.md`, `reglas-de-negocio.md` (BR-171 a BR-178), `modelo-entidad-relacion.md`, `diseno-api.md`, `plan-de-pruebas.md`, `plan-implementacion.md` y `analisis-funcional.md`.
 
@@ -632,6 +633,31 @@
 
 ---
 
+### P-15 — Política de contraseñas y acceso
+
+**Pregunta:** ¿Qué longitud y reglas debe cumplir una contraseña? ¿Caduca? ¿Cómo se recupera el acceso? ¿Se exige un segundo factor?
+
+**Respuesta del propietario (2026-11-12):** se adopta la política moderna. Contraseñas de 12 a 128 caracteres, sin reglas de composición ni caducidad forzada; el reset lo hace el administrador; sin segundo factor en el MVP.
+
+**Lectura:**
+
+- La política prioriza longitud y bloqueo por intentos sobre reglas de composición.
+- No se depende de correo para recuperar el acceso.
+- El segundo factor puede añadirse después sin cambiar el modelo de usuarios.
+
+**Qué NO se concluye todavía:**
+
+- La recuperación por correo (autoservicio), que depende del canal de notificaciones (D-20).
+- Si en el futuro se exigirá MFA; el diseño no lo impide.
+
+**Implicaciones:** D-06b se aprueba con opción A. El backend valida la política y rechaza contraseñas comunes; el reset administrativo obliga cambio.
+
+**Decisiones afectadas:** D-06b (aprobada), D-06, D-20.
+
+**Documentos actualizados:** este registro (P-15, H-21), `decisiones-pendientes.md`, `reglas-de-negocio.md` (BR-179A a BR-179E), `diseno-api.md`, `plan-de-pruebas.md`, `plan-implementacion.md`, `requerimientos.md` y `analisis-funcional.md`.
+
+---
+
 ## 4. Contradicciones y hallazgos
 
 | ID | Hallazgo | Efecto |
@@ -656,9 +682,10 @@
 | H-18 | No existen códigos de sede ni de área; solo nombres. | D-02: código interno generado por el servidor; nombre único dentro de la sede y repetible entre sedes. |
 | H-19 | No hay proveedor de identidad corporativo obligatorio. | D-06: autenticación local en el MVP con proveedor desacoplado; las cuentas y contraseñas se administran en SITE. |
 | H-20 | El vocabulario de condición técnica es estable y se limita a cuatro valores; no hay códigos ni estados propios. | D-26: enum fijo; sin catálogo administrable. El efecto operativo de cada valor sigue abierto (D-26b). |
+| H-21 | No existía una política de contraseñas ni segundo factor definidos. | D-06b: 12–128 caracteres, sin composición ni caducidad, rechazo de comunes, reset por `ADMIN` y sin MFA en el MVP. |
 
 ---
 
 ## 5. Próxima pregunta
 
-Levantamiento cerrado el 2026-11-10 y ampliado con D-02, D-06, D-26 y D-27. No quedan preguntas de ubicaciones, identidad, vocabulario técnico ni autoridad sobre la condición pendientes. La siguiente decisión abierta por impacto es **D-06b (política de contraseñas)**, seguida de **D-26b (efecto de cada condición)** y **D-28 (inspección y condición)**. No se inicia implementación funcional sin aprobación.
+Levantamiento cerrado el 2026-11-10 y ampliado con D-02, D-06, D-06b, D-26 y D-27. No quedan preguntas de ubicaciones, identidad, política de acceso, vocabulario técnico ni autoridad sobre la condición pendientes. La siguiente decisión abierta por impacto es **D-26b (efecto de cada condición)**, seguida de **D-28 (inspección y condición)** y **D-12 (vencimiento del equipo)**. No se inicia implementación funcional sin aprobación.

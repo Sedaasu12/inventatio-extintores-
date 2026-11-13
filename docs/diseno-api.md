@@ -100,6 +100,8 @@ No se devuelven stack traces, SQL, nombres de tablas ni datos de otros activos.
 | POST | `/auth/change-password` | Autenticado | Cambia contraseña propia. |
 | POST | `/users/:id/reset-password` | `users.manage` | Reset administrativo; obliga cambio. |
 
+> **Política de contraseñas (D-06b):** 12–128 caracteres; sin reglas de composición ni caducidad forzada; se rechazan contraseñas comunes de una lista local; el reset es solo administrativo y obliga cambio; sin autoservicio por correo ni MFA en el MVP.
+
 ### 2.3 Ejemplo de login
 
 ```json

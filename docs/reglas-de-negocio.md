@@ -290,8 +290,13 @@ stateDiagram-v2
 | BR-176 | Añadir un proveedor OIDC no puede alterar permisos, auditoría, sesión ni reglas de negocio; solo cambia cómo se valida la identidad. | El proveedor no emite permisos; el RBAC se resuelve en SITE. |
 | BR-177 | Los intentos fallidos de login se limitan por IP y por correo, con bloqueo temporal progresivo. | Rate limit; pruebas de bloqueo. |
 | BR-178 | Cerrar sesión revoca el refresh actual; desactivar un usuario invalida sus sesiones vigentes. (BR-169) | Revocación; guard y refresh consultan el estado del usuario. |
+| BR-179A | La contraseña tiene entre 12 y 128 caracteres; no se exigen clases de caracteres ni caducidad forzada. (D-06b) | Validador de contraseña; pruebas de borde. |
+| BR-179B | Se rechazan contraseñas comunes o triviales mediante una lista local versionada. | Validador; prueba con contraseña común. |
+| BR-179C | El reset administrativo lo ejecuta `ADMIN` con `users.manage` y obliga cambio en el siguiente ingreso; no hay autoservicio por correo en el MVP. | Endpoint administrativo; `must_change_password`. |
+| BR-179D | Sin MFA en el MVP; el diseño no impide añadirlo después. | Sin campos de segundo factor. |
+| BR-179E | No se guardan pistas ni historial de contraseñas. | Esquema y auditoría. |
 
-> La política de longitud, complejidad, caducidad, recuperación y doble factor es **D-06b**; no se aplican valores por defecto hasta su aprobación.
+> La recuperación de acceso por correo queda fuera hasta que D-20 defina el canal de notificaciones.
 
 ---
 
