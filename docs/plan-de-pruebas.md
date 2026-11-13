@@ -135,9 +135,10 @@ Estructura D-02: `SEDE` es la raíz; `ALMACEN`, `TALLER` y `AREA` son hijos. Los
 | T-EXT-07 | Integración | Cambiar condición técnica sin motivo | 422. | RF-EXT-08 |
 | T-EXT-08 | Integración | Cambiar condición técnica con motivo y permiso | 200; auditoría; ubicación intacta. | RF-EXT-08 |
 | T-EXT-09 | Unitario | Validar fechas imposibles | Rechazo o confirmación según regla; no se guarda una fecha futura de fabricación. | RF-EXT-04 |
-| T-EXT-10 | Integración | Alta con código existente (importación) | 409; no se reutiliza. | BR-003 |
+| T-EXT-10 | Integración | Alta enviando `assetCode` | 422 o campo rechazado; el código lo genera el servidor (D-04). | BR-003 |
 | T-EXT-11 | Unitario | Generación de código | Formato `EXT-000001`, padding correcto, sin reutilización. | RF-EXT-02 |
 | T-EXT-12 | Integración | Búsqueda/filtros/paginación | Resultados correctos; filtros en servidor; no carga todo el inventario. | RF-EXT-06 |
+| T-EXT-13 | Unitario | Enviar condición `EN_REVISION` o texto libre | 422; solo se aceptan los cuatro valores del enum (D-26). | BR-012A |
 
 ### 4.4 QR y escaneo
 

@@ -42,6 +42,7 @@
 | P-11 | Listado de inventario existente | D-24 | Respondida |
 | P-12 | Estructura real de ubicaciones | D-02 | Respondida y aplicada |
 | P-13 | Proveedor de identidad corporativo | D-06 | Respondida y aplicada |
+| P-14 | Vocabulario de condición técnica | D-26 | Respondida y aplicada |
 
 ---
 
@@ -602,6 +603,32 @@
 
 ---
 
+### P-14 — Vocabulario de condición técnica
+
+**Pregunta:** ¿Las cuatro condiciones propuestas (`OPERATIVO`, `OBSERVADO`, `NO_OPERATIVO`, `PENDIENTE_INSPECCION`) cubren la operación, o se necesitan estados adicionales o un vocabulario propio?
+
+**Respuesta del propietario (2026-11-12):** los cuatro valores son suficientes; no se requieren estados adicionales ni existe otro vocabulario que deba respetarse.
+
+**Lectura:**
+
+- No hace falta un catálogo administrable: el conjunto es estable y cerrado.
+- Un valor nuevo sería un cambio de modelo, no una configuración operativa.
+- La condición se elige al alta y se cambia con una acción auditada; no se deduce de la ubicación ni del estado logístico.
+
+**Qué NO se concluye todavía:**
+
+- Qué efecto operativo tiene cada condición (si `NO_OPERATIVO` impide asignar o mover, si genera alerta): queda como D-26b.
+- Quién puede cambiarla y con qué evidencia: D-27.
+- Si una inspección la cambia automáticamente: D-28.
+
+**Implicaciones:** D-26 se aprueba con enum fijo de cuatro valores. Agregar o quitar un valor exige migración, análisis de impacto y pruebas de regresión.
+
+**Decisiones afectadas:** D-26 (aprobada), D-26b (abierta), D-27, D-28.
+
+**Documentos actualizados:** este registro (P-14, H-20), `decisiones-pendientes.md`, `reglas-de-negocio.md` (BR-012A/BR-012B), `modelo-entidad-relacion.md`, `diseno-api.md`, `plan-de-pruebas.md`, `plan-implementacion.md` y `analisis-funcional.md`.
+
+---
+
 ## 4. Contradicciones y hallazgos
 
 | ID | Hallazgo | Efecto |
@@ -625,9 +652,10 @@
 | H-17 | La estructura real es Sede → área, sin edificios ni pisos; el almacén central y el taller propio están dentro de una sede. | D-02: jerarquía de dos niveles con tipos `SEDE`, `ALMACEN`, `AREA` y `TALLER`; las sedes no alojan activos directamente. |
 | H-18 | No existen códigos de sede ni de área; solo nombres. | D-02: código interno generado por el servidor; nombre único dentro de la sede y repetible entre sedes. |
 | H-19 | No hay proveedor de identidad corporativo obligatorio. | D-06: autenticación local en el MVP con proveedor desacoplado; las cuentas y contraseñas se administran en SITE. |
+| H-20 | El vocabulario de condición técnica es estable y se limita a cuatro valores; no hay códigos ni estados propios. | D-26: enum fijo; sin catálogo administrable. El efecto operativo de cada valor sigue abierto (D-26b). |
 
 ---
 
 ## 5. Próxima pregunta
 
-Levantamiento cerrado el 2026-11-10 y ampliado con D-02 y D-06 el 2026-11-11. No quedan preguntas de ubicaciones ni de identidad pendientes. La siguiente decisión abierta por impacto es **D-26 (condición técnica)**, seguida de **D-27 (quién la cambia)** y **D-06b (política de contraseñas)**. No se inicia implementación funcional sin aprobación.
+Levantamiento cerrado el 2026-11-10 y ampliado con D-02, D-06 y D-26. No quedan preguntas de ubicaciones, identidad ni vocabulario técnico pendientes. La siguiente decisión abierta por impacto es **D-27 (quién cambia la condición)**, seguida de **D-06b (política de contraseñas)** y **D-26b (efecto de cada condición)**. No se inicia implementación funcional sin aprobación.

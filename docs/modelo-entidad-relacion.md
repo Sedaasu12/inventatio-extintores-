@@ -299,7 +299,7 @@ erDiagram
 |---|---|---|
 | `LocationType` | `SEDE`, `ALMACEN`, `AREA`, `TALLER` | D-02 aprobada: `SEDE` es la raíz; `ALMACEN`, `TALLER` y `AREA` son hijos de una sede. Sin edificios, pisos ni puntos en el MVP. Solo `ALMACEN` produce `EN_ALMACEN`; `TALLER` aloja equipos en mantenimiento interno. |
 | `LogisticsStatus` | `EN_ALMACEN`, `ASIGNADO`, `EN_MANTENIMIENTO`, `DADO_DE_BAJA` | `EN_TRANSITO` reservado, no se usa en MVP. |
-| `TechnicalCondition` | `OPERATIVO`, `OBSERVADO`, `NO_OPERATIVO`, `PENDIENTE_INSPECCION` | Catálogo administrable en fase 2. |
+| `TechnicalCondition` | `OPERATIVO`, `OBSERVADO`, `NO_OPERATIVO`, `PENDIENTE_INSPECCION` | Enum fijo en el MVP (D-26 aprobada); no es catálogo administrable. Agregar valores exige migración. |
 | `PlacementType` | `INTERNAL`, `EXTERNAL`, `NONE` | Mutuamente excluyente con las FKs. |
 | `MovementType` | `INGRESO`, `SALIDA`, `TRASLADO`, `RETORNO_ALMACEN`, `ENVIO_MANTENIMIENTO`, `RETORNO_MANTENIMIENTO`, `BAJA`, `AJUSTE` | `INGRESO` solo en alta. |
 | `EntrySource` | `COMPRA_CENTRAL`, `COMPRA_LOCAL`, `CARGA_INICIAL`, `RETORNO_MANTENIMIENTO`, `TRASLADO` | Obligatorio solo en `INGRESO` (D-03). |

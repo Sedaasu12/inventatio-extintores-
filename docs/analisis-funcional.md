@@ -254,16 +254,10 @@ Cada flujo indica disparador, actor, precondiciones, pasos, validaciones, result
 1. Registrar el/los servicios realizados: tipo, fecha, resultado, certificado/documento, próxima fecha indicada y observaciones.
 2. Elegir “Registrar retorno”; indicar ubicación interna destino (almacén o área), recibido por, fecha, motivo, documento y notas.
 3. El backend valida que la orden esté abierta, que exista al menos un servicio y que la fecha de retorno no sea anterior al envío/servicio.
-4. En una transacción: inserta `RETORNO_MANTENIMIENTO`, actualiza la colocación interna y el estado (`EN_ALMACEN` o `ASIGNADO`), cierra la orden, recalcula las fechas objetivo de mantenimiento/recarga/prueba y actualiza la condición técnica según el resultado del servicio.
+4. En una transacción: inserta `RETORNO_MANTENIMIENTO`, actualiza la colocación interna y el estado (`EN_ALMACEN` o `ASIGNADO`), cierra la orden y recalcula las fechas objetivo de mantenimiento/recarga/prueba. **No** cambia la condición técnica: el resultado del servicio es evidencia (D-10).
 5. Devuelve la ficha, el historial y las nuevas alertas.
 
-**Mapeo de condición técnica (supuesto a confirmar, D-10):**
-
-| Resultado del servicio | Condición técnica propuesta |
-|---|---|
-| `APROBADO` | `OPERATIVO` |
-| `APROBADO_CON_OBSERVACIONES` | `OBSERVADO` |
-| `RECHAZADO` | `NO_OPERATIVO` |
+**Condición técnica tras el servicio:** el resultado (`APROBADO`, `APROBADO_CON_OBSERVACIONES`, `RECHAZADO`) queda como evidencia. Si se requiere cambiar la condición, se usa la acción explícita `POST /extinguishers/:id/condition`, con motivo y auditoría (D-10, BR-089).
 
 **Excepciones:** retorno sin servicio (422), orden inexistente/cerrada (409), proveedor distinto (409), fecha inválida (422).
 
@@ -462,9 +456,9 @@ Hechos aportados por el propietario. **No son reglas aprobadas**; el detalle y l
 
 > **Estado al 2026-11-11:** el levantamiento está cerrado y las decisiones D-01 a D-05, D-07, D-09, D-10, D-15, D-16, D-17, D-24 y D-31 están aprobadas. El registro completo está en `docs/decisiones-pendientes.md`. Lo que sigue son las decisiones abiertas que bloquean fases concretas.
 
-1. **D-26 — Condición técnica:** ¿enum fijo o catálogo administrable? Bloquea la fase 1.
-2. **D-27 — Permisos sobre la condición:** ¿quién puede cambiarla y con qué evidencia? Bloquea la fase 2.
-3. **D-06b — Política de acceso:** longitud y complejidad de contraseñas, caducidad, recuperación y doble factor. Bloquea la fase 2.
+1. **D-27 — Permisos sobre la condición:** ¿quién puede cambiarla y con qué evidencia? Bloquea la fase 2.
+2. **D-06b — Política de acceso:** longitud y complejidad de contraseñas, caducidad, recuperación y doble factor. Bloquea la fase 2.
+3. **D-26b — Efecto de cada condición:** ¿`NO_OPERATIVO` impide asignar o mover? ¿Genera alerta? Bloquea la fase 5.
 4. **D-28 — Inspecciones y condición:** ¿una inspección puede cambiarla automáticamente? Bloquea la fase 6.
 5. **D-12 — Vencimiento del equipo:** ¿qué significa y de qué documento procede? Bloquea las fechas objetivo.
 6. **D-11 — Umbrales de alerta:** ¿qué intervalos y anticipaciones están aprobados? Bloquea la fase 7.

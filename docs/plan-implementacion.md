@@ -157,7 +157,7 @@ Materializar el ERD aprobado en Prisma/MySQL, con restricciones, índices y dato
 ### Dependencias
 
 - Fase 0.
-- D-01 (single/multi-tenant), D-02 (ubicaciones, aprobada), D-15 (zona horaria), D-26 (enum de condición).
+- D-01 (single/multi-tenant), D-02 (ubicaciones, aprobada), D-15 (zona horaria), D-26 (enum de condición, aprobada).
 
 ### Alcance
 
@@ -202,7 +202,7 @@ docs/modelo-entidad-relacion.md
 |---|---|
 | `CHECK`/columna generada no soportada por Prisma | SQL manual en migración; prueba desde cero. |
 | FKs circulares movimientos/órdenes | Orden de inserción documentado; transacción; pruebas. |
-| Enums rígidos | Documentar migración para agregar valores; catálogo en fase 2 si D-26 lo pide. |
+| Enums rígidos | `TechnicalCondition` es fijo (D-26); documentar migración y pruebas si se agrega un valor. |
 | Zona horaria | Guardar UTC; pruebas de borde. |
 
 ### Verificación

@@ -33,6 +33,8 @@
 | BR-010 | No se permite eliminar físicamente un extintor. | Sin endpoint `DELETE`; FK `RESTRICT`. |
 | BR-011 | Los campos descriptivos/técnicos pueden editarse con auditoría; la ubicación/estado no. | DTO de edición separado; rechazo de campos de proyección. |
 | BR-012 | La condición técnica siempre tiene un valor explícito. | `NOT NULL`; se elige al alta y se cambia con acción auditada. |
+| BR-012A | El conjunto de condiciones técnicas es fijo: `OPERATIVO`, `OBSERVADO`, `NO_OPERATIVO` y `PENDIENTE_INSPECCION` (D-26 aprobada). No es un catálogo administrable en el MVP. | `ENUM`; agregar o quitar valores exige migración y análisis de impacto. |
+| BR-012B | El alta exige una condición inicial elegida por el usuario; no se asigna un valor por defecto silencioso. | DTO obligatorio; prueba de rechazo si falta. |
 | BR-013 | La condición técnica no se deduce automáticamente de la ubicación. | Campos separados; validaciones independientes. |
 | BR-014 | El estado logístico no se deduce automáticamente de la condición técnica. | Campos separados. |
 | BR-015 | Un activo no puede estar simultáneamente en dos ubicaciones/contrapartes. | Una sola colocación actual; `placement_type` + FKs mutuamente excluyentes. |

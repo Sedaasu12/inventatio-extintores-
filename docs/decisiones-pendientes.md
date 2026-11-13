@@ -110,6 +110,7 @@ El propietario revisó las decisiones una por una y **confirmó** las once, sin 
 | D-15 | A — zona única `America/Lima` |
 | D-02 | A — Sede → (Almacén/Taller/Área), código generado y nombre único por sede (2026-11-11) |
 | D-06 | C — autenticación local con `AuthProvider` desacoplado para OIDC posterior (2026-11-11) |
+| D-26 | A — condición técnica como enum fijo de cuatro valores (2026-11-12) |
 
 ---
 
@@ -680,9 +681,18 @@ El propietario revisó las decisiones una por una y **confirmó** las once, sin 
 
 **Recomendación:** A; B en fase 2.
 
-**Si no se responde:** A.
+**Hecho confirmado (2026-11-12):** los cuatro valores propuestos cubren la operación; no se requieren estados adicionales ni existe otro vocabulario que deba respetarse.
 
-**Bloquea:** fase 1/2. **Estado:** abierta.
+**Decisión aprobada (2026-11-12):** opción **A**. El conjunto es fijo en el MVP:
+
+- `OPERATIVO`, `OBSERVADO`, `NO_OPERATIVO`, `PENDIENTE_INSPECCION`.
+- No hay catálogo administrable ni creación de valores desde la aplicación.
+- Agregar, quitar o renombrar un valor exige migración, análisis de impacto en reportes y pruebas de regresión.
+- El valor siempre es explícito; no se deduce de la ubicación ni del estado logístico (BR-012/BR-013).
+
+**Bloquea:** fase 1/2. **Estado:** aprobada.
+
+**Derivada abierta — D-26b:** qué efecto operativo tiene cada condición (por ejemplo, si `NO_OPERATIVO` impide asignar o mover el equipo, si genera alerta y cómo se reporta). D-26 fija el conjunto de valores, no su semántica operativa. Bloquea la fase 5. No se asume ningún bloqueo por condición hasta su aprobación.
 
 ---
 
@@ -835,9 +845,9 @@ Estas decisiones se usaron para escribir los documentos, pero **no están aproba
 
 Para no bloquear el diseño, se propone esta secuencia. Solo figuran las decisiones **abiertas** al 2026-11-11; las aprobadas están en §2.2 y ya se reflejaron en los documentos. Cada respuesta se registra aquí y se refleja en el modelo/API antes de avanzar.
 
-1. **D-26:** ¿condición técnica como enum o catálogo administrable? (fase 1)
-2. **D-27:** ¿quién puede cambiar la condición técnica? (fase 2)
-3. **D-06b:** ¿política de contraseñas, recuperación de acceso y doble factor? (fase 2)
+1. **D-27:** ¿quién puede cambiar la condición técnica? (fase 2)
+2. **D-06b:** ¿política de contraseñas, recuperación de acceso y doble factor? (fase 2)
+3. **D-26b:** ¿qué efecto operativo tiene cada condición? (fase 5)
 4. **D-28:** ¿una inspección cambia automáticamente la condición? (fase 6)
 5. **D-12:** ¿qué significa "vencimiento del equipo" y de qué documento procede? (fase 1/6)
 6. **D-11:** ¿intervalos y umbrales de alerta aprobados? (fase 7)

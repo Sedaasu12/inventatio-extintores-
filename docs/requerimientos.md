@@ -47,7 +47,7 @@ La matriz detallada está en `docs/diseno-api.md`. Los permisos se validan siemp
 | RF-UBI-04 | Desactivar ubicaciones sin borrar historial. | Must | Una ubicación referenciada no se elimina; se desactiva y no puede recibir nuevos movimientos. |
 | RF-UBI-05 | Administrar tipos de extintor configurables. | Must | Tipo con agente, capacidad nominal y unidad; no incluye periodos reglamentarios inventados. |
 | RF-UBI-06 | Administrar contrapartes externas (proveedores/talleres). | Must | Código único, tipo, contacto y estado activo; una contraparte inactiva no puede recibir envíos. |
-| RF-UBI-07 | Administrar condiciones técnicas y tipos de servicio como catálogo o enum documentado. | Should | El MVP puede usar enums; la ampliación a catálogo administrable no rompe datos existentes. |
+| RF-UBI-07 | Administrar tipos de servicio y usar un enum documentado de condiciones técnicas. | Must | La condición es el enum fijo de D-26; los tipos de servicio se configuran como catálogo. |
 
 ### 2.3 Ficha individual y código
 
