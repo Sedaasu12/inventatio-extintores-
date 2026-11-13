@@ -438,8 +438,8 @@ Respuesta `201` con inspección y fecha objetivo actualizada; no cambia la condi
 |---|---|---|---|
 | GET | `/alerts` | `alerts.read` | Alertas calculadas; filtros por categoría/estado/ubicación. |
 | GET | `/alerts/summary` | `alerts.read` | Conteos por categoría/estado. |
-| GET | `/alert-settings` | `alerts.read` | Umbrales configurados. |
-| PUT | `/alert-settings/:eventType` | `alerts.settings` | Configura `daysBefore` y `enabled`. |
+| GET | `/alert-settings` | `alerts.read` | Umbrales configurados; `daysBefore` puede ser `null` (sin umbral). |
+| PUT | `/alert-settings/:eventType` | `alerts.settings` | Configura `daysBefore` y `enabled`; no se siembran valores por defecto (D-11). |
 | GET | `/dashboard/summary` | `dashboard.read` | Totales, estados, condiciones, mantenimiento y alertas. |
 
 #### Ejemplo de alertas
@@ -473,6 +473,8 @@ GET /api/v1/alerts?eventType=INSPECCION&status=POR_VENCER&page=1&pageSize=20
 `status` admitido: `VENCIDO`, `POR_VENCER`, `VIGENTE`, `SIN_FECHA_CONFIGURADA`. `eventType`: `EQUIPO`, `INSPECCION`, `MANTENIMIENTO`, `RECARGA`, `PRUEBA_HIDROSTATICA`.
 
 > Para `EQUIPO`, la fecha objetivo es la más temprana entre la documentada (`manufacturerExpiryDate`) y la calculada (`manufactureDate + usefulLifeYears`) cuando ambas existen (D-12). Si no hay ninguna, la categoría queda `SIN_FECHA_CONFIGURADA`.
+
+> **Sin cálculo de intervalos (D-11):** las categorías `INSPECCION`, `MANTENIMIENTO`, `RECARGA` y `PRUEBA_HIDROSTATICA` usan solo el `nextDueDate` indicado; el servidor no calcula la próxima fecha sumando periodos. Si no se indica, la categoría queda sin fecha.
 
 ### 4.7 Reportes
 

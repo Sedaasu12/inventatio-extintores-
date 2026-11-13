@@ -225,6 +225,8 @@ stateDiagram-v2
 | BR-107D | La fecha documentada y la calculada se muestran por separado en la ficha; la documentada no se sobrescribe con la calculada. | DTO de ficha; dos campos derivados. |
 | BR-107E | Cambiar `useful_life_years` de un tipo exige auditoría y recalcula las fechas objetivo `EQUIPO` de los equipos de ese tipo dentro de la misma transacción. | Servicio de catálogo; recálculo y auditoría. |
 | BR-108 | No se inventan intervalos ni fechas de próxima atención. | Sin valores por defecto; configuración aprobada. |
+| BR-108A | La próxima fecha de inspección, mantenimiento, recarga y prueba hidrostática se registra **solo** desde la fecha indicada por el certificado, proveedor o responsable autorizado; el sistema no la calcula con intervalos (D-11 aprobada). | DTO `nextDueDate`; sin fórmulas automáticas; prueba de ausencia de fecha. |
+| BR-108B | El MVP arranca sin umbrales: `days_before = NULL` para todas las categorías; no se genera `POR_VENCER` hasta que se configure (D-11 aprobada). | Sin seed; cálculo explícito; auditoría al cambiar. |
 | BR-109 | Las fechas calendario se almacenan como `DATE`; los eventos como `DATETIME(3)` UTC. | Esquema y configuración de zona. |
 | BR-110 | Una fecha objetivo se puede corregir solo con un nuevo registro técnico o una edición auditada de la fecha documentada del equipo. | Historial y auditoría. |
 | BR-111 | Si se inserta un evento con fecha anterior al evento fuente actual, no reemplaza la proyección. | Comparación por fecha de evento y `created_at`. |
@@ -240,10 +242,11 @@ stateDiagram-v2
 |---|---|---|
 | BR-120 | Cada categoría se evalúa por separado. | `event_type` independiente. |
 | BR-121 | `VENCIDO` si la fecha objetivo es anterior a hoy (zona de la organización). | Cálculo. |
-| BR-122 | `POR_VENCER` si la fecha es hoy o está dentro del umbral configurado. | Cálculo. |
+| BR-122 | `POR_VENCER` solo si hay un umbral configurado y la fecha está entre hoy y hoy + `days_before`. | Cálculo; sin umbral no se produce `POR_VENCER` (D-11). |
 | BR-123 | `VIGENTE` si la fecha está fuera del umbral. | Cálculo. |
 | BR-124 | `SIN_FECHA_CONFIGURADA` si no existe fecha objetivo documentada. | Proyección ausente. |
-| BR-125 | Si no hay umbral configurado, no se inventa uno; la fecha de hoy se muestra como `POR_VENCER` y las futuras como `VIGENTE`. | `days_before` nulo; cálculo explícito. |
+| BR-125 | Si no hay umbral configurado, no se inventa uno: las fechas de hoy y futuras se muestran como `VIGENTE`; solo las anteriores a hoy como `VENCIDO` (D-11). | `days_before` nulo; cálculo explícito. |
+| BR-125A | El MVP no siembra `alert_settings`; la instalación crea las filas con `days_before = NULL` (D-11). | Migración/seed; prueba de ausencia de valores por defecto. |
 | BR-126 | Los activos `DADO_DE_BAJA` se excluyen por defecto. | Filtro. |
 | BR-127 | Las alertas no se persisten como filas duplicadas; se calculan de forma determinista. | Consulta sobre `due_dates`; sin job que duplique. |
 | BR-128 | Cambiar un umbral afecta la clasificación, no las fechas fuente. | Configuración separada. |
@@ -284,7 +287,7 @@ stateDiagram-v2
 | BR-166 | El ajuste requiere `movements.adjust`, exclusivo de `ADMIN` en el MVP. | Validación. |
 | BR-167 | Cambiar la condición técnica requiere `extinguishers.condition` y motivo; solo `SEGURIDAD` y `ADMIN` (D-27 aprobada). | Endpoint dedicado; 403 para los demás roles; auditoría. |
 | BR-167A | La evidencia documental del cambio de condición es opcional; el certificado o acta se registra en el servicio o la inspección. | `document_ref` opcional; sin duplicar evidencia. |
-| BR-168 | Cambiar umbrales requiere `alerts.settings`; por defecto `ADMIN`. `[D-11]` | Endpoint dedicado. |
+| BR-168 | Cambiar umbrales requiere `alerts.settings`; por defecto `ADMIN` (D-11 aprobada). | Endpoint dedicado. |
 | BR-169 | Un usuario desactivado no puede autenticarse ni usar tokens vigentes. | Validación en guard/refresh. |
 | BR-170 | Los permisos efectivos se recalculan desde roles; no se confía en permisos enviados por el cliente. | Servidor. |
 

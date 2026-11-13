@@ -50,7 +50,7 @@ Los roles y permisos finales deben ser validados por la organización.
 - Quién autoriza cada clase de movimiento.
 - Tipos de extintor y campos técnicos obligatorios.
 - Qué fecha considera “vencimiento” la organización y de qué documento procede (resuelto en D-12: fecha documentada del fabricante + vida útil calculada por tipo, con la más temprana como fecha objetivo).
-- Umbral para alertar “por vencer” por cada tipo de evento.
+- Umbral para alertar “por vencer” por cada tipo de evento (resuelto en D-11: el MVP arranca sin umbral; se configura cuando exista política aprobada).
 - Si los proveedores externos de mantenimiento deben tener ficha propia.
 - Si se exige operación sin internet en almacenes o sedes.
 - Si se requiere firma, foto o documento adjunto como evidencia de entrega/recepción.

@@ -33,7 +33,7 @@ Estado al 2026-11-12. El registro formal de aprobaciones está en §2.2 a §2.4;
 | 4 | D-07 | Roles y quién autoriza cada operación | Cuatro roles como semilla, permisos granulares. | Aprobada | Fase 2 |
 | 5 | D-08 | Evidencia de autorización/recepción | Nombre del receptor + referencia documental; aprobación en app pendiente (D-08b). | Parcial | Fase 5 |
 | 6 | D-10 | Condición técnica tras mantenimiento | Resultado como evidencia; cambio explícito y auditado. | Aprobada | Fase 6 |
-| 7 | D-11 | Intervalos y umbrales de alerta | Sin valores por defecto; configurar desde política aprobada. | Abierta | Fase 7 |
+| 7 | D-11 | Intervalos y umbrales de alerta | Solo fecha indicada; sin umbral inicial; configurable después. | Aprobada | Fase 7 |
 | 8 | D-12 | Vencimiento del equipo | Documentada del fabricante + vida útil por tipo; `EQUIPO` usa la más temprana. | Aprobada | Fase 4/7 |
 | 9 | D-17 | Baja de un activo en mantenimiento | Prohibida con orden activa; ajuste excepcional de `ADMIN`. | Aprobada | Fase 6 |
 | 10 | D-06 | Autenticación local vs SSO corporativo | Local con `AuthProvider` desacoplado; sin SSO obligatorio confirmado. | Aprobada | Fase 2 |
@@ -117,6 +117,7 @@ El propietario revisó las decisiones una por una y **confirmó** las once, sin 
 | D-26b | B — `NO_OPERATIVO` bloquea la asignación a áreas (2026-11-12) |
 | D-28 | A — la inspección no cambia la condición automáticamente (2026-11-12) |
 | D-12 | A ampliada — fecha documentada + vida útil por tipo; `EQUIPO` usa la más temprana (2026-11-12) |
+| D-11 | A + C — solo fecha indicada y sin umbral inicial (2026-11-12) |
 
 ---
 
@@ -409,9 +410,16 @@ El propietario revisó las decisiones una por una y **confirmó** las once, sin 
 
 **Recomendación:** A + C: registrar la fecha indicada y configurar umbrales; no calcular intervalos automáticamente. Ejemplo de 30 días solo como valor de prueba, nunca como norma.
 
-**Si no se responde:** `days_before = NULL`; se muestran vencido/vigente/sin fecha; no se genera “por vencer” hasta configurar.
+**Decisión aprobada (2026-11-12):** **A + C + sin umbral inicial**:
 
-**Bloquea:** fase 7. **Estado:** abierta.
+- La próxima fecha de inspección, mantenimiento, recarga y prueba hidrostática se toma **solo** de la fecha indicada por el certificado, el proveedor o el responsable autorizado. El sistema no calcula intervalos automáticamente.
+- Si el evento no indica próxima fecha, la categoría queda `SIN_FECHA_CONFIGURADA`; no se conserva una fecha anterior como vigente.
+- El MVP arranca con `days_before = NULL` para todas las categorías: solo se distingue `VENCIDO`, `VIGENTE` y `SIN_FECHA_CONFIGURADA`. No se genera `POR_VENCER` hasta que se configure un umbral.
+- Los umbrales son configurables por categoría y no se siembran valores por defecto.
+- Cambiar un umbral solo afecta la clasificación, no las fechas fuente, y queda auditado.
+- Cualquier valor de ejemplo (por ejemplo, 30 días) es de prueba y no una norma.
+
+**Bloquea:** fase 7. **Estado:** aprobada.
 
 ---
 
@@ -892,7 +900,7 @@ El propietario revisó las decisiones una por una y **confirmó** las once, sin 
 | S-07 | Código generado `EXT-` + 6 dígitos; sin importación de códigos (D-04). | D-04 |
 | S-08 | QR con código plano. | D-05 |
 | S-09 | Serie opcional y no única. | D-16 |
-| S-10 | Umbrales sin valor por defecto. | D-11 |
+| S-10 | Solo fecha indicada; sin umbral inicial (D-11). | D-11 |
 | S-11 | La inspección no cambia condición automáticamente. | D-28 |
 | S-12 | No se permite baja con orden de mantenimiento activa. | D-17 |
 | S-13 | Documentos como referencia textual; archivos en fase 2. | D-13 |
@@ -905,7 +913,7 @@ El propietario revisó las decisiones una por una y **confirmó** las once, sin 
 | S-20 | Un solo `ADMIN` puede ajustar; Seguridad puede baja/condición. | D-07/D-27 |
 | S-21 | El vencimiento del equipo combina fecha documentada y vida útil calculada por tipo; sin datos queda sin fecha. | D-12 |
 
-**Tras la aprobación del 2026-11-10**, S-06, S-07, S-08, S-09, S-11 y S-12 dejan de ser supuestos y pasan a decisiones aprobadas (ver 2.2). S-11 se ajusta: **no** existe mapeo automático de resultado a condición. El resto sigue siendo supuesto.
+**Tras las aprobaciones del 2026-11-10 al 2026-11-12**, S-01, S-02, S-04, S-06 a S-12, S-16, S-20 y S-21 pasan a decisiones aprobadas (ver §2.2 y §2.4). S-11 se ajusta: **no** existe mapeo automático de resultado a condición. Siguen como supuesto S-03, S-05, S-13, S-14, S-15, S-17, S-18 y S-19.
 
 ---
 
@@ -930,18 +938,17 @@ Estas decisiones se usaron para escribir los documentos, pero **no están aproba
 
 Para no bloquear el diseño, se propone esta secuencia. Solo figuran las decisiones **abiertas** al 2026-11-12; las aprobadas están en §2.2 y §2.4, y ya se reflejaron en los documentos. Cada respuesta se registra aquí y se refleja en el modelo/API antes de avanzar.
 
-1. **D-11:** ¿intervalos y umbrales de alerta aprobados? (fase 7)
-2. **D-08b:** ¿se requiere flujo de aprobación en la aplicación? (fase 5)
-3. **D-13:** ¿adjuntos, fotos o firmas en el MVP? (fase 6)
-4. **D-19:** ¿qué formatos de reporte se necesitan? (fase 7)
-5. **D-20:** ¿qué notificaciones se requieren? (fase 7)
-6. **D-21:** ¿cuánto tiempo se conserva el historial y la auditoría? (transversal)
-7. **D-22:** ¿cuál es el volumen esperado? (transversal)
-8. **D-23:** ¿dónde se despliega y cuál es el objetivo de respaldo? (transversal)
-9. **D-14:** ¿se requiere operación sin internet? (transversal)
-10. **D-25:** ¿se necesitan movimientos por lote? (fase 5)
-11. **D-29:** ¿se registran costos de mantenimiento? (fase 6)
-12. **D-30:** ¿idioma y localización? (transversal)
+1. **D-08b:** ¿se requiere flujo de aprobación en la aplicación? (fase 5)
+2. **D-13:** ¿adjuntos, fotos o firmas en el MVP? (fase 6)
+3. **D-19:** ¿qué formatos de reporte se necesitan? (fase 7)
+4. **D-20:** ¿qué notificaciones se requieren? (fase 7)
+5. **D-21:** ¿cuánto tiempo se conserva el historial y la auditoría? (transversal)
+6. **D-22:** ¿cuál es el volumen esperado? (transversal)
+7. **D-23:** ¿dónde se despliega y cuál es el objetivo de respaldo? (transversal)
+8. **D-14:** ¿se requiere operación sin internet? (transversal)
+9. **D-25:** ¿se necesitan movimientos por lote? (fase 5)
+10. **D-29:** ¿se registran costos de mantenimiento? (fase 6)
+11. **D-30:** ¿idioma y localización? (transversal)
 
 ---
 

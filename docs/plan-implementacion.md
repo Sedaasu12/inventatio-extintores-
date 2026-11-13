@@ -587,12 +587,13 @@ Convertir las fechas documentadas en información operativa, sin inventar period
 ### Dependencias
 
 - Fase 6.
-- D-11 (umbrales), D-12 (vencimiento del equipo, aprobada: documentada + vida útil por tipo), D-19 (formatos).
+- D-11 (umbrales, aprobada: solo fecha indicada y sin umbral inicial), D-12 (vencimiento del equipo, aprobada: documentada + vida útil por tipo), D-19 (formatos).
 
 ### Alcance
 
 - Cálculo de alertas por categoría/estado; para `EQUIPO`, la fecha más temprana entre documentada y calculada (D-12).
-- Configuración de umbrales.
+- Configuración de umbrales, sin seed ni valores por defecto (D-11).
+- Verificación de que las categorías de inspección/servicio no calculan intervalos (D-11).
 - Resumen por categoría/estado.
 - Dashboard.
 - Reportes de inventario, movimientos, mantenimiento, inspecciones y bajas.
@@ -957,7 +958,7 @@ Cada puerta requiere evidencia de pruebas y revisión de los documentos actualiz
 
 | Riesgo | Probabilidad | Impacto | Mitigación | Responsable |
 |---|---|---|---|---|
-| Reglas técnicas no confirmadas | Media | Alto | D-11 pendiente; D-10/D-12 aprobadas; no inventar; configuración explícita. | Propietario/seguridad |
+| Reglas técnicas no confirmadas | Baja | Medio | D-10/D-11/D-12 aprobadas; D-19 pendiente; no inventar; configuración explícita. | Propietario/seguridad |
 | Datos existentes de baja calidad | Media | Alto | D-24; dry-run; reporte de errores. | Almacén/administración |
 | Permisos ambiguos | Media | Alto | D-07; matriz; pruebas 403. | Propietario |
 | Concurrencia/doble envío | Media | Alto | Bloqueo, versión, idempotencia, pruebas. | Desarrollo |

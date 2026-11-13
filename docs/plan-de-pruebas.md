@@ -240,10 +240,10 @@ Estructura D-02: `SEDE` es la raíz; `ALMACEN`, `TALLER` y `AREA` son hijos. Los
 | ID | Nivel | Acción | Resultado esperado | Requisito |
 |---|---|---|---|---|
 | T-ALE-01 | Unitario | Fecha ayer | `VENCIDO`. | RF-ALE-02 |
-| T-ALE-02 | Unitario | Fecha hoy | `POR_VENCER`. | BR-122 |
+| T-ALE-02 | Unitario | Fecha hoy con umbral configurado | `POR_VENCER`. | BR-122 |
 | T-ALE-03 | Unitario | Fecha dentro del umbral | `POR_VENCER`; días restantes correctos. | RF-ALE-02 |
 | T-ALE-04 | Unitario | Fecha fuera del umbral | `VIGENTE`. | RF-ALE-02 |
-| T-ALE-05 | Unitario | Sin umbral configurado | Hoy → `POR_VENCER`; futura → `VIGENTE`; no se inventa periodo. | BR-125 |
+| T-ALE-05 | Unitario | Sin umbral configurado | Hoy y futura → `VIGENTE`; no se genera `POR_VENCER`; no se inventa periodo. | D-11 / BR-125 |
 | T-ALE-06 | Integración | Activo sin fecha documentada | `SIN_FECHA_CONFIGURADA`; no se inventa fecha. | RF-ALE-08 |
 | T-ALE-07 | Integración | Activo dado de baja | Excluido por defecto; incluido con filtro explícito. | RF-ALE-05 |
 | T-ALE-08 | Integración | Categoría deshabilitada | No aparece en alertas operativas. | BR-130 |
@@ -254,6 +254,8 @@ Estructura D-02: `SEDE` es la raíz; `ALMACEN`, `TALLER` y `AREA` son hijos. Los
 | T-ALE-13 | Unitario | `EQUIPO` con documentada y calculada | Se usa la más temprana; el estado se calcula sobre esa fecha. | D-12 / BR-107C |
 | T-ALE-14 | Integración | `EQUIPO` solo con calculada | Alerta correcta desde `manufactureDate + usefulLifeYears`. | D-12 / BR-107B |
 | T-ALE-15 | Integración | `EQUIPO` sin documentada ni calculable | `SIN_FECHA_CONFIGURADA`; no se inventa fecha. | D-12 / RF-ALE-08 |
+| T-ALE-16 | Integración | Inspección/servicio sin `nextDueDate` | La categoría queda `SIN_FECHA_CONFIGURADA`; el servidor no calcula un intervalo. | D-11 / BR-108A |
+| T-ALE-17 | Integración | Instalación sin umbrales sembrados | `alert_settings.days_before` nulo; no aparecen `POR_VENCER`. | D-11 / BR-125A |
 
 ### 4.9 Dashboard, reportes y auditoría
 
@@ -452,7 +454,7 @@ Verificar `EXPLAIN` de las consultas principales y que se usen los índices defi
 | Retorno almacén | RF-MOV-04 | T-MOV-06 |
 | Mantenimiento | RF-MAN-01..09, RF-MOV-05/06 | T-MAN-01..15, E2E-01 |
 | Inspección | RF-INS-01..06 | T-INS-01..06 |
-| Alertas | RF-ALE-01..09 | T-ALE-01..15 |
+| Alertas | RF-ALE-01..09 | T-ALE-01..17 |
 | Baja | RF-MOV-07 | T-MOV-21/22/23, E2E-01 |
 | Ajuste | RF-MOV-08 | T-MOV-19/20 |
 | QR | RF-QR-01..06 | T-QR-01..10 |

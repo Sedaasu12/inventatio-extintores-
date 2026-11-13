@@ -49,7 +49,7 @@
 - RN-05 No se eliminan movimientos confirmados; las correcciones se documentan.
 - RN-06 Un extintor dado de baja no participa en movimientos ordinarios.
 - RN-07 Las fechas de vencimiento, inspección, mantenimiento, recarga y prueba se almacenan separadamente.
-- RN-08 Las alertas usan umbrales configurables; no se inventan periodos técnicos.
+- RN-08 Las alertas usan umbrales configurables; no se inventan periodos técnicos ni se calculan intervalos de próxima fecha (D-11).
 - RN-09 Cada movimiento registra usuario creador y sello de tiempo del servidor.
 - RN-10 La lectura de QR no reemplaza autenticación ni autorización.
 

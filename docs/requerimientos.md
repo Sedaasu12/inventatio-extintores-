@@ -123,8 +123,9 @@ La matriz detallada está en `docs/diseno-api.md`. Los permisos se validan siemp
 | ID | Requisito | Prioridad | Criterio de aceptación |
 |---|---|---|---|
 | RF-ALE-01 | Mantener categorías separadas: equipo, inspección, mantenimiento, recarga y prueba hidrostática. | Must | Cada categoría tiene su propia fecha y fuente; `EQUIPO` combina documentada y calculada, y no existe un único campo `fecha_vencimiento` (D-12). |
-| RF-ALE-02 | Calcular estado `VENCIDO`, `POR_VENCER`, `VIGENTE` o `SIN_FECHA_CONFIGURADA`. | Must | El cálculo usa la fecha objetivo (para `EQUIPO`, la más temprana disponible), la fecha actual y el umbral configurado. |
-| RF-ALE-03 | Configurar umbrales por categoría. | Must | `days_before` configurable; sin valor por defecto inventado; cambios auditados. |
+| RF-ALE-02 | Calcular estado `VENCIDO`, `POR_VENCER`, `VIGENTE` o `SIN_FECHA_CONFIGURADA`. | Must | El cálculo usa la fecha objetivo (para `EQUIPO`, la más temprana disponible), la fecha actual y el umbral configurado; sin umbral no se genera `POR_VENCER` (D-11). |
+| RF-ALE-03 | Configurar umbrales por categoría. | Must | `days_before` configurable; sin valor por defecto ni seed (D-11); cambios auditados. |
+| RF-ALE-03A | No calcular intervalos de próxima fecha. | Must | La próxima fecha solo se registra desde el certificado/proveedor/responsable; si no se indica, queda sin configurar (D-11). |
 | RF-ALE-04 | Mostrar la fecha fuente y los días restantes/atraso. | Must | Cada alerta indica categoría, fecha, días y activo. |
 | RF-ALE-05 | Excluir activos dados de baja por defecto. | Must | No aparecen en alertas operativas; se pueden incluir con filtro explícito. |
 | RF-ALE-06 | No duplicar alertas al recalcular. | Must | Cálculo determinista desde fechas objetivo; no se insertan filas duplicadas. |

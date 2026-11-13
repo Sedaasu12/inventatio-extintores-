@@ -57,6 +57,7 @@
 | PT-13 | Dar de baja | Equipo no aparece como operativo, pero conserva historial. |
 | PT-14 | Doble clic o lectura duplicada | No se crea movimiento repetido sin control. |
 | PT-15 | Cámara denegada | Se ofrece código manual/lector externo. |
+| PT-16 | Sin umbral configurado | No aparece “por vencer”; solo vencido, vigente o sin fecha (D-11). |
 
 ## 7. Cierre de cada entrega
 - Migración ejecutada desde una base vacía.

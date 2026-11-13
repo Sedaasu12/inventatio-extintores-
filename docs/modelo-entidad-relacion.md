@@ -581,7 +581,7 @@ Sin `updated_at`: inmutable; corrección = nueva fila.
 | `updated_by` | `CHAR(36)` | No | FK `users.id`. |
 | `updated_at` | `DATETIME(3)` | No | |
 
-No se siembran valores de días por defecto. La instalación crea las filas con `days_before = NULL`; el administrador las configura con la política aprobada.
+No se siembran valores de días por defecto. La instalación crea las filas con `days_before = NULL`; el administrador las configura con la política aprobada (D-11). Hasta entonces no se genera `POR_VENCER`.
 
 ### 4.13 `audit_logs`
 
@@ -713,6 +713,8 @@ Con 10 000 activos y 100 000 movimientos, los listados deben paginarse y filtrar
 | `PRUEBA_HIDROSTATICA` | Último `maintenance_service` de tipo `PRUEBA_HIDROSTATICA` | Solo actualiza esa categoría. |
 
 **Comparación:** se actualiza la proyección solo si el evento nuevo tiene `source_event_at` posterior, o igual con `created_at` posterior. Un evento retroactivo anterior no pisa la fecha vigente. Una corrección se registra como nuevo evento con `corrects_id` y fecha/creación posterior.
+
+**Sin cálculo de intervalos (D-11):** las categorías `INSPECCION`, `MANTENIMIENTO`, `RECARGA` y `PRUEBA_HIDROSTATICA` toman la fecha únicamente del `next_due_date` indicado. El sistema no suma meses ni años desde el último evento.
 
 **Consecuencia:** si una inspección nueva no indica próxima fecha, la categoría queda `SIN_FECHA_CONFIGURADA`. No se conserva una fecha antigua como si siguiera vigente.
 
