@@ -37,6 +37,10 @@
 | BR-012B | El alta exige una condición inicial elegida por el usuario; no se asigna un valor por defecto silencioso. | DTO obligatorio; prueba de rechazo si falta. |
 | BR-013 | La condición técnica no se deduce automáticamente de la ubicación. | Campos separados; validaciones independientes. |
 | BR-014 | El estado logístico no se deduce automáticamente de la condición técnica. | Campos separados. |
+| BR-014A | Un extintor `NO_OPERATIVO` no puede asignarse a un `AREA` ni darse de alta directamente en un área (D-26b aprobada). | Validación de destino y de alta; 422 `CONDITION_NOT_ASSIGNABLE`. |
+| BR-014B | Un extintor `NO_OPERATIVO` sí puede ubicarse en `ALMACEN`, `TALLER` o proveedor externo, y puede enviarse a mantenimiento. | Validación de destino. |
+| BR-014C | `OBSERVADO` y `PENDIENTE_INSPECCION` permiten cualquier ubicación, con advertencia visible. La condición no genera alertas por sí misma. | Aviso en UI; alertas solo por fechas. |
+| BR-014D | Si el equipo está `ASIGNADO` en un área, no puede pasar a `NO_OPERATIVO`; primero se retira a almacén o taller. | Validación en el cambio de condición; mensaje que indique el movimiento requerido. |
 | BR-015 | Un activo no puede estar simultáneamente en dos ubicaciones/contrapartes. | Una sola colocación actual; `placement_type` + FKs mutuamente excluyentes. |
 
 ---
@@ -407,6 +411,7 @@ stateDiagram-v2
 | `LOCATION_DEPTH` | 422 | Se intentó anidar una ubicación bajo un área, almacén o taller (D-02). |
 | `LOCATION_PARENT_TYPE` | 422 | El padre no es una `SEDE` activa, o una `SEDE` recibió `parentId`. |
 | `LOCATION_NAME_DUPLICATE` | 409 | Ya existe una ubicación con ese nombre en la misma sede. |
+| `CONDITION_NOT_ASSIGNABLE` | 422 | Un extintor `NO_OPERATIVO` no puede asignarse a un área (D-26b). |
 | `RATE_LIMITED` | 429 | Límite de intentos. |
 | `INTERNAL_ERROR` | 500 | Error no controlado; sin detalles internos. |
 

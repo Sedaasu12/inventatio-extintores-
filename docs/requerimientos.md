@@ -61,6 +61,7 @@ La matriz detallada está en `docs/diseno-api.md`. Los permisos se validan siemp
 | RF-EXT-06 | Buscar y filtrar por código, serie, tipo, ubicación, estado, condición y fechas. | Must | Filtros y paginación se ejecutan en servidor; resultados consistentes. |
 | RF-EXT-07 | Editar campos descriptivos y técnicos sin afectar ubicación/estado. | Must | Un payload con `currentLocationId` o `logisticsStatus` es rechazado o ignorado explícitamente; el cambio queda auditado. |
 | RF-EXT-08 | Cambiar la condición técnica mediante acción auditada. | Must | Se exige motivo; solo `SEGURIDAD` y `ADMIN` (D-27); no cambia la ubicación. |
+| RF-EXT-09 | Impedir que un extintor `NO_OPERATIVO` se asigne a un área. | Must | El alta y el movimiento a área devuelven 422; almacén, taller y proveedor están permitidos (D-26b). |
 | RF-EXT-09 | Generar la etiqueta QR del activo. | Must | El QR contiene solo el código estable o una URL estable aprobada; la etiqueta muestra el código legible. |
 | RF-EXT-10 | Resolver un código escaneado a la ficha autenticada. | Must | Código existente devuelve ficha; inexistente devuelve 404; dado de baja devuelve ficha con estado y sin acciones ordinarias. |
 | RF-EXT-11 | Imprimir etiquetas sin datos sensibles. | Must | La etiqueta no incluye ubicación, fechas, nombres ni datos personales. |

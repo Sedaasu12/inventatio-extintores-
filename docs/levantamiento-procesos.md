@@ -44,6 +44,7 @@
 | P-13 | Proveedor de identidad corporativo | D-06 | Respondida y aplicada |
 | P-14 | Vocabulario de condición técnica | D-26 | Respondida y aplicada |
 | P-15 | Política de contraseñas y acceso | D-06b | Respondida y aplicada |
+| P-16 | Efecto operativo de la condición técnica | D-26b | Respondida y aplicada |
 
 ---
 
@@ -620,14 +621,14 @@
 
 **Qué NO se concluye todavía:**
 
-- Qué efecto operativo tiene cada condición (si `NO_OPERATIVO` impide asignar o mover, si genera alerta): queda como D-26b.
+- Qué efecto operativo tiene cada condición: resuelto en D-26b (2026-11-12); `NO_OPERATIVO` no puede estar en un área.
 - Si una inspección la cambia automáticamente: D-28.
 
 **Quién puede cambiarla (D-27, aprobada el 2026-11-12):** `SEGURIDAD` y `ADMIN`, con motivo obligatorio y evidencia documental opcional.
 
 **Implicaciones:** D-26 se aprueba con enum fijo de cuatro valores. Agregar o quitar un valor exige migración, análisis de impacto y pruebas de regresión.
 
-**Decisiones afectadas:** D-26 (aprobada), D-26b (abierta), D-27, D-28.
+**Decisiones afectadas:** D-26 (aprobada), D-26b (aprobada el 2026-11-12), D-27, D-28.
 
 **Documentos actualizados:** este registro (P-14, H-20), `decisiones-pendientes.md`, `reglas-de-negocio.md` (BR-012A/BR-012B), `modelo-entidad-relacion.md`, `diseno-api.md`, `plan-de-pruebas.md`, `plan-implementacion.md` y `analisis-funcional.md`.
 
@@ -658,6 +659,31 @@
 
 ---
 
+### P-16 — Efecto operativo de la condición técnica
+
+**Pregunta:** ¿La condición técnica bloquea movimientos? ¿Puede un extintor `NO_OPERATIVO` instalarse en un área?
+
+**Respuesta del propietario (2026-11-12):** un equipo no operativo no debe instalarse en un área. Puede permanecer en almacén o taller, o enviarse a mantenimiento. Las condiciones observada y pendiente de inspección no impiden instalarlo, pero deben advertirse.
+
+**Lectura:**
+
+- La condición tiene efecto operativo, no es solo informativa.
+- El sistema debe impedir la asignación de un equipo `NO_OPERATIVO` para que el registro no valide una situación insegura.
+- No se necesita un permiso de excepción en el MVP.
+
+**Qué NO se concluye todavía:**
+
+- Si en el futuro hará falta una excepción autorizada; queda fuera del MVP.
+- Si una inspección puede cambiar la condición automáticamente: D-28.
+
+**Implicaciones:** D-26b se aprueba con opción B. El backend rechaza destino `AREA` para `NO_OPERATIVO` y rechaza el cambio a `NO_OPERATIVO` mientras el equipo está asignado en un área.
+
+**Decisiones afectadas:** D-26b (aprobada), D-27, D-28.
+
+**Documentos actualizados:** este registro (P-16, H-22), `decisiones-pendientes.md`, `reglas-de-negocio.md` (BR-014A a BR-014D), `modelo-entidad-relacion.md`, `diseno-api.md`, `plan-de-pruebas.md`, `plan-implementacion.md`, `requerimientos.md` y `analisis-funcional.md`.
+
+---
+
 ## 4. Contradicciones y hallazgos
 
 | ID | Hallazgo | Efecto |
@@ -681,11 +707,12 @@
 | H-17 | La estructura real es Sede → área, sin edificios ni pisos; el almacén central y el taller propio están dentro de una sede. | D-02: jerarquía de dos niveles con tipos `SEDE`, `ALMACEN`, `AREA` y `TALLER`; las sedes no alojan activos directamente. |
 | H-18 | No existen códigos de sede ni de área; solo nombres. | D-02: código interno generado por el servidor; nombre único dentro de la sede y repetible entre sedes. |
 | H-19 | No hay proveedor de identidad corporativo obligatorio. | D-06: autenticación local en el MVP con proveedor desacoplado; las cuentas y contraseñas se administran en SITE. |
-| H-20 | El vocabulario de condición técnica es estable y se limita a cuatro valores; no hay códigos ni estados propios. | D-26: enum fijo; sin catálogo administrable. El efecto operativo de cada valor sigue abierto (D-26b). |
+| H-20 | El vocabulario de condición técnica es estable y se limita a cuatro valores; no hay códigos ni estados propios. | D-26: enum fijo; sin catálogo administrable. D-26b define el efecto de cada valor. |
 | H-21 | No existía una política de contraseñas ni segundo factor definidos. | D-06b: 12–128 caracteres, sin composición ni caducidad, rechazo de comunes, reset por `ADMIN` y sin MFA en el MVP. |
+| H-22 | No había una regla sobre si la condición técnica impide instalar un equipo. | D-26b: `NO_OPERATIVO` no puede estar en un área; solo almacén, taller o proveedor. `OBSERVADO` y `PENDIENTE_INSPECCION` se permiten con advertencia. |
 
 ---
 
 ## 5. Próxima pregunta
 
-Levantamiento cerrado el 2026-11-10 y ampliado con D-02, D-06, D-06b, D-26 y D-27. No quedan preguntas de ubicaciones, identidad, política de acceso, vocabulario técnico ni autoridad sobre la condición pendientes. La siguiente decisión abierta por impacto es **D-26b (efecto de cada condición)**, seguida de **D-28 (inspección y condición)** y **D-12 (vencimiento del equipo)**. No se inicia implementación funcional sin aprobación.
+Levantamiento cerrado el 2026-11-10 y ampliado con D-02, D-06, D-06b, D-26, D-26b y D-27. No quedan preguntas de ubicaciones, identidad, política de acceso, vocabulario técnico, autoridad sobre la condición ni efecto de la condición pendientes. La siguiente decisión abierta por impacto es **D-28 (inspección y condición)**, seguida de **D-12 (vencimiento del equipo)** y **D-11 (umbrales de alerta)**. No se inicia implementación funcional sin aprobación.

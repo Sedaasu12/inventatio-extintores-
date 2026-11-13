@@ -427,6 +427,7 @@ Se registran como supuestos explícitos; no son reglas aprobadas. El detalle y l
 | S-14 | El sistema será usado por menos de 100 usuarios y un inventario del orden de 10 000 extintores; confirmar volumen. |
 | S-15 | Interfaz en español; no se requiere i18n en el MVP. |
 | S-16 | Contraseñas de 12–128 caracteres, sin composición obligatoria, caducidad ni MFA en el MVP; el reset es solo administrativo (D-06b). |
+| S-17 | Un extintor `NO_OPERATIVO` no puede estar asignado a un área; solo se ubica en almacén, taller o proveedor (D-26b). |
 
 ### 9.1 Realidad operativa declarada (levantamiento 2026-11-10; precisión D-02 el 2026-11-11)
 
@@ -457,12 +458,11 @@ Hechos aportados por el propietario. **No son reglas aprobadas**; el detalle y l
 
 > **Estado al 2026-11-11:** el levantamiento está cerrado y las decisiones D-01 a D-05, D-07, D-09, D-10, D-15, D-16, D-17, D-24 y D-31 están aprobadas. El registro completo está en `docs/decisiones-pendientes.md`. Lo que sigue son las decisiones abiertas que bloquean fases concretas.
 
-1. **D-26b — Efecto de cada condición:** ¿`NO_OPERATIVO` impide asignar o mover? ¿Genera alerta? Bloquea la fase 5.
-2. **D-28 — Inspecciones y condición:** ¿una inspección puede cambiarla automáticamente? Bloquea la fase 6.
-3. **D-12 — Vencimiento del equipo:** ¿qué significa y de qué documento procede? Bloquea las fechas objetivo.
-4. **D-11 — Umbrales de alerta:** ¿qué intervalos y anticipaciones están aprobados? Bloquea la fase 7.
-5. **D-08b — Flujo de aprobación:** ¿basta la evidencia textual o se requiere aprobación en la aplicación? Bloquea la fase 5.
-6. **D-13/D-14/D-19/D-20/D-21/D-22/D-23/D-25/D-29/D-30:** adjuntos, operación sin internet, reportes, notificaciones, retención, volumen, despliegue, lotes, costos e idioma.
+1. **D-28 — Inspecciones y condición:** ¿una inspección puede cambiarla automáticamente? Bloquea la fase 6.
+2. **D-12 — Vencimiento del equipo:** ¿qué significa y de qué documento procede? Bloquea las fechas objetivo.
+3. **D-11 — Umbrales de alerta:** ¿qué intervalos y anticipaciones están aprobados? Bloquea la fase 7.
+4. **D-08b — Flujo de aprobación:** ¿basta la evidencia textual o se requiere aprobación en la aplicación? Bloquea la fase 5.
+5. **D-13/D-14/D-19/D-20/D-21/D-22/D-23/D-25/D-29/D-30:** adjuntos, operación sin internet, reportes, notificaciones, retención, volumen, despliegue, lotes, costos e idioma.
 
 El detalle, la recomendación y el supuesto de cada una está en `docs/decisiones-pendientes.md`.
 
@@ -485,7 +485,7 @@ El detalle, la recomendación y el supuesto de cada una está en `docs/decisione
 
 ## 12. Próximo paso
 
-1. Completar las decisiones abiertas de `decisiones-pendientes.md` (siguiente: D-26b, D-28 y D-12).
+1. Completar las decisiones abiertas de `decisiones-pendientes.md` (siguiente: D-28, D-12 y D-11).
 2. Cerrar el alcance de la fase 1 (esquema y migración inicial) con las decisiones ya aprobadas.
 3. Autorizar la fase 1 antes de escribir módulos funcionales.
 

@@ -113,6 +113,7 @@ El propietario revisó las decisiones una por una y **confirmó** las once, sin 
 | D-26 | A — condición técnica como enum fijo de cuatro valores (2026-11-12) |
 | D-27 | A — `SEGURIDAD` y `ADMIN` cambian la condición con motivo (2026-11-12) |
 | D-06b | A — contraseña de 12–128, sin caducidad ni MFA; reset por `ADMIN` (2026-11-12) |
+| D-26b | B — `NO_OPERATIVO` bloquea la asignación a áreas (2026-11-12) |
 
 ---
 
@@ -721,7 +722,35 @@ El propietario revisó las decisiones una por una y **confirmó** las once, sin 
 
 **Bloquea:** fase 1/2. **Estado:** aprobada.
 
-**Derivada abierta — D-26b:** qué efecto operativo tiene cada condición (por ejemplo, si `NO_OPERATIVO` impide asignar o mover el equipo, si genera alerta y cómo se reporta). D-26 fija el conjunto de valores, no su semántica operativa. Bloquea la fase 5. No se asume ningún bloqueo por condición hasta su aprobación.
+**Derivada resuelta — D-26b:** el efecto operativo de cada condición se aprobó el 2026-11-12 (ver la decisión D-26b a continuación).
+
+---
+
+### D-26b — ¿Qué efecto operativo tiene cada condición?
+
+**Pregunta:** ¿La condición técnica bloquea movimientos o solo informa? En particular, ¿puede un extintor `NO_OPERATIVO` instalarse en un área?
+
+**Por qué importa:** define si el sistema impide una asignación insegura o si depende de la disciplina del usuario.
+
+**Opciones:**
+
+- A. Solo informativa; ningún valor bloquea.
+- B. `NO_OPERATIVO` bloquea la asignación a áreas; permite almacén, taller y proveedor.
+- C. Como B, con excepción forzada por permiso especial.
+
+**Recomendación:** B.
+
+**Decisión aprobada (2026-11-12):** opción **B**.
+
+- `NO_OPERATIVO` no puede ser destino `AREA` ni alta inicial en un área.
+- `NO_OPERATIVO` sí puede ubicarse en `ALMACEN`, `TALLER` o proveedor externo, y puede enviarse a mantenimiento.
+- `OBSERVADO` y `PENDIENTE_INSPECCION` permiten cualquier ubicación, con advertencia visible.
+- La condición no genera alertas por sí misma; las alertas siguen siendo por fechas.
+- El bloqueo se valida en el servidor y se cubre con pruebas de integración.
+- Si un equipo está `ASIGNADO` en un área y se intenta cambiar a `NO_OPERATIVO`, el cambio se rechaza: primero debe retirarse a almacén o taller mediante el movimiento correspondiente.
+- No se crea un permiso de excepción en el MVP; si la operación lo exige, se evalúa en una fase posterior.
+
+**Bloquea:** fase 5. **Estado:** aprobada.
 
 ---
 
@@ -881,21 +910,20 @@ Estas decisiones se usaron para escribir los documentos, pero **no están aproba
 
 Para no bloquear el diseño, se propone esta secuencia. Solo figuran las decisiones **abiertas** al 2026-11-11; las aprobadas están en §2.2 y ya se reflejaron en los documentos. Cada respuesta se registra aquí y se refleja en el modelo/API antes de avanzar.
 
-1. **D-26b:** ¿qué efecto operativo tiene cada condición? (fase 5)
-2. **D-28:** ¿una inspección cambia automáticamente la condición? (fase 6)
-3. **D-12:** ¿qué significa "vencimiento del equipo" y de qué documento procede? (fase 1/6)
-4. **D-11:** ¿intervalos y umbrales de alerta aprobados? (fase 7)
-5. **D-08b:** ¿se requiere flujo de aprobación en la aplicación? (fase 5)
-6. **D-13:** ¿adjuntos, fotos o firmas en el MVP? (fase 6)
-7. **D-19:** ¿qué formatos de reporte se necesitan? (fase 7)
-8. **D-20:** ¿qué notificaciones se requieren? (fase 7)
-9. **D-21:** ¿cuánto tiempo se conserva el historial y la auditoría? (transversal)
-10. **D-22:** ¿cuál es el volumen esperado? (transversal)
-11. **D-23:** ¿dónde se despliega y cuál es el objetivo de respaldo? (transversal)
-12. **D-14:** ¿se requiere operación sin internet? (transversal)
-13. **D-25:** ¿se necesitan movimientos por lote? (fase 5)
-14. **D-29:** ¿se registran costos de mantenimiento? (fase 6)
-15. **D-30:** ¿idioma y localización? (transversal)
+1. **D-28:** ¿una inspección cambia automáticamente la condición? (fase 6)
+2. **D-12:** ¿qué significa "vencimiento del equipo" y de qué documento procede? (fase 1/6)
+3. **D-11:** ¿intervalos y umbrales de alerta aprobados? (fase 7)
+4. **D-08b:** ¿se requiere flujo de aprobación en la aplicación? (fase 5)
+5. **D-13:** ¿adjuntos, fotos o firmas en el MVP? (fase 6)
+6. **D-19:** ¿qué formatos de reporte se necesitan? (fase 7)
+7. **D-20:** ¿qué notificaciones se requieren? (fase 7)
+8. **D-21:** ¿cuánto tiempo se conserva el historial y la auditoría? (transversal)
+9. **D-22:** ¿cuál es el volumen esperado? (transversal)
+10. **D-23:** ¿dónde se despliega y cuál es el objetivo de respaldo? (transversal)
+11. **D-14:** ¿se requiere operación sin internet? (transversal)
+12. **D-25:** ¿se necesitan movimientos por lote? (fase 5)
+13. **D-29:** ¿se registran costos de mantenimiento? (fase 6)
+14. **D-30:** ¿idioma y localización? (transversal)
 
 ---
 

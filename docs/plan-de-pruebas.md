@@ -145,6 +145,9 @@ Estructura D-02: `SEDE` es la raíz; `ALMACEN`, `TALLER` y `AREA` son hijos. Los
 | T-EXT-12 | Integración | Búsqueda/filtros/paginación | Resultados correctos; filtros en servidor; no carga todo el inventario. | RF-EXT-06 |
 | T-EXT-13 | Unitario | Enviar condición `EN_REVISION` o texto libre | 422; solo se aceptan los cuatro valores del enum (D-26). | BR-012A |
 | T-EXT-14 | Integración | `SEGURIDAD` cambia condición sin documento | 200; auditoría con anterior/nuevo y motivo; la evidencia documental es opcional. | D-27 / BR-167A |
+| T-EXT-15 | Integración | Alta en área con `NO_OPERATIVO` | 422 `CONDITION_NOT_ASSIGNABLE`; no se crea el activo. | D-26b / BR-014A |
+| T-EXT-16 | Integración | Alta en almacén con `NO_OPERATIVO` | 201; estado `EN_ALMACEN`. | D-26b / BR-014B |
+| T-EXT-17 | Integración | Alta en área con `OBSERVADO` | 201; se permite con advertencia. | D-26b / BR-014C |
 
 ### 4.4 QR y escaneo
 
@@ -189,6 +192,9 @@ Estructura D-02: `SEDE` es la raíz; `ALMACEN`, `TALLER` y `AREA` son hijos. Los
 | T-MOV-22 | Integración | Baja con orden activa | 409/422; no se permite por defecto. | BR-069 |
 | T-MOV-23 | Integración | Movimiento posterior a baja | 409. | BR-054 |
 | T-MOV-24 | Integración | Historial paginado/ordenado | Orden correcto por secuencia/fecha; sin huecos. | RF-MOV-11/15 |
+| T-MOV-25 | Integración | Mover un equipo `NO_OPERATIVO` a un `AREA` | 422 `CONDITION_NOT_ASSIGNABLE`; sin cambios. | D-26b / BR-014A |
+| T-MOV-26 | Integración | Mover un equipo `NO_OPERATIVO` a almacén o taller | 201; destino permitido. | D-26b / BR-014B |
+| T-MOV-27 | Integración | Cambiar a `NO_OPERATIVO` un equipo `ASIGNADO` en área | 422; indica retirarlo primero a almacén o taller. | D-26b / BR-014D |
 
 ### 4.6 Mantenimiento
 
@@ -306,6 +312,7 @@ Después de cada operación, ejecutar consultas de verificación:
 - `ASIGNADO` ⇒ ubicación tipo `AREA`.
 - `EN_MANTENIMIENTO` interno ⇒ ubicación tipo `TALLER`.
 - Una `SEDE` no puede ser ubicación actual de un extintor.
+- `ASIGNADO` ⇒ `technical_condition <> 'NO_OPERATIVO'` (D-26b).
 - `EN_MANTENIMIENTO` ⇒ contraparte externa + orden activa.
 - `DADO_DE_BAJA` ⇒ `placement_type='NONE'`, FKs nulas, `retired_at` no nulo.
 - Secuencia de movimientos sin huecos.

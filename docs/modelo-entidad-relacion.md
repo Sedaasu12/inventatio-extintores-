@@ -673,6 +673,7 @@ No se siembran valores de días por defecto. La instalación crea las filas con 
 | I-08 | Una orden activa tiene exactamente un movimiento de envío y ningún retorno. |
 | I-09 | Una orden cerrada tiene movimiento de retorno y al menos un servicio. |
 | I-10 | Una fecha objetivo apunta a una fuente existente y coherente con su categoría. |
+| I-11 | `ASIGNADO` ⇒ `technical_condition <> 'NO_OPERATIVO'` (D-26b). Un equipo no operativo nunca está instalado en un área. |
 
 ---
 

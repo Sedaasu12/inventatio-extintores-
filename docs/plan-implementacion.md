@@ -25,8 +25,8 @@
 | 1 | Modelo de datos y migración inicial | Fase 0 + D-01/02/15/26 | M | Esquema Prisma, migración, constraints, seed. |
 | 2 | Autenticación, RBAC y auditoría base | Fase 1 + D-06/07/27 | M | Login, refresh, permisos, auditoría. |
 | 3 | Ubicaciones y catálogos | Fase 2 + D-02 | M | CRUD de sedes y de sus almacenes, taller y áreas (dos niveles), tipos y proveedores. |
-| 4 | Extintores, código, QR y alta inicial | Fase 3 + D-03/04/05/16 | L | Ficha, código, QR, etiqueta, `INGRESO` inicial. |
-| 5 | Motor de movimientos | Fase 4 + D-08/09/17 | L | Salida, traslado, retorno, baja, ajuste, historial. |
+| 4 | Extintores, código, QR y alta inicial | Fase 3 + D-03/04/05/16/26b | L | Ficha, código, QR, etiqueta, `INGRESO` inicial. |
+| 5 | Motor de movimientos | Fase 4 + D-08/09/17/26b | L | Salida, traslado, retorno, baja, ajuste, historial. |
 | 6 | Mantenimiento, inspecciones y fechas | Fase 5 + D-10/18/28 | L | Órdenes, servicios, retornos, inspecciones, `due_dates`. |
 | 7 | Alertas, dashboard y reportes | Fase 6 + D-11/12/19 | M | Alertas, umbrales, resumen, reportes y CSV. |
 | 8 | Frontend: base, login y shell | Fase 2 + Fase 7 (API estable) | M | Login, layout, guards, API client, accesibilidad base. |
@@ -362,12 +362,13 @@ Entregar el primer flujo vertical completo: crear un activo individual, generar 
 ### Dependencias
 
 - Fase 3.
-- D-03 (ubicación inicial), D-04 (código), D-05 (QR), D-16 (serie).
+- D-03 (ubicación inicial), D-04 (código), D-05 (QR), D-16 (serie), D-26b (efecto de la condición).
 
 ### Alcance
 
 - Servicio de contador de códigos con bloqueo.
 - Alta transaccional: ficha + `INGRESO` + `due_dates` + auditoría.
+- Rechazo de alta en área con condición `NO_OPERATIVO` (D-26b).
 - Registro de idempotencia para el alta (`POST /extinguishers`), reutilizable por los flujos posteriores.
 - Ficha, listado, búsqueda y filtros.
 - Edición de campos descriptivos/técnicos con `rowVersion`; rechazo de ubicación/estado.
@@ -437,13 +438,14 @@ Implementar el corazón de la trazabilidad: movimientos atómicos, validación d
 ### Dependencias
 
 - Fase 4.
-- D-08 (evidencia), D-09 (tránsito), D-17 (baja).
+- D-08 (evidencia), D-09 (tránsito), D-17 (baja), D-26b (efecto de la condición).
 
 ### Alcance
 
 - Servicio único de movimientos con bloqueo de fila, secuencia, snapshots e idempotencia.
 - `SALIDA`, `TRASLADO`, `RETORNO_ALMACEN`, `BAJA`, `AJUSTE`.
 - Validación de máquina de estados y campos obligatorios.
+- Rechazo de destino `AREA` para equipos `NO_OPERATIVO` y de cambio a `NO_OPERATIVO` mientras están asignados (D-26b).
 - Historial por activo y global.
 - `row_version` y manejo de 409.
 - Auditoría transaccional.
