@@ -225,7 +225,7 @@ Permitir acceso seguro y sentar la base de autorización y trazabilidad que usar
 ### Dependencias
 
 - Fase 1.
-- D-06 (auth, aprobada: local con `AuthProvider` desacoplado), D-06b (política de contraseñas, abierta), D-07 (roles, aprobada), D-27 (condición, abierta).
+- D-06 (auth, aprobada: local con `AuthProvider` desacoplado), D-06b (política de contraseñas, abierta), D-07 (roles, aprobada), D-27 (condición, aprobada: `SEGURIDAD` y `ADMIN`).
 
 ### Alcance
 

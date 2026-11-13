@@ -103,6 +103,7 @@ Estructura D-02: `SEDE` es la raíz; `ALMACEN`, `TALLER` y `AREA` son hijos. Los
 | T-AUT-11 | Unitario | Doble del proveedor de identidad | Resolver identidad y emitir sesión | La sesión y los permisos no dependen del proveedor; cambiar `LOCAL` por un doble no altera el resultado. | D-06 / BR-171/176 |
 | T-AUT-12 | Integración | Sin sesión | `POST /users` | 401/403; no existe autorregistro. | BR-175 |
 | T-AUT-13 | Integración | Usuario desactivado con access token vigente | `GET /auth/me` | 401; el token deja de ser aceptado. | BR-169/BR-178 |
+| T-AUT-14 | Integración | `almacen.test` | `POST /extinguishers/:id/condition` | 403; la condición no cambia. | D-27 / BR-167 |
 
 ### 4.2 Ubicaciones y catálogos
 
@@ -139,6 +140,7 @@ Estructura D-02: `SEDE` es la raíz; `ALMACEN`, `TALLER` y `AREA` son hijos. Los
 | T-EXT-11 | Unitario | Generación de código | Formato `EXT-000001`, padding correcto, sin reutilización. | RF-EXT-02 |
 | T-EXT-12 | Integración | Búsqueda/filtros/paginación | Resultados correctos; filtros en servidor; no carga todo el inventario. | RF-EXT-06 |
 | T-EXT-13 | Unitario | Enviar condición `EN_REVISION` o texto libre | 422; solo se aceptan los cuatro valores del enum (D-26). | BR-012A |
+| T-EXT-14 | Integración | `SEGURIDAD` cambia condición sin documento | 200; auditoría con anterior/nuevo y motivo; la evidencia documental es opcional. | D-27 / BR-167A |
 
 ### 4.4 QR y escaneo
 

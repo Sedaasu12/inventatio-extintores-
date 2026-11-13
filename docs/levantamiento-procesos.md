@@ -425,7 +425,7 @@
 - No hay una autoridad formal constante que declare la operatividad.
 - Por tanto, no se puede asumir que el certificado del técnico cambie la condición automáticamente (opción A de D-10), ni que Seguridad siempre lo haga (opción B).
 - Cualquier automatismo del tipo "resultado aprobado → operativo" produciría equipos operativos sin una decisión registrada en los casos en que nadie declaró nada.
-- La alternativa coherente con la práctica es registrar el **resultado del servicio como evidencia** y exigir un **cambio de condición explícito y auditado** por alguien autorizado. Quién es ese alguien sigue siendo D-27.
+- La alternativa coherente con la práctica es registrar el **resultado del servicio como evidencia** y exigir un **cambio de condición explícito y auditado** por alguien autorizado. Quién es ese alguien quedó resuelto en D-27 (ver actualización).
 
 **Qué NO se concluye todavía:**
 
@@ -437,6 +437,8 @@
 **Decisiones afectadas:** D-10 (mapeo), D-27 (quién cambia la condición), D-07.
 
 **Documentos actualizados:** este registro (P-07, H-12). Sin cambios en reglas.
+
+**Actualización (2026-11-12):** D-27 aprobada con opción A. `SEGURIDAD` y `ADMIN` pueden cambiar la condición con motivo obligatorio; la evidencia documental es opcional; `ALMACEN` y `CONSULTA` reciben 403. El resultado del servicio sigue siendo solo evidencia (D-10).
 
 ---
 
@@ -618,8 +620,9 @@
 **Qué NO se concluye todavía:**
 
 - Qué efecto operativo tiene cada condición (si `NO_OPERATIVO` impide asignar o mover, si genera alerta): queda como D-26b.
-- Quién puede cambiarla y con qué evidencia: D-27.
 - Si una inspección la cambia automáticamente: D-28.
+
+**Quién puede cambiarla (D-27, aprobada el 2026-11-12):** `SEGURIDAD` y `ADMIN`, con motivo obligatorio y evidencia documental opcional.
 
 **Implicaciones:** D-26 se aprueba con enum fijo de cuatro valores. Agregar o quitar un valor exige migración, análisis de impacto y pruebas de regresión.
 
@@ -644,7 +647,7 @@
 | H-09 | Las devoluciones al almacén ocurren por daño/vencimiento y por rotación. | `RETORNO_ALMACEN` es una operación real; un activo puede tener varios ciclos almacén ↔ sede. |
 | H-10 | El mantenimiento lo hace un taller propio, no un proveedor externo. | El modelo actual (`provider_id` obligatorio, `EN_MANTENIMIENTO` = colocación externa) no representa el caso. Requiere decisión de representación. |
 | H-11 | El alcance del taller varía por tipo de equipo; conviven servicios internos y externos. | El sistema debe soportar ambos flujos; la ubicación interna de taller no reemplaza al proveedor externo. |
-| H-12 | No hay una autoridad formal constante que declare operativo un equipo tras el servicio. | D-10 no puede ser automático; el cambio de condición debe ser una acción explícita y auditada, con permiso definido. |
+| H-12 | No hay una autoridad formal constante que declare operativo un equipo tras el servicio. | D-10 no puede ser automático; el cambio de condición debe ser una acción explícita y auditada. D-27 lo asigna a `SEGURIDAD` y `ADMIN`. |
 | H-13 | No hay un documento estándar de los servicios realizados; depende del caso. | D-18 debe distinguir servicio interno y externo; la obligatoriedad de `document_ref` en el retorno no puede ser uniforme sin decisión. |
 | H-14 | No hay una autoridad formal constante para autorizar bajas. | D-17 y el permiso `extinguishers.retire` requieren una definición explícita; `authorized_by` obligatorio puede ser inviable tal como está. |
 | H-15 | Los equipos solo tienen número de serie de fábrica; no hay código interno ni etiqueta propia. | No hay códigos que importar; todos los equipos requieren etiqueta nueva. El serial es el único dato para emparejar la carga inicial. |
@@ -658,4 +661,4 @@
 
 ## 5. Próxima pregunta
 
-Levantamiento cerrado el 2026-11-10 y ampliado con D-02, D-06 y D-26. No quedan preguntas de ubicaciones, identidad ni vocabulario técnico pendientes. La siguiente decisión abierta por impacto es **D-27 (quién cambia la condición)**, seguida de **D-06b (política de contraseñas)** y **D-26b (efecto de cada condición)**. No se inicia implementación funcional sin aprobación.
+Levantamiento cerrado el 2026-11-10 y ampliado con D-02, D-06, D-26 y D-27. No quedan preguntas de ubicaciones, identidad, vocabulario técnico ni autoridad sobre la condición pendientes. La siguiente decisión abierta por impacto es **D-06b (política de contraseñas)**, seguida de **D-26b (efecto de cada condición)** y **D-28 (inspección y condición)**. No se inicia implementación funcional sin aprobación.

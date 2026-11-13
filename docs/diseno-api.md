@@ -226,7 +226,7 @@ Los roles son una agrupación de permisos; el backend verifica permisos, no nomb
 | GET | `/extinguishers/:id` | `extinguishers.read` | Ficha completa con resumen de alertas y orden activa. |
 | GET | `/extinguishers/by-code/:assetCode` | `extinguishers.read` | Resolución de QR/manual; rate limit. |
 | PATCH | `/extinguishers/:id` | `extinguishers.update` | Campos descriptivos/técnicos; rechaza ubicación, estado y condición técnica; requiere `rowVersion`. |
-| POST | `/extinguishers/:id/condition` | `extinguishers.condition` | Cambio de condición técnica con motivo; `condition` es un enum fijo, no texto libre (D-26); usa `rowVersion` para concurrencia. |
+| POST | `/extinguishers/:id/condition` | `extinguishers.condition` | Cambio de condición técnica con motivo; solo `SEGURIDAD` y `ADMIN` (D-27); `condition` es un enum fijo, no texto libre (D-26); usa `rowVersion` para concurrencia. |
 | GET | `/extinguishers/:id/movements` | `movements.read` | Historial paginado. |
 | GET | `/extinguishers/:id/timeline` | `movements.read` | Movimientos + inspecciones + servicios (segunda fase si se complica). |
 | GET | `/extinguishers/:id/qr` | `extinguishers.read` | PNG/SVG del QR; query `format`, `size`. |

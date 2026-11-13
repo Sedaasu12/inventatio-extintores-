@@ -111,6 +111,7 @@ El propietario revisó las decisiones una por una y **confirmó** las once, sin 
 | D-02 | A — Sede → (Almacén/Taller/Área), código generado y nombre único por sede (2026-11-11) |
 | D-06 | C — autenticación local con `AuthProvider` desacoplado para OIDC posterior (2026-11-11) |
 | D-26 | A — condición técnica como enum fijo de cuatro valores (2026-11-12) |
+| D-27 | A — `SEGURIDAD` y `ADMIN` cambian la condición con motivo (2026-11-12) |
 
 ---
 
@@ -710,9 +711,16 @@ El propietario revisó las decisiones una por una y **confirmó** las once, sin 
 
 **Recomendación:** A.
 
-**Si no se responde:** A.
+**Decisión aprobada (2026-11-12):** opción **A**.
 
-**Bloquea:** fase 2. **Estado:** abierta.
+- Pueden cambiar la condición `SEGURIDAD` y `ADMIN`, con el permiso `extinguishers.condition`.
+- `ALMACEN` y `CONSULTA` no pueden; reciben 403 aunque invoquen la API directamente.
+- Motivo obligatorio (5–500 caracteres).
+- Evidencia documental **opcional** en este endpoint; el certificado o acta se registra en el servicio o la inspección.
+- El cambio no altera ubicación ni estado logístico; genera auditoría con valor anterior, valor nuevo, usuario, fecha y motivo.
+- `ALMACEN` con aprobación queda fuera del MVP y depende de D-08b.
+
+**Bloquea:** fase 2. **Estado:** aprobada.
 
 ---
 
@@ -845,23 +853,22 @@ Estas decisiones se usaron para escribir los documentos, pero **no están aproba
 
 Para no bloquear el diseño, se propone esta secuencia. Solo figuran las decisiones **abiertas** al 2026-11-11; las aprobadas están en §2.2 y ya se reflejaron en los documentos. Cada respuesta se registra aquí y se refleja en el modelo/API antes de avanzar.
 
-1. **D-27:** ¿quién puede cambiar la condición técnica? (fase 2)
-2. **D-06b:** ¿política de contraseñas, recuperación de acceso y doble factor? (fase 2)
-3. **D-26b:** ¿qué efecto operativo tiene cada condición? (fase 5)
-4. **D-28:** ¿una inspección cambia automáticamente la condición? (fase 6)
-5. **D-12:** ¿qué significa "vencimiento del equipo" y de qué documento procede? (fase 1/6)
-6. **D-11:** ¿intervalos y umbrales de alerta aprobados? (fase 7)
-7. **D-08b:** ¿se requiere flujo de aprobación en la aplicación? (fase 5)
-8. **D-13:** ¿adjuntos, fotos o firmas en el MVP? (fase 6)
-9. **D-19:** ¿qué formatos de reporte se necesitan? (fase 7)
-10. **D-20:** ¿qué notificaciones se requieren? (fase 7)
-11. **D-21:** ¿cuánto tiempo se conserva el historial y la auditoría? (transversal)
-12. **D-22:** ¿cuál es el volumen esperado? (transversal)
-13. **D-23:** ¿dónde se despliega y cuál es el objetivo de respaldo? (transversal)
-14. **D-14:** ¿se requiere operación sin internet? (transversal)
-15. **D-25:** ¿se necesitan movimientos por lote? (fase 5)
-16. **D-29:** ¿se registran costos de mantenimiento? (fase 6)
-17. **D-30:** ¿idioma y localización? (transversal)
+1. **D-06b:** ¿política de contraseñas, recuperación de acceso y doble factor? (fase 2)
+2. **D-26b:** ¿qué efecto operativo tiene cada condición? (fase 5)
+3. **D-28:** ¿una inspección cambia automáticamente la condición? (fase 6)
+4. **D-12:** ¿qué significa "vencimiento del equipo" y de qué documento procede? (fase 1/6)
+5. **D-11:** ¿intervalos y umbrales de alerta aprobados? (fase 7)
+6. **D-08b:** ¿se requiere flujo de aprobación en la aplicación? (fase 5)
+7. **D-13:** ¿adjuntos, fotos o firmas en el MVP? (fase 6)
+8. **D-19:** ¿qué formatos de reporte se necesitan? (fase 7)
+9. **D-20:** ¿qué notificaciones se requieren? (fase 7)
+10. **D-21:** ¿cuánto tiempo se conserva el historial y la auditoría? (transversal)
+11. **D-22:** ¿cuál es el volumen esperado? (transversal)
+12. **D-23:** ¿dónde se despliega y cuál es el objetivo de respaldo? (transversal)
+13. **D-14:** ¿se requiere operación sin internet? (transversal)
+14. **D-25:** ¿se necesitan movimientos por lote? (fase 5)
+15. **D-29:** ¿se registran costos de mantenimiento? (fase 6)
+16. **D-30:** ¿idioma y localización? (transversal)
 
 ---
 

@@ -272,7 +272,8 @@ stateDiagram-v2
 | BR-164 | `CONSULTA` no puede crear ni modificar datos. | Solo permisos `.read`. |
 | BR-165 | La baja requiere permiso `extinguishers.retire` y campo `authorized_by`. `[D-17]` | Validación. |
 | BR-166 | El ajuste requiere `movements.adjust`, exclusivo de `ADMIN` en el MVP. | Validación. |
-| BR-167 | Cambiar condición técnica requiere `extinguishers.condition` y motivo. `[D-27]` | Endpoint dedicado. |
+| BR-167 | Cambiar la condición técnica requiere `extinguishers.condition` y motivo; solo `SEGURIDAD` y `ADMIN` (D-27 aprobada). | Endpoint dedicado; 403 para los demás roles; auditoría. |
+| BR-167A | La evidencia documental del cambio de condición es opcional; el certificado o acta se registra en el servicio o la inspección. | `document_ref` opcional; sin duplicar evidencia. |
 | BR-168 | Cambiar umbrales requiere `alerts.settings`; por defecto `ADMIN`. `[D-11]` | Endpoint dedicado. |
 | BR-169 | Un usuario desactivado no puede autenticarse ni usar tokens vigentes. | Validación en guard/refresh. |
 | BR-170 | Los permisos efectivos se recalculan desde roles; no se confía en permisos enviados por el cliente. | Servidor. |

@@ -456,14 +456,13 @@ Hechos aportados por el propietario. **No son reglas aprobadas**; el detalle y l
 
 > **Estado al 2026-11-11:** el levantamiento está cerrado y las decisiones D-01 a D-05, D-07, D-09, D-10, D-15, D-16, D-17, D-24 y D-31 están aprobadas. El registro completo está en `docs/decisiones-pendientes.md`. Lo que sigue son las decisiones abiertas que bloquean fases concretas.
 
-1. **D-27 — Permisos sobre la condición:** ¿quién puede cambiarla y con qué evidencia? Bloquea la fase 2.
-2. **D-06b — Política de acceso:** longitud y complejidad de contraseñas, caducidad, recuperación y doble factor. Bloquea la fase 2.
-3. **D-26b — Efecto de cada condición:** ¿`NO_OPERATIVO` impide asignar o mover? ¿Genera alerta? Bloquea la fase 5.
-4. **D-28 — Inspecciones y condición:** ¿una inspección puede cambiarla automáticamente? Bloquea la fase 6.
-5. **D-12 — Vencimiento del equipo:** ¿qué significa y de qué documento procede? Bloquea las fechas objetivo.
-6. **D-11 — Umbrales de alerta:** ¿qué intervalos y anticipaciones están aprobados? Bloquea la fase 7.
-7. **D-08b — Flujo de aprobación:** ¿basta la evidencia textual o se requiere aprobación en la aplicación? Bloquea la fase 5.
-8. **D-13/D-14/D-19/D-20/D-21/D-22/D-23/D-25/D-29/D-30:** adjuntos, operación sin internet, reportes, notificaciones, retención, volumen, despliegue, lotes, costos e idioma.
+1. **D-06b — Política de acceso:** longitud y complejidad de contraseñas, caducidad, recuperación y doble factor. Bloquea la fase 2.
+2. **D-26b — Efecto de cada condición:** ¿`NO_OPERATIVO` impide asignar o mover? ¿Genera alerta? Bloquea la fase 5.
+3. **D-28 — Inspecciones y condición:** ¿una inspección puede cambiarla automáticamente? Bloquea la fase 6.
+4. **D-12 — Vencimiento del equipo:** ¿qué significa y de qué documento procede? Bloquea las fechas objetivo.
+5. **D-11 — Umbrales de alerta:** ¿qué intervalos y anticipaciones están aprobados? Bloquea la fase 7.
+6. **D-08b — Flujo de aprobación:** ¿basta la evidencia textual o se requiere aprobación en la aplicación? Bloquea la fase 5.
+7. **D-13/D-14/D-19/D-20/D-21/D-22/D-23/D-25/D-29/D-30:** adjuntos, operación sin internet, reportes, notificaciones, retención, volumen, despliegue, lotes, costos e idioma.
 
 El detalle, la recomendación y el supuesto de cada una está en `docs/decisiones-pendientes.md`.
 
