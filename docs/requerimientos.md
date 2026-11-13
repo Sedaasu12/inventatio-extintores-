@@ -111,7 +111,7 @@ La matriz detallada está en `docs/diseno-api.md`. Los permisos se validan siemp
 | RF-INS-02 | Registrar próxima fecha indicada. | Must | Si se indica, actualiza la fecha objetivo de inspección; si no, queda `SIN_FECHA_CONFIGURADA`. |
 | RF-INS-03 | Validar que la próxima fecha sea posterior a la inspección. | Must | Fecha inválida devuelve 422. |
 | RF-INS-04 | Consultar historial de inspecciones por activo. | Must | Orden cronológico, paginado, con resultado y documento. |
-| RF-INS-05 | No modificar automáticamente la condición técnica. | Must | El MVP no cambia condición por inspección; se requiere acción separada auditada. |
+| RF-INS-05 | No modificar automáticamente la condición técnica. | Must | El MVP no cambia condición por inspección (D-28); se requiere acción separada auditada. |
 | RF-INS-06 | Permitir corrección de una inspección sin borrar la anterior. | Should | Nuevo registro correctivo con referencia; historial conservado. |
 | RF-INS-07 | Registrar documento/certificado de inspección. | Should | Referencia textual en MVP; archivo en segunda fase. |
 | RF-INS-08 | Filtrar inspecciones por fecha, resultado, inspector y ubicación. | Must | Filtros en servidor. |

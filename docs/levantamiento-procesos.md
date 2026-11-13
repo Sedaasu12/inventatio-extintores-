@@ -45,6 +45,7 @@
 | P-14 | Vocabulario de condición técnica | D-26 | Respondida y aplicada |
 | P-15 | Política de contraseñas y acceso | D-06b | Respondida y aplicada |
 | P-16 | Efecto operativo de la condición técnica | D-26b | Respondida y aplicada |
+| P-17 | Inspección y cambio de condición | D-28 | Respondida y aplicada |
 
 ---
 
@@ -622,7 +623,7 @@
 **Qué NO se concluye todavía:**
 
 - Qué efecto operativo tiene cada condición: resuelto en D-26b (2026-11-12); `NO_OPERATIVO` no puede estar en un área.
-- Si una inspección la cambia automáticamente: D-28.
+- Si una inspección la cambia automáticamente: resuelto en D-28 (2026-11-12); no la cambia.
 
 **Quién puede cambiarla (D-27, aprobada el 2026-11-12):** `SEGURIDAD` y `ADMIN`, con motivo obligatorio y evidencia documental opcional.
 
@@ -674,13 +675,38 @@
 **Qué NO se concluye todavía:**
 
 - Si en el futuro hará falta una excepción autorizada; queda fuera del MVP.
-- Si una inspección puede cambiar la condición automáticamente: D-28.
+- Si una inspección puede cambiar la condición automáticamente: resuelto en D-28 (2026-11-12); no la cambia.
 
 **Implicaciones:** D-26b se aprueba con opción B. El backend rechaza destino `AREA` para `NO_OPERATIVO` y rechaza el cambio a `NO_OPERATIVO` mientras el equipo está asignado en un área.
 
 **Decisiones afectadas:** D-26b (aprobada), D-27, D-28.
 
 **Documentos actualizados:** este registro (P-16, H-22), `decisiones-pendientes.md`, `reglas-de-negocio.md` (BR-014A a BR-014D), `modelo-entidad-relacion.md`, `diseno-api.md`, `plan-de-pruebas.md`, `plan-implementacion.md`, `requerimientos.md` y `analisis-funcional.md`.
+
+---
+
+### P-17 — Inspección y cambio de condición
+
+**Pregunta:** Si una inspección resulta `RECHAZADO`, ¿el equipo pasa automáticamente a `NO_OPERATIVO`?
+
+**Respuesta del propietario (2026-11-12):** no. La inspección deja su resultado y sus fechas; el cambio de condición es una decisión aparte, hecha por alguien autorizado.
+
+**Lectura:**
+
+- El resultado de la inspección es evidencia, igual que el de un servicio (D-10).
+- Mezclar la inspección con el cambio de condición dificultaría explicar quién declaró operativo o no operativo un equipo.
+- La ficha debe mostrar el último resultado para que un rechazo no pase desapercibido.
+
+**Qué NO se concluye todavía:**
+
+- Si más adelante se añadirá una sugerencia con confirmación en la misma pantalla; queda como mejora posterior.
+- La política de frecuencia de inspecciones: D-11/D-12.
+
+**Implicaciones:** D-28 se aprueba con opción A. La inspección no escribe `technical_condition`; el cambio usa el endpoint de D-27.
+
+**Decisiones afectadas:** D-28 (aprobada), D-10, D-27, D-11.
+
+**Documentos actualizados:** este registro (P-17, H-23), `decisiones-pendientes.md`, `reglas-de-negocio.md` (BR-103/BR-103A), `modelo-entidad-relacion.md`, `diseno-api.md`, `plan-de-pruebas.md`, `plan-implementacion.md`, `requerimientos.md` y `analisis-funcional.md`.
 
 ---
 
@@ -710,9 +736,10 @@
 | H-20 | El vocabulario de condición técnica es estable y se limita a cuatro valores; no hay códigos ni estados propios. | D-26: enum fijo; sin catálogo administrable. D-26b define el efecto de cada valor. |
 | H-21 | No existía una política de contraseñas ni segundo factor definidos. | D-06b: 12–128 caracteres, sin composición ni caducidad, rechazo de comunes, reset por `ADMIN` y sin MFA en el MVP. |
 | H-22 | No había una regla sobre si la condición técnica impide instalar un equipo. | D-26b: `NO_OPERATIVO` no puede estar en un área; solo almacén, taller o proveedor. `OBSERVADO` y `PENDIENTE_INSPECCION` se permiten con advertencia. |
+| H-23 | No había una regla sobre el efecto de una inspección en la condición técnica. | D-28: la inspección no cambia la condición; el resultado es evidencia y el cambio es una acción aparte (D-27). |
 
 ---
 
 ## 5. Próxima pregunta
 
-Levantamiento cerrado el 2026-11-10 y ampliado con D-02, D-06, D-06b, D-26, D-26b y D-27. No quedan preguntas de ubicaciones, identidad, política de acceso, vocabulario técnico, autoridad sobre la condición ni efecto de la condición pendientes. La siguiente decisión abierta por impacto es **D-28 (inspección y condición)**, seguida de **D-12 (vencimiento del equipo)** y **D-11 (umbrales de alerta)**. No se inicia implementación funcional sin aprobación.
+Levantamiento cerrado el 2026-11-10 y ampliado con D-02, D-06, D-06b, D-26, D-26b, D-27 y D-28. No quedan preguntas de ubicaciones, identidad, política de acceso, condición técnica ni inspecciones pendientes. La siguiente decisión abierta por impacto es **D-12 (vencimiento del equipo)**, seguida de **D-11 (umbrales de alerta)** y **D-08b (flujo de aprobación)**. No se inicia implementación funcional sin aprobación.

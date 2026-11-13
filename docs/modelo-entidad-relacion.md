@@ -549,6 +549,8 @@ Sin `updated_at`: inmutable; corrección = nueva fila.
 
 Índices: `INDEX(extinguisher_id, inspected_at)`, `INDEX(next_due_date)`, `INDEX(inspector_user_id)`, `INDEX(result)`.
 
+> La inspección **no** escribe `extinguishers.technical_condition` (D-28). La ficha muestra el último `result` por `inspected_at`; el cambio de condición usa el endpoint dedicado de D-27.
+
 ### 4.11 `due_dates`
 
 | Columna | Tipo | Nulo | Restricción / nota |

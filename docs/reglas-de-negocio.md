@@ -213,7 +213,8 @@ stateDiagram-v2
 | BR-100 | La inspección registra fecha, inspector, resultado, checklist y próxima fecha indicada. | Modelo; validación. |
 | BR-101 | La próxima fecha debe ser posterior a la fecha local de la inspección. | `inspected_on` derivada de `inspected_at` en zona de la organización; validación y `CHECK`. |
 | BR-102 | La inspección no cambia la ubicación ni el estado logístico. | Servicio separado. |
-| BR-103 | La inspección no cambia automáticamente la condición técnica en el MVP. `[D-28]` | Acción separada auditada. |
+| BR-103 | La inspección no cambia automáticamente la condición técnica (D-28 aprobada); el cambio es una acción separada con motivo y auditoría (D-27). | Servicio separado; prueba de que el resultado `RECHAZADO` no altera la condición. |
+| BR-103A | La ficha y los reportes muestran el resultado de la última inspección, para que un equipo rechazado siga visible aunque su condición no haya cambiado. | Consulta de última inspección; columna en ficha. |
 | BR-104 | La última inspección por fecha de evento define la fecha objetivo de inspección. | Proyección; desempate por `created_at`. |
 | BR-105 | Una inspección sin próxima fecha deja la categoría `SIN_FECHA_CONFIGURADA`. | Proyección se elimina. |
 | BR-106 | Las fechas de equipo, inspección, mantenimiento, recarga y prueba son independientes. | `due_dates` por `event_type`. |

@@ -405,7 +405,7 @@ Idempotency-Key: 7b8c...
 | Método | Ruta | Permiso | Descripción |
 |---|---|---|---|
 | GET | `/inspections` | `inspections.read` | Lista global; filtros. |
-| POST | `/extinguishers/:id/inspections` | `inspections.create` | Registra inspección y actualiza fecha objetivo. Requiere `Idempotency-Key`. |
+| POST | `/extinguishers/:id/inspections` | `inspections.create` | Registra inspección y actualiza fecha objetivo; no cambia la condición técnica (D-28). Requiere `Idempotency-Key`. |
 | GET | `/inspections/:id` | `inspections.read` | Detalle. |
 | POST | `/inspections/:id/corrections` | `inspections.create` | Corrección como nuevo registro (fase 2). |
 

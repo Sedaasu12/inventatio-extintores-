@@ -511,7 +511,7 @@ Cubrir el ciclo técnico: envío/retorno de mantenimiento, servicios, inspeccion
 ### Dependencias
 
 - Fase 5.
-- D-10 (condición), D-18 (documentos), D-28 (inspección/condición).
+- D-10 (condición, aprobada), D-18 (documentos), D-28 (inspección/condición, aprobada: sin cambio automático).
 
 ### Alcance
 

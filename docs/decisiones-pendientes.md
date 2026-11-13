@@ -114,6 +114,7 @@ El propietario revisó las decisiones una por una y **confirmó** las once, sin 
 | D-27 | A — `SEGURIDAD` y `ADMIN` cambian la condición con motivo (2026-11-12) |
 | D-06b | A — contraseña de 12–128, sin caducidad ni MFA; reset por `ADMIN` (2026-11-12) |
 | D-26b | B — `NO_OPERATIVO` bloquea la asignación a áreas (2026-11-12) |
+| D-28 | A — la inspección no cambia la condición automáticamente (2026-11-12) |
 
 ---
 
@@ -795,9 +796,15 @@ El propietario revisó las decisiones una por una y **confirmó** las once, sin 
 
 **Recomendación:** A; C en fase 2.
 
-**Si no se responde:** A.
+**Decisión aprobada (2026-11-12):** opción **A**.
 
-**Bloquea:** fase 6. **Estado:** abierta.
+- La inspección registra resultado y fechas; no modifica `technical_condition`.
+- El cambio de condición se hace con `POST /extinguishers/:id/condition` (D-27), con motivo y auditoría.
+- La ficha y los reportes muestran el resultado de la última inspección para que la falta de cambio sea visible.
+- La regla es la misma que en mantenimiento (D-10): el resultado es evidencia, no una transición automática.
+- La sugerencia con confirmación (opción C) queda como mejora posterior.
+
+**Bloquea:** fase 6. **Estado:** aprobada.
 
 ---
 
@@ -910,20 +917,19 @@ Estas decisiones se usaron para escribir los documentos, pero **no están aproba
 
 Para no bloquear el diseño, se propone esta secuencia. Solo figuran las decisiones **abiertas** al 2026-11-11; las aprobadas están en §2.2 y ya se reflejaron en los documentos. Cada respuesta se registra aquí y se refleja en el modelo/API antes de avanzar.
 
-1. **D-28:** ¿una inspección cambia automáticamente la condición? (fase 6)
-2. **D-12:** ¿qué significa "vencimiento del equipo" y de qué documento procede? (fase 1/6)
-3. **D-11:** ¿intervalos y umbrales de alerta aprobados? (fase 7)
-4. **D-08b:** ¿se requiere flujo de aprobación en la aplicación? (fase 5)
-5. **D-13:** ¿adjuntos, fotos o firmas en el MVP? (fase 6)
-6. **D-19:** ¿qué formatos de reporte se necesitan? (fase 7)
-7. **D-20:** ¿qué notificaciones se requieren? (fase 7)
-8. **D-21:** ¿cuánto tiempo se conserva el historial y la auditoría? (transversal)
-9. **D-22:** ¿cuál es el volumen esperado? (transversal)
-10. **D-23:** ¿dónde se despliega y cuál es el objetivo de respaldo? (transversal)
-11. **D-14:** ¿se requiere operación sin internet? (transversal)
-12. **D-25:** ¿se necesitan movimientos por lote? (fase 5)
-13. **D-29:** ¿se registran costos de mantenimiento? (fase 6)
-14. **D-30:** ¿idioma y localización? (transversal)
+1. **D-12:** ¿qué significa "vencimiento del equipo" y de qué documento procede? (fase 1/6)
+2. **D-11:** ¿intervalos y umbrales de alerta aprobados? (fase 7)
+3. **D-08b:** ¿se requiere flujo de aprobación en la aplicación? (fase 5)
+4. **D-13:** ¿adjuntos, fotos o firmas en el MVP? (fase 6)
+5. **D-19:** ¿qué formatos de reporte se necesitan? (fase 7)
+6. **D-20:** ¿qué notificaciones se requieren? (fase 7)
+7. **D-21:** ¿cuánto tiempo se conserva el historial y la auditoría? (transversal)
+8. **D-22:** ¿cuál es el volumen esperado? (transversal)
+9. **D-23:** ¿dónde se despliega y cuál es el objetivo de respaldo? (transversal)
+10. **D-14:** ¿se requiere operación sin internet? (transversal)
+11. **D-25:** ¿se necesitan movimientos por lote? (fase 5)
+12. **D-29:** ¿se registran costos de mantenimiento? (fase 6)
+13. **D-30:** ¿idioma y localización? (transversal)
 
 ---
 

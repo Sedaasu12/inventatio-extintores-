@@ -273,7 +273,7 @@ Cada flujo indica disparador, actor, precondiciones, pasos, validaciones, result
 2. Registrar fecha, inspector, resultado, checklist/observaciones, documento y próxima fecha indicada por la política o el responsable autorizado.
 3. El backend valida la fecha y actualiza la fecha objetivo de inspección.
 4. Si se indica una nueva próxima fecha, reemplaza la anterior; si no se indica, la fecha objetivo queda sin configurar (no se conserva una fecha vieja como si siguiera vigente).
-5. La condición técnica **no se modifica automáticamente** por el resultado de la inspección en el MVP; si se requiere cambiarla, se usa una acción separada y auditada.
+5. La condición técnica **no se modifica automáticamente** por el resultado de la inspección (D-28); si se requiere cambiarla, se usa una acción separada y auditada (D-27).
 
 **Excepciones:** fecha futura, próxima fecha anterior a la inspección, activo dado de baja (se permite consultar historial, no inspeccionar), permisos insuficientes.
 
@@ -421,7 +421,7 @@ Se registran como supuestos explícitos; no son reglas aprobadas. El detalle y l
 | S-08 | El QR contiene solo el código estable, no una URL con datos ni datos personales. |
 | S-09 | El número de serie es opcional y no único por defecto. |
 | S-10 | Los umbrales de alerta se configuran después de la instalación; no hay valor por defecto. |
-| S-11 | La condición técnica no cambia automáticamente por una inspección ni por el resultado de un servicio; el cambio es explícito y auditado (D-10). |
+| S-11 | La condición técnica no cambia automáticamente por una inspección ni por el resultado de un servicio; el cambio es explícito y auditado (D-10, D-28). |
 | S-12 | No se permite dar de baja un activo en mantenimiento externo; primero debe retornar o resolverse con un ajuste administrativo. |
 | S-13 | Los documentos/certificados se registran como referencia textual en el MVP; los archivos quedan para la segunda fase. |
 | S-14 | El sistema será usado por menos de 100 usuarios y un inventario del orden de 10 000 extintores; confirmar volumen. |
@@ -458,11 +458,10 @@ Hechos aportados por el propietario. **No son reglas aprobadas**; el detalle y l
 
 > **Estado al 2026-11-11:** el levantamiento está cerrado y las decisiones D-01 a D-05, D-07, D-09, D-10, D-15, D-16, D-17, D-24 y D-31 están aprobadas. El registro completo está en `docs/decisiones-pendientes.md`. Lo que sigue son las decisiones abiertas que bloquean fases concretas.
 
-1. **D-28 — Inspecciones y condición:** ¿una inspección puede cambiarla automáticamente? Bloquea la fase 6.
-2. **D-12 — Vencimiento del equipo:** ¿qué significa y de qué documento procede? Bloquea las fechas objetivo.
-3. **D-11 — Umbrales de alerta:** ¿qué intervalos y anticipaciones están aprobados? Bloquea la fase 7.
-4. **D-08b — Flujo de aprobación:** ¿basta la evidencia textual o se requiere aprobación en la aplicación? Bloquea la fase 5.
-5. **D-13/D-14/D-19/D-20/D-21/D-22/D-23/D-25/D-29/D-30:** adjuntos, operación sin internet, reportes, notificaciones, retención, volumen, despliegue, lotes, costos e idioma.
+1. **D-12 — Vencimiento del equipo:** ¿qué significa y de qué documento procede? Bloquea las fechas objetivo.
+2. **D-11 — Umbrales de alerta:** ¿qué intervalos y anticipaciones están aprobados? Bloquea la fase 7.
+3. **D-08b — Flujo de aprobación:** ¿basta la evidencia textual o se requiere aprobación en la aplicación? Bloquea la fase 5.
+4. **D-13/D-14/D-19/D-20/D-21/D-22/D-23/D-25/D-29/D-30:** adjuntos, operación sin internet, reportes, notificaciones, retención, volumen, despliegue, lotes, costos e idioma.
 
 El detalle, la recomendación y el supuesto de cada una está en `docs/decisiones-pendientes.md`.
 
@@ -485,7 +484,7 @@ El detalle, la recomendación y el supuesto de cada una está en `docs/decisione
 
 ## 12. Próximo paso
 
-1. Completar las decisiones abiertas de `decisiones-pendientes.md` (siguiente: D-28, D-12 y D-11).
+1. Completar las decisiones abiertas de `decisiones-pendientes.md` (siguiente: D-12, D-11 y D-08b).
 2. Cerrar el alcance de la fase 1 (esquema y migración inicial) con las decisiones ya aprobadas.
 3. Autorizar la fase 1 antes de escribir módulos funcionales.
 

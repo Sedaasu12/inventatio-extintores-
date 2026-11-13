@@ -229,6 +229,7 @@ Estructura D-02: `SEDE` es la raíz; `ALMACEN`, `TALLER` y `AREA` son hijos. Los
 | T-INS-06 | Integración | Inspección retroactiva | No reemplaza una inspección posterior vigente. | BR-111 |
 | T-INS-07 | Integración | Corrección (fase 2) | Nueva fila con `corrects_id`; original conservado. | RF-INS-06 |
 | T-INS-08 | Unitario | Inspección a las 02:00 UTC (21:00 local) con próxima fecha al día siguiente local | `inspected_on` es la fecha local correcta; `next_due_date` válida. | BR-101 |
+| T-INS-09 | Integración | Inspección con resultado `RECHAZADO` | La condición técnica **no** cambia; la ficha muestra el último resultado; el cambio exige la acción de D-27. | D-28 / BR-103 |
 
 ### 4.8 Alertas
 
