@@ -336,6 +336,8 @@ erDiagram
 
 Índices: `UNIQUE(email)`, `INDEX(active)`, `INDEX(deactivated_at)`.
 
+> **Autenticación (D-06 opción C):** en el MVP todas las cuentas son locales y `password_hash` es obligatorio. El desacoplamiento es de servicio (`AuthProvider`), no de esquema: si se adopta OIDC, una migración añadirá `auth_provider` y el identificador externo, y `password_hash` pasará a ser nulo para esas cuentas. No se crean columnas especulativas ahora.
+
 ### 4.2 `roles`, `permissions`, `user_roles`, `role_permissions`
 
 | Tabla | Columnas clave | Restricciones |

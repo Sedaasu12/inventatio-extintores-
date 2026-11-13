@@ -87,6 +87,8 @@ No se devuelven stack traces, SQL, nombres de tablas ni datos de otros activos.
 5. `POST /auth/logout` revoca el refresh actual.
 6. Un refresh revocado o reutilizado invalida la familia de tokens y devuelve 401.
 
+> **Proveedor de identidad (D-06 opción C):** el login valida la identidad a través de un `AuthProvider`. El MVP incluye solo el proveedor `LOCAL`; el contrato de sesión (tokens, permisos, auditoría) no depende de él. Si se adopta OIDC, se añaden rutas de redirección y callback, y el resto de la API no cambia.
+
 ### 2.2 Endpoints de autenticación
 
 | Método | Ruta | Permiso | Descripción |

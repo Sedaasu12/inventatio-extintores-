@@ -6,7 +6,7 @@ Este es un modelo lógico de partida. Debe revisarse antes de generar la migraci
 
 | Entidad | Campos principales | Propósito |
 |---|---|---|
-| `users` | id, name, email, password_hash, active, created_at | Usuarios del sistema. |
+| `users` | id, name, email, password_hash, active, created_at | Usuarios del sistema; autenticación local con proveedor desacoplado (D-06). |
 | `roles` | id, code, name | Roles funcionales. |
 | `user_roles` | user_id, role_id | Relación usuario-rol. |
 | `locations` | id, code, name, type, parent_id, active | Sedes, almacenes, taller y áreas; jerarquía de dos niveles (D-02). |

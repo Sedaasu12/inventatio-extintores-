@@ -41,6 +41,7 @@
 | P-10 | Etiquetas y códigos existentes | D-04, D-05 | Respondida |
 | P-11 | Listado de inventario existente | D-24 | Respondida |
 | P-12 | Estructura real de ubicaciones | D-02 | Respondida y aplicada |
+| P-13 | Proveedor de identidad corporativo | D-06 | Respondida y aplicada |
 
 ---
 
@@ -576,6 +577,31 @@
 
 ---
 
+### P-13 — Proveedor de identidad
+
+**Pregunta:** ¿La organización exige un proveedor de identidad corporativo (Microsoft 365/Entra ID, Google Workspace, LDAP/OIDC) para iniciar sesión?
+
+**Respuesta del propietario (2026-11-11):** no hay un proveedor de identidad corporativo obligatorio.
+
+**Lectura:**
+
+- Las cuentas se crean y administran dentro de SITE.
+- No se depende de un tenant, de una configuración externa ni de que cada usuario tenga cuenta corporativa.
+- La autenticación local no impide adoptar SSO después, siempre que el módulo no mezcle identidad con permisos.
+
+**Qué NO se concluye todavía:**
+
+- La política de contraseñas, caducidad, recuperación y doble factor (D-06b).
+- Si en el futuro la organización adoptará identidad corporativa; el diseño queda preparado.
+
+**Implicaciones:** D-06 se aprueba con opción C. El MVP implementa el proveedor `LOCAL`; el servicio de sesión (tokens, permisos, auditoría) es independiente del proveedor, de modo que un OIDC posterior no rehace el módulo.
+
+**Decisiones afectadas:** D-06 (aprobada), D-06b (abierta), D-07.
+
+**Documentos actualizados:** este registro (P-13, H-19), `decisiones-pendientes.md`, `reglas-de-negocio.md` (BR-171 a BR-178), `modelo-entidad-relacion.md`, `diseno-api.md`, `plan-de-pruebas.md`, `plan-implementacion.md` y `analisis-funcional.md`.
+
+---
+
 ## 4. Contradicciones y hallazgos
 
 | ID | Hallazgo | Efecto |
@@ -598,9 +624,10 @@
 | H-16 | Existe un listado de inventario, pero desactualizado. | La carga inicial requiere conciliación y verificación física; el archivo no es fuente de verdad. |
 | H-17 | La estructura real es Sede → área, sin edificios ni pisos; el almacén central y el taller propio están dentro de una sede. | D-02: jerarquía de dos niveles con tipos `SEDE`, `ALMACEN`, `AREA` y `TALLER`; las sedes no alojan activos directamente. |
 | H-18 | No existen códigos de sede ni de área; solo nombres. | D-02: código interno generado por el servidor; nombre único dentro de la sede y repetible entre sedes. |
+| H-19 | No hay proveedor de identidad corporativo obligatorio. | D-06: autenticación local en el MVP con proveedor desacoplado; las cuentas y contraseñas se administran en SITE. |
 
 ---
 
 ## 5. Próxima pregunta
 
-Levantamiento cerrado el 2026-11-10 y ampliado con D-02 el 2026-11-11. No queda ninguna pregunta de ubicaciones pendiente. La siguiente decisión abierta por impacto es **D-06 (autenticación)**, seguida de **D-26 (condición técnica)** y **D-27 (quién cambia la condición)**. No se inicia implementación funcional sin aprobación.
+Levantamiento cerrado el 2026-11-10 y ampliado con D-02 y D-06 el 2026-11-11. No quedan preguntas de ubicaciones ni de identidad pendientes. La siguiente decisión abierta por impacto es **D-26 (condición técnica)**, seguida de **D-27 (quién la cambia)** y **D-06b (política de contraseñas)**. No se inicia implementación funcional sin aprobación.

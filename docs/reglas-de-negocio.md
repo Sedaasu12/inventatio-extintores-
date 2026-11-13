@@ -275,6 +275,21 @@ stateDiagram-v2
 | BR-169 | Un usuario desactivado no puede autenticarse ni usar tokens vigentes. | Validación en guard/refresh. |
 | BR-170 | Los permisos efectivos se recalculan desde roles; no se confía en permisos enviados por el cliente. | Servidor. |
 
+### 9.1 Autenticación y sesión (D-06 opción C)
+
+| ID | Regla | Cumplimiento |
+|---|---|---|
+| BR-171 | La identidad se resuelve mediante un proveedor de autenticación; el MVP solo implementa `LOCAL` (correo y contraseña). | Interfaz `AuthProvider`; el proveedor local es la única implementación inicial. |
+| BR-172 | La contraseña se guarda con Argon2id (o bcrypt costo 12); nunca en texto plano ni en auditoría. | Hash; pruebas de almacenamiento. |
+| BR-173 | La sesión usa un token de acceso de corta duración y un refresh rotativo en cookie `HttpOnly`, `Secure` y `SameSite=Strict`. | Servicio de sesión; rotación por refresh. |
+| BR-174 | La reutilización de un refresh revocado invalida toda la familia de tokens y devuelve 401. | Detección de reutilización; revocación en cascada. |
+| BR-175 | No existe autorregistro: un `ADMIN` crea la cuenta y el primer ingreso exige cambio de contraseña. | Endpoint de usuarios con `users.manage`; `must_change_password`. |
+| BR-176 | Añadir un proveedor OIDC no puede alterar permisos, auditoría, sesión ni reglas de negocio; solo cambia cómo se valida la identidad. | El proveedor no emite permisos; el RBAC se resuelve en SITE. |
+| BR-177 | Los intentos fallidos de login se limitan por IP y por correo, con bloqueo temporal progresivo. | Rate limit; pruebas de bloqueo. |
+| BR-178 | Cerrar sesión revoca el refresh actual; desactivar un usuario invalida sus sesiones vigentes. (BR-169) | Revocación; guard y refresh consultan el estado del usuario. |
+
+> La política de longitud, complejidad, caducidad, recuperación y doble factor es **D-06b**; no se aplican valores por defecto hasta su aprobación.
+
 ---
 
 ## 10. Auditoría, datos y retención

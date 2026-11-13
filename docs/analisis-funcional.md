@@ -420,7 +420,7 @@ Se registran como supuestos explícitos; no son reglas aprobadas. El detalle y l
 | S-01 | Una sola organización en el MVP, con varias sedes; el almacén central y el taller dependen de una sede (D-02). |
 | S-02 | Zona horaria de operación `America/Lima`; eventos en UTC y fechas calendario sin hora. |
 | S-03 | Operación en línea; sin modo offline en el MVP. |
-| S-04 | Autenticación local con correo/contraseña; sin SSO en el MVP. |
+| S-04 | Autenticación local con correo/contraseña a través de un `AuthProvider`; sin SSO obligatorio en el MVP, pero preparado para OIDC (D-06). |
 | S-05 | Un movimiento por activo; los lotes se evalúan en segunda fase. |
 | S-06 | Un extintor puede registrarse inicialmente en almacén o en un área interna, con `entry_source` y motivo (aprobado D-03). |
 | S-07 | El código se genera en servidor con prefijo `EXT-` y secuencia de 6 dígitos; no se importan códigos (D-04). |
@@ -462,9 +462,9 @@ Hechos aportados por el propietario. **No son reglas aprobadas**; el detalle y l
 
 > **Estado al 2026-11-11:** el levantamiento está cerrado y las decisiones D-01 a D-05, D-07, D-09, D-10, D-15, D-16, D-17, D-24 y D-31 están aprobadas. El registro completo está en `docs/decisiones-pendientes.md`. Lo que sigue son las decisiones abiertas que bloquean fases concretas.
 
-1. **D-06 — Autenticación:** ¿login local con correo/contraseña o SSO corporativo? Bloquea la fase 2.
-2. **D-26 — Condición técnica:** ¿enum fijo o catálogo administrable? Bloquea la fase 1.
-3. **D-27 — Permisos sobre la condición:** ¿quién puede cambiarla y con qué evidencia? Bloquea la fase 2.
+1. **D-26 — Condición técnica:** ¿enum fijo o catálogo administrable? Bloquea la fase 1.
+2. **D-27 — Permisos sobre la condición:** ¿quién puede cambiarla y con qué evidencia? Bloquea la fase 2.
+3. **D-06b — Política de acceso:** longitud y complejidad de contraseñas, caducidad, recuperación y doble factor. Bloquea la fase 2.
 4. **D-28 — Inspecciones y condición:** ¿una inspección puede cambiarla automáticamente? Bloquea la fase 6.
 5. **D-12 — Vencimiento del equipo:** ¿qué significa y de qué documento procede? Bloquea las fechas objetivo.
 6. **D-11 — Umbrales de alerta:** ¿qué intervalos y anticipaciones están aprobados? Bloquea la fase 7.

@@ -100,6 +100,9 @@ Estructura D-02: `SEDE` es la raíz; `ALMACEN`, `TALLER` y `AREA` son hijos. Los
 | T-AUT-08 | Integración | — | 6 intentos de login fallidos en 1 min | 429 con `Retry-After`; no bloqueo permanente por defecto. | RF-AUT-07 |
 | T-AUT-09 | Integración | Usuario creado | Inspeccionar DB | `password_hash` no es texto plano; algoritmo/costo verificable. | RNF-01 |
 | T-AUT-10 | Integración | Sesión activa | Cambiar contraseña | Éxito; sesiones previas revocadas según política; auditoría. | RF-AUT-03 |
+| T-AUT-11 | Unitario | Doble del proveedor de identidad | Resolver identidad y emitir sesión | La sesión y los permisos no dependen del proveedor; cambiar `LOCAL` por un doble no altera el resultado. | D-06 / BR-171/176 |
+| T-AUT-12 | Integración | Sin sesión | `POST /users` | 401/403; no existe autorregistro. | BR-175 |
+| T-AUT-13 | Integración | Usuario desactivado con access token vigente | `GET /auth/me` | 401; el token deja de ser aceptado. | BR-169/BR-178 |
 
 ### 4.2 Ubicaciones y catálogos
 

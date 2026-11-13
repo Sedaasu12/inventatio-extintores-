@@ -35,6 +35,7 @@ La matriz detallada está en `docs/diseno-api.md`. Los permisos se validan siemp
 | RF-AUT-06 | Aplicar autorización por permiso en cada endpoint. | Must | Un usuario sin permiso recibe 403 aunque invoque la API directamente. |
 | RF-AUT-07 | Limitar intentos de login y resolución de códigos. | Must | Superado el límite se devuelve 429 con `Retry-After`; no se bloquea permanentemente una cuenta por defecto. |
 | RF-AUT-08 | Registrar eventos de autenticación relevantes. | Must | Login exitoso/fallido, logout y cambio de contraseña quedan en auditoría sin guardar contraseñas ni tokens. |
+| RF-AUT-09 | Resolver la identidad mediante un proveedor de autenticación desacoplado. | Should | El MVP usa un proveedor local; sustituirlo no altera sesión, permisos ni auditoría (D-06). |
 
 ### 2.2 Ubicaciones y catálogos
 

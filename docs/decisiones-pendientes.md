@@ -35,7 +35,7 @@ Estado al 2026-11-11. El registro formal de aprobaciones está en §2.2 a §2.4;
 | 6 | D-10 | Condición técnica tras mantenimiento | Resultado como evidencia; cambio explícito y auditado. | Aprobada | Fase 6 |
 | 7 | D-11 | Intervalos y umbrales de alerta | Sin valores por defecto; configurar desde política aprobada. | Abierta | Fase 7 |
 | 8 | D-17 | Baja de un activo en mantenimiento | Prohibida con orden activa; ajuste excepcional de `ADMIN`. | Aprobada | Fase 6 |
-| 9 | D-06 | Autenticación local vs SSO corporativo | Local en MVP; OIDC si la organización ya tiene SSO obligatorio. | Abierta | Fase 2 |
+| 9 | D-06 | Autenticación local vs SSO corporativo | Local con `AuthProvider` desacoplado; sin SSO obligatorio confirmado. | Aprobada | Fase 2 |
 | 10 | D-02 | Estructura real de sedes/almacenes/áreas | Sede → almacén/taller/área; dos niveles, código generado y nombre único por sede. | Aprobada | Fase 3 |
 | 11 | D-24 | Inventario existente para importar | Conciliación por sede + verificación física, con dry-run. | Aprobada | Fase 4 |
 | 12 | D-15 | Zona horaria | `America/Lima`; eventos UTC, fechas calendario `DATE`. | Aprobada | Fase 1 |
@@ -109,6 +109,7 @@ El propietario revisó las decisiones una por una y **confirmó** las once, sin 
 | D-01 | A — single-tenant |
 | D-15 | A — zona única `America/Lima` |
 | D-02 | A — Sede → (Almacén/Taller/Área), código generado y nombre único por sede (2026-11-11) |
+| D-06 | C — autenticación local con `AuthProvider` desacoplado para OIDC posterior (2026-11-11) |
 
 ---
 
@@ -254,9 +255,20 @@ El propietario revisó las decisiones una por una y **confirmó** las once, sin 
 
 **Recomendación:** C. Si la organización ya tiene SSO obligatorio, B desde el inicio.
 
-**Si no se responde:** C.
+**Hecho confirmado (2026-11-11):** la organización **no tiene un proveedor de identidad corporativo obligatorio**; las cuentas se crean dentro de SITE.
 
-**Bloquea:** fase 2. **Estado:** abierta.
+**Decisión aprobada (2026-11-11):** opción **C**. Autenticación local con correo y contraseña, con el módulo de autenticación desacoplado:
+
+- La identidad se resuelve mediante un `AuthProvider`; el MVP solo implementa el proveedor `LOCAL`.
+- El servicio de sesión (emisión, rotación y revocación de tokens) es independiente del proveedor; añadir OIDC después no cambia permisos, auditoría ni sesión.
+- Contraseñas con hash Argon2id (o bcrypt costo 12); nunca texto plano.
+- Sesión con JWT de acceso corto y refresh rotativo en cookie `HttpOnly`; la reutilización de un refresh revoca la familia.
+- No hay autorregistro: los usuarios los crea un `ADMIN` y el primer ingreso exige cambio de contraseña.
+- La política exacta de contraseñas y recuperación de acceso queda como **D-06b**.
+
+**Derivada abierta — D-06b:** longitud y complejidad de contraseñas, caducidad, recuperación de acceso y doble factor. Bloquea la fase 2. No se aplican valores por defecto no aprobados.
+
+**Bloquea:** fase 2. **Estado:** aprobada (D-06); derivada D-06b abierta.
 
 ---
 
@@ -780,7 +792,7 @@ El propietario revisó las decisiones una por una y **confirmó** las once, sin 
 | S-01 | Single-tenant, una organización con varias sedes. | D-01 |
 | S-02 | Zona horaria `America/Lima`. | D-15 |
 | S-03 | Online solamente; sin offline en MVP. | D-14 |
-| S-04 | Auth local con JWT + refresh. | D-06 |
+| S-04 | Auth local (correo + contraseña) con `AuthProvider` desacoplado; JWT + refresh. | D-06 |
 | S-05 | Un movimiento por activo; sin cabecera de lote. | D-25 |
 | S-06 | Alta en almacén o área interna. | D-03 |
 | S-07 | Código generado `EXT-` + 6 dígitos; sin importación de códigos (D-04). | D-04 |
@@ -823,9 +835,9 @@ Estas decisiones se usaron para escribir los documentos, pero **no están aproba
 
 Para no bloquear el diseño, se propone esta secuencia. Solo figuran las decisiones **abiertas** al 2026-11-11; las aprobadas están en §2.2 y ya se reflejaron en los documentos. Cada respuesta se registra aquí y se refleja en el modelo/API antes de avanzar.
 
-1. **D-06:** ¿autenticación local o SSO corporativo? (fase 2)
-2. **D-26:** ¿condición técnica como enum o catálogo administrable? (fase 1)
-3. **D-27:** ¿quién puede cambiar la condición técnica? (fase 2)
+1. **D-26:** ¿condición técnica como enum o catálogo administrable? (fase 1)
+2. **D-27:** ¿quién puede cambiar la condición técnica? (fase 2)
+3. **D-06b:** ¿política de contraseñas, recuperación de acceso y doble factor? (fase 2)
 4. **D-28:** ¿una inspección cambia automáticamente la condición? (fase 6)
 5. **D-12:** ¿qué significa "vencimiento del equipo" y de qué documento procede? (fase 1/6)
 6. **D-11:** ¿intervalos y umbrales de alerta aprobados? (fase 7)
