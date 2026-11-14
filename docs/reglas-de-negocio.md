@@ -116,6 +116,8 @@
 | BR-051 | `document_ref` es obligatorio en envío/retorno de mantenimiento **externo**, baja y ajuste; opcional en servicio interno (D-18 aprobada). | Validación por tipo y por origen/destino. |
 | BR-051A | Todo `INGRESO` exige `received_by` y `document_ref` (referencia textual a guía, factura u orden). Evidencia mínima aprobada el 2026-11-10. | Validación en servicio; 422 si falta. |
 | BR-051B | La referencia documental del `INGRESO` es texto, no archivo, en el MVP. | Sin adjuntos; `document_ref` de 1–100 caracteres. |
+| BR-051C | El MVP no almacena archivos, fotos ni firmas (D-13 aprobada). Toda evidencia documental se registra como `document_ref` textual. | Sin endpoints de subida, almacenamiento de objetos ni antivirus; `document_ref` máx. 100. |
+| BR-051D | Los adjuntos, fotos y firma electrónica quedan para una fase posterior y requieren aprobación y análisis de almacenamiento, respaldo y permisos. | Fuera del alcance del MVP; se documenta como mejora futura. |
 | BR-052 | Un movimiento no puede tener destino externo salvo envío a mantenimiento o ajuste autorizado. | Validación por tipo. |
 | BR-053 | Un movimiento no puede tener origen externo salvo retorno de mantenimiento. | Validación por tipo. |
 | BR-054 | No se permite mover un activo dado de baja, salvo ajuste de reactivación. | Máquina de estados. |

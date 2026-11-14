@@ -41,6 +41,7 @@ Estado al 2026-11-12. El registro formal de aprobaciones está en §2.2 a §2.4;
 | 12 | D-24 | Inventario existente para importar | Conciliación por sede + verificación física, con dry-run. | Aprobada | Fase 4 |
 | 13 | D-15 | Zona horaria | `America/Lima`; eventos UTC, fechas calendario `DATE`. | Aprobada | Fase 1 |
 | 14 | D-16 | Unicidad del número de serie | No único; advertir y reportar duplicados. | Aprobada | Fase 4 |
+| 15 | D-13 | Adjuntos, fotos o firmas | Solo referencia textual; sin archivos ni firmas en el MVP. | Aprobada | Fase 2/6 |
 
 ---
 
@@ -119,6 +120,7 @@ El propietario revisó las decisiones una por una y **confirmó** las once, sin 
 | D-12 | A ampliada — fecha documentada + vida útil por tipo; `EQUIPO` usa la más temprana (2026-11-12) |
 | D-11 | A + C — solo fecha indicada y sin umbral inicial (2026-11-12) |
 | D-08b | A — sin aprobación de otro usuario en la aplicación; RBAC + auditoría (2026-11-12) |
+| D-13 | A — solo referencia textual; sin adjuntos, fotos ni firmas en el MVP (2026-11-13) |
 
 ---
 
@@ -477,9 +479,14 @@ El propietario revisó las decisiones una por una y **confirmó** las once, sin 
 
 **Recomendación:** A. Si el proceso legal exige evidencia, B para mantenimiento y baja, con análisis de almacenamiento.
 
-**Si no se responde:** A.
+**Decisión aprobada (2026-11-13):** opción **A** — solo referencia textual en el MVP.
 
-**Bloquea:** no bloquea MVP; afecta fase 2. **Estado:** abierta.
+- La evidencia documental se registra como `document_ref` (texto de 1–100 caracteres); no se almacenan archivos, fotos ni firmas.
+- No se implementan endpoints de subida, almacenamiento de objetos, validación MIME ni antivirus en el MVP.
+- Los adjuntos, fotos y firma electrónica quedan para una fase posterior, previa aprobación y análisis de almacenamiento, respaldo y permisos.
+- El resto de reglas de evidencia (nombre + referencia documental) se mantiene según D-08 y D-08b.
+
+**Bloquea:** no bloquea el MVP; los archivos quedan para fase 2. **Estado:** aprobada.
 
 ---
 
@@ -913,7 +920,7 @@ El propietario revisó las decisiones una por una y **confirmó** las once, sin 
 | S-10 | Solo fecha indicada; sin umbral inicial (D-11). | D-11 |
 | S-11 | La inspección no cambia condición automáticamente. | D-28 |
 | S-12 | No se permite baja con orden de mantenimiento activa. | D-17 |
-| S-13 | Documentos como referencia textual; archivos en fase 2. | D-13 |
+| S-13 | Documentos como referencia textual; sin archivos, fotos ni firmas en el MVP (D-13). | D-13 |
 | S-14 | 10 000 activos, 100 000 movimientos, <100 usuarios. | D-22 |
 | S-15 | Interfaz en español. | D-30 |
 | S-16 | Condición técnica como enum en MVP. | D-26 |
@@ -924,7 +931,7 @@ El propietario revisó las decisiones una por una y **confirmó** las once, sin 
 | S-21 | El vencimiento del equipo combina fecha documentada y vida útil calculada por tipo; sin datos queda sin fecha. | D-12 |
 | S-22 | Sin segunda aprobación en la aplicación: quien tiene el permiso ejecuta y registra `authorized_by`, motivo y documento; el control es RBAC + auditoría. | D-08b |
 
-**Tras las aprobaciones del 2026-11-10 al 2026-11-12**, S-01, S-02, S-04, S-06 a S-12, S-16, S-20, S-21 y S-22 pasan a decisiones aprobadas (ver §2.2 y §2.4). S-11 se ajusta: **no** existe mapeo automático de resultado a condición. Siguen como supuesto S-03, S-05, S-13, S-14, S-15, S-17, S-18 y S-19.
+**Tras las aprobaciones del 2026-11-10 al 2026-11-13**, S-01, S-02, S-04, S-06 a S-13, S-16, S-20, S-21 y S-22 pasan a decisiones aprobadas (ver §2.2 y §2.4). S-11 se ajusta: **no** existe mapeo automático de resultado a condición. Siguen como supuesto S-03, S-05, S-14, S-15, S-17, S-18 y S-19.
 
 ---
 
@@ -947,18 +954,17 @@ Estas decisiones se usaron para escribir los documentos, pero **no están aproba
 
 ## 6. Orden recomendado para responder (una por una)
 
-Para no bloquear el diseño, se propone esta secuencia. Solo figuran las decisiones **abiertas** al 2026-11-12; las aprobadas están en §2.2 y §2.4, y ya se reflejaron en los documentos. Cada respuesta se registra aquí y se refleja en el modelo/API antes de avanzar.
+Para no bloquear el diseño, se propone esta secuencia. Solo figuran las decisiones **abiertas** al 2026-11-13; las aprobadas están en §2.2 y §2.4, y ya se reflejaron en los documentos. Cada respuesta se registra aquí y se refleja en el modelo/API antes de avanzar.
 
-1. **D-13:** ¿adjuntos, fotos o firmas en el MVP? (fase 6)
-2. **D-19:** ¿qué formatos de reporte se necesitan? (fase 7)
-3. **D-20:** ¿qué notificaciones se requieren? (fase 7)
-4. **D-21:** ¿cuánto tiempo se conserva el historial y la auditoría? (transversal)
-5. **D-22:** ¿cuál es el volumen esperado? (transversal)
-6. **D-23:** ¿dónde se despliega y cuál es el objetivo de respaldo? (transversal)
-7. **D-14:** ¿se requiere operación sin internet? (transversal)
-8. **D-25:** ¿se necesitan movimientos por lote? (fase 5)
-9. **D-29:** ¿se registran costos de mantenimiento? (fase 6)
-10. **D-30:** ¿idioma y localización? (transversal)
+1. **D-19:** ¿qué formatos de reporte se necesitan? (fase 7)
+2. **D-20:** ¿qué notificaciones se requieren? (fase 7)
+3. **D-21:** ¿cuánto tiempo se conserva el historial y la auditoría? (transversal)
+4. **D-22:** ¿cuál es el volumen esperado? (transversal)
+5. **D-23:** ¿dónde se despliega y cuál es el objetivo de respaldo? (transversal)
+6. **D-14:** ¿se requiere operación sin internet? (transversal)
+7. **D-25:** ¿se necesitan movimientos por lote? (fase 5)
+8. **D-29:** ¿se registran costos de mantenimiento? (fase 6)
+9. **D-30:** ¿idioma y localización? (transversal)
 
 ---
 

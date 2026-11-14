@@ -27,7 +27,7 @@
 | RF-21 | Permitir lectura QR desde cámara del navegador. | Must |
 | RF-22 | Permitir ingreso manual y lector USB 2D en modo teclado. | Should |
 | RF-23 | Registrar baja con motivo, fecha y autorización. | Must |
-| RF-24 | Adjuntar fotos, actas o constancias a movimientos y servicios. | Could |
+| RF-24 | Adjuntar fotos, actas o constancias a movimientos y servicios. | Could | Fuera del MVP: solo referencia textual (D-13); archivos en fase posterior. |
 
 ## 2. Requerimientos no funcionales
 - RNF-01 Seguridad: autenticación, autorización por rol y validación en backend.

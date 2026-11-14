@@ -88,8 +88,9 @@ La matriz detallada está en `docs/diseno-api.md`. Los permisos se validan siemp
 | RF-MOV-13 | Evitar movimientos duplicados por reintento o doble clic. | Must | La misma clave de idempotencia devuelve el resultado previo; no crea otra fila. |
 | RF-MOV-14 | Resolver conflictos de concurrencia. | Must | Dos movimientos simultáneos: uno se confirma, el otro devuelve 409 y no corrompe el estado. |
 | RF-MOV-15 | Consultar historial por activo y movimientos globales filtrados. | Must | Paginación, filtros por tipo/fecha/usuario/ubicación y orden descendente/ascendente. |
-| RF-MOV-16 | Adjuntar referencia documental al movimiento. | Should | Campo `document_ref` obligatorio para mantenimiento externo, baja y ajuste; archivo adjunto en segunda fase (D-08b). |
+| RF-MOV-16 | Adjuntar referencia documental al movimiento. | Should | Campo `document_ref` textual obligatorio para mantenimiento externo, baja y ajuste; sin archivos, fotos ni firmas en el MVP (D-13). |
 | RF-MOV-17 | Ejecutar operaciones sensibles sin segunda aprobación en la aplicación. | Must | `BAJA` y `AJUSTE` se confirman con permiso, motivo y documento; no existen estados pendientes ni aprobación de otro usuario en el MVP (D-08b). |
+| RF-MOV-18 | Mantener la evidencia documental como texto en el MVP. | Must | No se aceptan archivos ni firmas; `document_ref` máximo 100 caracteres; los adjuntos quedan para fase posterior (D-13). |
 
 ### 2.5 Mantenimiento, recarga, reparación y prueba
 

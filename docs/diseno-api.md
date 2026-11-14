@@ -580,6 +580,8 @@ Al cambiar `usefulLifeYears`, el servidor recalcula la fecha objetivo `EQUIPO` d
 
 > **Sin flujo de aprobación (D-08b):** no existe endpoint de aprobación, estado `PENDIENTE` ni tabla de solicitudes. Quien tiene el permiso ejecuta el movimiento; `authorizedBy` registra el nombre de quien autoriza fuera del sistema. `BAJA` y `AJUSTE` siguen exigiendo permiso específico, motivo y `documentRef`; sin ellos la API responde 403 o 422.
 
+> **Sin archivos (D-13):** el MVP no expone endpoints de subida, descarga ni firma. La evidencia documental se limita a `documentRef` textual (máx. 100). Los adjuntos, fotos y firma electrónica quedan para una fase posterior.
+
 ### 5.4 DTO de inspección/servicio
 
 - `nextDueDate` debe ser posterior a la fecha local de `inspectedAt`/`performedAt`; el servidor deriva `inspectedOn`/`performedOn` en la zona configurada y no acepta esas fechas del cliente.

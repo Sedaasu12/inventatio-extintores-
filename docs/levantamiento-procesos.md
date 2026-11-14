@@ -49,6 +49,7 @@
 | P-18 | Vencimiento del equipo y vida útil | D-12 | Respondida y aplicada |
 | P-19 | Intervalos y umbrales de alerta | D-11 | Respondida y aplicada |
 | P-20 | Aprobación de operaciones sensibles | D-08b | Respondida y aplicada |
+| P-21 | Adjuntos, fotos o firmas | D-13 | Respondida y aplicada |
 
 ---
 
@@ -780,13 +781,38 @@
 **Qué NO se concluye todavía:**
 
 - Si en el futuro se exigirá aprobación de cuatro ojos para bajas/ajustes; queda como mejora posterior.
-- Si se incorporarán firmas o archivos; depende de D-13.
+- Si se incorporarán firmas o archivos; resuelta en P-21 (D-13): no en el MVP.
 
 **Implicaciones:** D-08b se aprueba con opción A. No hay tabla, estado `PENDIENTE` ni endpoint de aprobación; `authorized_by` es un snapshot de nombre.
 
 **Decisiones afectadas:** D-08b (aprobada), D-08, D-13.
 
 **Documentos actualizados:** este registro (P-20, H-26), `decisiones-pendientes.md`, `reglas-de-negocio.md` (BR-050/BR-050A/BR-050B, BR-071, BR-165/BR-166), `modelo-entidad-relacion.md`, `diseno-api.md`, `plan-de-pruebas.md`, `plan-implementacion.md`, `requerimientos.md` y `analisis-funcional.md`.
+
+---
+
+### P-21 — Adjuntos, fotos o firmas
+
+**Pregunta:** ¿Basta una referencia documental (`document_ref`) o se deben subir actas, certificados, fotos y firmas?
+
+**Respuesta del propietario (2026-11-13):** basta la referencia textual en el MVP. No se suben archivos, fotos ni firmas.
+
+**Lectura:**
+
+- Los archivos añaden almacenamiento, validación de MIME/tamaño, permisos, respaldo y posible antivirus; no son necesarios para el alcance actual.
+- La referencia textual ya identifica el documento físico y permite auditarlo.
+- La firma electrónica es un proyecto aparte y requiere análisis legal y técnico.
+
+**Qué NO se concluye todavía:**
+
+- Si en el futuro se adjuntarán actas o certificados: requerirá una nueva decisión y análisis de almacenamiento.
+- Qué tipos de archivo y límites se aceptarían: fuera del MVP.
+
+**Implicaciones:** D-13 se aprueba con opción A. No hay endpoints de subida ni tabla de adjuntos; `document_ref` es texto de hasta 100 caracteres.
+
+**Decisiones afectadas:** D-13 (aprobada), D-08b, D-18.
+
+**Documentos actualizados:** este registro (P-21, H-27), `decisiones-pendientes.md`, `reglas-de-negocio.md` (BR-051C/BR-051D), `modelo-entidad-relacion.md`, `diseno-api.md`, `plan-de-pruebas.md`, `plan-implementacion.md`, `requerimientos.md` y `analisis-funcional.md`.
 
 ---
 
@@ -820,9 +846,10 @@
 | H-24 | No había una regla única sobre el vencimiento del equipo: existe fecha documentada del fabricante y vida útil variable por tipo. | D-12: se registran ambas fuentes; `EQUIPO` usa la más temprana; sin datos no se inventa fecha. |
 | H-25 | No había una política de intervalos ni umbrales de “por vencer”. | D-11: solo fecha indicada, sin cálculo de intervalos y sin umbrales iniciales. |
 | H-26 | No estaba definido si las operaciones sensibles requerían aprobación de otro usuario en la aplicación. | D-08b: sin segunda aprobación; `authorized_by` es un nombre registrado y el control es RBAC + auditoría. |
+| H-27 | No estaba definido si la evidencia documental requería archivos, fotos o firmas. | D-13: solo referencia textual; sin adjuntos ni firma electrónica en el MVP. |
 
 ---
 
 ## 5. Próxima pregunta
 
-Levantamiento cerrado el 2026-11-10 y ampliado con D-02, D-06, D-06b, D-08b, D-11, D-12, D-26, D-26b, D-27 y D-28. No quedan preguntas de ubicaciones, identidad, política de acceso, condición técnica, inspecciones, vencimiento del equipo, umbrales de alerta ni aprobación de operaciones sensibles pendientes. La siguiente decisión abierta por impacto es **D-13 (adjuntos)**, seguida de **D-19 (reportes)** y **D-20 (notificaciones)**. No se inicia implementación funcional sin aprobación.
+Levantamiento cerrado el 2026-11-10 y ampliado con D-02, D-06, D-06b, D-08b, D-11, D-12, D-13, D-26, D-26b, D-27 y D-28. No quedan preguntas de ubicaciones, identidad, política de acceso, condición técnica, inspecciones, vencimiento del equipo, umbrales de alerta, aprobación de operaciones sensibles ni adjuntos pendientes. La siguiente decisión abierta por impacto es **D-19 (reportes)**, seguida de **D-20 (notificaciones)** y **D-21 (retención)**. No se inicia implementación funcional sin aprobación.

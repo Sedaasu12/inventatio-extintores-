@@ -35,6 +35,7 @@ Este es un modelo lógico de partida. Debe revisarse antes de generar la migraci
 - Claves foráneas y restricciones de integridad.
 - No usar borrado en cascada para historial de movimientos o servicios.
 - Si un extintor se da de baja, conservar su ficha y su historial.
+- No modelar tabla de adjuntos en el MVP: la evidencia es `document_ref` textual (D-13).
 
 ## Nota de diseño importante
 La ubicación actual puede guardarse en `extinguishers.current_location_id` para consultas rápidas, pero esa columna es una proyección del último movimiento confirmado. Solo el servicio de movimientos puede modificarla y debe hacerlo dentro de la misma transacción que inserta el movimiento. Para destinos externos, usa un campo/relación explícito que permita identificar la contraparte y estado externo; no simules que el activo está en un almacén interno.

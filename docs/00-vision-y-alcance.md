@@ -53,4 +53,4 @@ Los roles y permisos finales deben ser validados por la organización.
 - Umbral para alertar “por vencer” por cada tipo de evento (resuelto en D-11: el MVP arranca sin umbral; se configura cuando exista política aprobada).
 - Si los proveedores externos de mantenimiento deben tener ficha propia.
 - Si se exige operación sin internet en almacenes o sedes.
-- Si se requiere firma, foto o documento adjunto como evidencia de entrega/recepción.
+- Si se requiere firma, foto o documento adjunto como evidencia de entrega/recepción (resuelto en D-13: solo referencia textual en el MVP; archivos y firmas en fase posterior).

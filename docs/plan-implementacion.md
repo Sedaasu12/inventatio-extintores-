@@ -26,8 +26,8 @@
 | 2 | Autenticación, RBAC y auditoría base | Fase 1 + D-06/07/27 | M | Login, refresh, permisos, auditoría. |
 | 3 | Ubicaciones y catálogos | Fase 2 + D-02 | M | CRUD de sedes y de sus almacenes, taller y áreas (dos niveles), tipos y proveedores. |
 | 4 | Extintores, código, QR y alta inicial | Fase 3 + D-03/04/05/16/26b | L | Ficha, código, QR, etiqueta, `INGRESO` inicial. |
-| 5 | Motor de movimientos | Fase 4 + D-08/09/17/26b | L | Salida, traslado, retorno, baja, ajuste, historial. |
-| 6 | Mantenimiento, inspecciones y fechas | Fase 5 + D-10/18/28 | L | Órdenes, servicios, retornos, inspecciones, `due_dates`. |
+| 5 | Motor de movimientos | Fase 4 + D-08/08b/09/13/17/26b | L | Salida, traslado, retorno, baja, ajuste, historial. |
+| 6 | Mantenimiento, inspecciones y fechas | Fase 5 + D-10/13/18/28 | L | Órdenes, servicios, retornos, inspecciones, `due_dates`. |
 | 7 | Alertas, dashboard y reportes | Fase 6 + D-11/12/19 | M | Alertas, umbrales, resumen, reportes y CSV. |
 | 8 | Frontend: base, login y shell | Fase 2 + Fase 7 (API estable) | M | Login, layout, guards, API client, accesibilidad base. |
 | 9 | Frontend: inventario y QR | Fase 8 + Fase 4 | L | Lista, ficha, alta, escaneo, etiqueta. |
@@ -511,7 +511,7 @@ Cubrir el ciclo técnico: envío/retorno de mantenimiento, servicios, inspeccion
 ### Dependencias
 
 - Fase 5.
-- D-10 (condición, aprobada), D-18 (documentos), D-28 (inspección/condición, aprobada: sin cambio automático).
+- D-10 (condición, aprobada), D-13 (evidencia textual, aprobada: sin archivos), D-18 (documentos), D-28 (inspección/condición, aprobada: sin cambio automático).
 
 ### Alcance
 
@@ -565,7 +565,7 @@ backend/test/due-dates.e2e-spec.ts
 |---|---|
 | Proyección desordenada por datos retroactivos | Comparar `source_event_at` + `created_at`; pruebas. |
 | Mapeo de condición no aprobado | D-10; si no, no automatizar. |
-| Documentos obligatorios | D-18; validación configurable. |
+| Documentos obligatorios | D-18; validación configurable; D-13: referencia textual sin archivos. |
 | Órdenes huérfanas | Transacción; pruebas de fallo. |
 
 ### Verificación

@@ -203,6 +203,8 @@ Estructura D-02: `SEDE` es la raíz; `ALMACEN`, `TALLER` y `AREA` son hijos. Los
 | T-MOV-29 | Integración | `BAJA` sin `authorizedBy` o sin `documentRef` | 422; no se crea el movimiento. | D-08b / BR-165 |
 | T-MOV-30 | Integración | `BAJA` por usuario sin `extinguishers.retire` | 403; no se crea el movimiento. | D-08b / BR-160 |
 | T-MOV-31 | Integración | `AJUSTE` por `ADMIN` sin `documentRef` | 422; no se crea el movimiento. | D-08b / BR-071 |
+| T-MOV-32 | Integración | Enviar un archivo o campo `attachments` en un movimiento | 422 por campo no permitido; no se almacena ningún archivo (D-13). | D-13 / BR-051C |
+| T-MOV-33 | Integración | `documentRef` de más de 100 caracteres | 422; la referencia es textual y limitada (D-13). | D-13 / BR-051C |
 
 ### 4.6 Mantenimiento
 
@@ -461,6 +463,7 @@ Verificar `EXPLAIN` de las consultas principales y que se usen los índices defi
 | Alertas | RF-ALE-01..09 | T-ALE-01..17 |
 | Baja | RF-MOV-07 | T-MOV-21/22/23/28/29/30, E2E-01 |
 | Ajuste | RF-MOV-08 | T-MOV-19/20/31 |
+| Evidencia textual | RF-MOV-16, RF-MOV-17 | T-MOV-32/33 |
 | QR | RF-QR-01..06 | T-QR-01..10 |
 | Permisos | RF-AUT-06 | T-AUT-07, T-SEC-02, E2E-03 |
 | Auditoría | RF-AUD-01..05 | T-AUD-01..03 |
