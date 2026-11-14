@@ -110,7 +110,9 @@
 | BR-047 | El usuario registrador se toma de la sesión, no del cuerpo. | No se acepta `created_by` del cliente. |
 | BR-048 | La fecha del servidor (`created_at`) se registra aparte de la fecha del hecho (`moved_at`). | Dos columnas; `moved_at` validado. |
 | BR-049 | El motivo es obligatorio y no puede ser un texto vacío. | `reason` requerido, longitud mínima 5. |
-| BR-050 | Los nombres de responsables son obligatorios según el tipo de movimiento. | Matriz de campos obligatorios. |
+| BR-050 | Los nombres de responsables son obligatorios según el tipo de movimiento. | Matriz de campos obligatorios; son snapshots de nombre, no FK a `users`. |
+| BR-050A | No existe flujo de segunda aprobación ni estado `PENDIENTE` en el MVP (D-08b aprobada). Quien tiene el permiso ejecuta la operación. | Sin tablas ni endpoints de aprobación; RBAC + auditoría. |
+| BR-050B | `authorized_by` es un snapshot del nombre de la persona que autoriza; puede no tener cuenta en el sistema. | Columna de texto; no FK; longitud 2–150. |
 | BR-051 | `document_ref` es obligatorio en envío/retorno de mantenimiento **externo**, baja y ajuste; opcional en servicio interno (D-18 aprobada). | Validación por tipo y por origen/destino. |
 | BR-051A | Todo `INGRESO` exige `received_by` y `document_ref` (referencia textual a guía, factura u orden). Evidencia mínima aprobada el 2026-11-10. | Validación en servicio; 422 si falta. |
 | BR-051B | La referencia documental del `INGRESO` es texto, no archivo, en el MVP. | Sin adjuntos; `document_ref` de 1–100 caracteres. |
@@ -152,7 +154,7 @@
 | BR-068 | `RETORNO_MANTENIMIENTO` exige al menos un servicio registrado en la orden, con resultado y fecha. |
 | BR-069 | `BAJA` exige que no exista una orden de mantenimiento activa. `[D-17]` |
 | BR-070 | `BAJA` limpia la colocación actual y fija `retired_at`; no borra la ficha. |
-| BR-071 | `AJUSTE` es exclusivo de `ADMIN` y requiere motivo, autorización y documento. |
+| BR-071 | `AJUSTE` es exclusivo de `ADMIN` y requiere motivo, autorización y documento; no requiere aprobación de otro usuario en la aplicación (D-08b). | Permiso `movements.adjust`; 403 sin permiso; 422 sin motivo/documento; auditoría. |
 | BR-072 | Un `AJUSTE` que reactiva un activo dado de baja debe indicar el movimiento de baja corregido y justificación; es excepcional. |
 
 ### 4.4 Máquina de estados
@@ -283,8 +285,8 @@ stateDiagram-v2
 | BR-162 | `ALMACEN` opera altas, ingresos, salidas, traslados, retornos y envíos a mantenimiento según permiso. | Matriz. |
 | BR-163 | `SEGURIDAD` registra inspecciones, servicios, condición técnica y puede autorizar bajas según decisión. `[D-07]` | Matriz. |
 | BR-164 | `CONSULTA` no puede crear ni modificar datos. | Solo permisos `.read`. |
-| BR-165 | La baja requiere permiso `extinguishers.retire` y campo `authorized_by`. `[D-17]` | Validación. |
-| BR-166 | El ajuste requiere `movements.adjust`, exclusivo de `ADMIN` en el MVP. | Validación. |
+| BR-165 | La baja requiere permiso `extinguishers.retire` y campo `authorized_by`; no requiere aprobación de otro usuario en la aplicación (D-17, D-08b). | Validación; 403 sin permiso; 422 sin motivo/documento. |
+| BR-166 | El ajuste requiere `movements.adjust`, exclusivo de `ADMIN` en el MVP; se ejecuta directamente con motivo, autorización y documento (D-08b). | Validación. |
 | BR-167 | Cambiar la condición técnica requiere `extinguishers.condition` y motivo; solo `SEGURIDAD` y `ADMIN` (D-27 aprobada). | Endpoint dedicado; 403 para los demás roles; auditoría. |
 | BR-167A | La evidencia documental del cambio de condición es opcional; el certificado o acta se registra en el servicio o la inspección. | `document_ref` opcional; sin duplicar evidencia. |
 | BR-168 | Cambiar umbrales requiere `alerts.settings`; por defecto `ADMIN` (D-11 aprobada). | Endpoint dedicado. |

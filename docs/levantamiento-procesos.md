@@ -48,6 +48,7 @@
 | P-17 | Inspección y cambio de condición | D-28 | Respondida y aplicada |
 | P-18 | Vencimiento del equipo y vida útil | D-12 | Respondida y aplicada |
 | P-19 | Intervalos y umbrales de alerta | D-11 | Respondida y aplicada |
+| P-20 | Aprobación de operaciones sensibles | D-08b | Respondida y aplicada |
 
 ---
 
@@ -186,9 +187,9 @@
 **Aplicado en documentación:**
 
 - `docs/reglas-de-negocio.md`: BR-051A (obligatoriedad en `INGRESO`) y BR-051B (referencia textual, sin archivo). Matriz de tipos de movimiento actualizada.
-- `docs/decisiones-pendientes.md`: D-08 marcada como aprobada parcialmente.
+- `docs/decisiones-pendientes.md`: D-08 aprobada (evidencia y flujo de aprobación, D-08b).
 
-**Pendiente relacionado:** si la carga inicial de equipos ya instalados puede quedar exenta de referencia documental (P-03); y si las operaciones sensibles requieren aprobación de otro usuario.
+**Pendiente relacionado:** si la carga inicial de equipos ya instalados puede quedar exenta de referencia documental (P-03). La aprobación de operaciones sensibles quedó resuelta en P-20 (D-08b): no hay segunda aprobación en la aplicación.
 
 **Documentos actualizados:** reglas de negocio, decisiones pendientes y este registro.
 
@@ -202,7 +203,7 @@
 
 **Lectura:**
 
-- No se puede asumir un flujo de aprobación (`authorized_by` obligatorio) ni un despacho de un solo paso como norma existente.
+- No se puede asumir un flujo de aprobación (`authorized_by` obligatorio) ni un despacho de un solo paso como norma existente. D-09 y D-08b resolvieron el modelo: un paso, sin segunda aprobación en la aplicación.
 - El modelo actual soporta ambos: un `SALIDA` registrado por el encargado, o un paso previo de aprobación.
 - Al igual que en P-01 y P-02, la ausencia de regla significa que SITE tendrá que **proponer un mínimo de control** y el propietario aprobarlo o rechazarlo.
 
@@ -764,6 +765,31 @@
 
 ---
 
+### P-20 — Aprobación de operaciones sensibles
+
+**Pregunta:** ¿Se requiere que otro usuario apruebe dentro de la aplicación las operaciones sensibles (baja, ajuste)?
+
+**Respuesta del propietario (2026-11-12):** no. Quien tiene el permiso ejecuta la operación y registra el nombre de quien autoriza, el motivo y el documento. La autorización ocurre fuera del sistema.
+
+**Lectura:**
+
+- La evidencia mínima (nombre + referencia documental) ya estaba definida en D-08.
+- Un flujo de aprobación añadiría estados pendientes, pantallas y notificaciones que hoy no se necesitan.
+- El control se mantiene con permisos de servidor y auditoría de cada acción.
+
+**Qué NO se concluye todavía:**
+
+- Si en el futuro se exigirá aprobación de cuatro ojos para bajas/ajustes; queda como mejora posterior.
+- Si se incorporarán firmas o archivos; depende de D-13.
+
+**Implicaciones:** D-08b se aprueba con opción A. No hay tabla, estado `PENDIENTE` ni endpoint de aprobación; `authorized_by` es un snapshot de nombre.
+
+**Decisiones afectadas:** D-08b (aprobada), D-08, D-13.
+
+**Documentos actualizados:** este registro (P-20, H-26), `decisiones-pendientes.md`, `reglas-de-negocio.md` (BR-050/BR-050A/BR-050B, BR-071, BR-165/BR-166), `modelo-entidad-relacion.md`, `diseno-api.md`, `plan-de-pruebas.md`, `plan-implementacion.md`, `requerimientos.md` y `analisis-funcional.md`.
+
+---
+
 ## 4. Contradicciones y hallazgos
 
 | ID | Hallazgo | Efecto |
@@ -793,9 +819,10 @@
 | H-23 | No había una regla sobre el efecto de una inspección en la condición técnica. | D-28: la inspección no cambia la condición; el resultado es evidencia y el cambio es una acción aparte (D-27). |
 | H-24 | No había una regla única sobre el vencimiento del equipo: existe fecha documentada del fabricante y vida útil variable por tipo. | D-12: se registran ambas fuentes; `EQUIPO` usa la más temprana; sin datos no se inventa fecha. |
 | H-25 | No había una política de intervalos ni umbrales de “por vencer”. | D-11: solo fecha indicada, sin cálculo de intervalos y sin umbrales iniciales. |
+| H-26 | No estaba definido si las operaciones sensibles requerían aprobación de otro usuario en la aplicación. | D-08b: sin segunda aprobación; `authorized_by` es un nombre registrado y el control es RBAC + auditoría. |
 
 ---
 
 ## 5. Próxima pregunta
 
-Levantamiento cerrado el 2026-11-10 y ampliado con D-02, D-06, D-06b, D-11, D-12, D-26, D-26b, D-27 y D-28. No quedan preguntas de ubicaciones, identidad, política de acceso, condición técnica, inspecciones, vencimiento del equipo ni umbrales de alerta pendientes. La siguiente decisión abierta por impacto es **D-08b (flujo de aprobación)**, seguida de **D-13 (adjuntos)** y **D-19 (reportes)**. No se inicia implementación funcional sin aprobación.
+Levantamiento cerrado el 2026-11-10 y ampliado con D-02, D-06, D-06b, D-08b, D-11, D-12, D-26, D-26b, D-27 y D-28. No quedan preguntas de ubicaciones, identidad, política de acceso, condición técnica, inspecciones, vencimiento del equipo, umbrales de alerta ni aprobación de operaciones sensibles pendientes. La siguiente decisión abierta por impacto es **D-13 (adjuntos)**, seguida de **D-19 (reportes)** y **D-20 (notificaciones)**. No se inicia implementación funcional sin aprobación.

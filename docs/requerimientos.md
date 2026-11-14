@@ -79,8 +79,8 @@ La matriz detallada está en `docs/diseno-api.md`. Los permisos se validan siemp
 | RF-MOV-04 | Registrar retorno al almacén. | Must | Activo `ASIGNADO` pasa a `EN_ALMACEN`; se conserva historial. |
 | RF-MOV-05 | Registrar envío a mantenimiento externo. | Must | Crea orden, movimiento, colocación externa y estado `EN_MANTENIMIENTO`. |
 | RF-MOV-06 | Registrar retorno de mantenimiento. | Must | Exige orden abierta y servicio; cierra orden, actualiza colocación/estado y fechas objetivo. |
-| RF-MOV-07 | Registrar baja. | Must | Estado `DADO_DE_BAJA`, colocación `NONE`, historial conservado, no se permiten movimientos ordinarios posteriores. |
-| RF-MOV-08 | Registrar ajuste excepcional. | Must | Solo `ADMIN`; exige motivo, autorización y referencia; no edita ni borra el movimiento original. |
+| RF-MOV-07 | Registrar baja. | Must | Estado `DADO_DE_BAJA`, colocación `NONE`, historial conservado, no se permiten movimientos ordinarios posteriores; se ejecuta directamente con permiso, `authorized_by` y documento, sin segunda aprobación (D-08b). |
+| RF-MOV-08 | Registrar ajuste excepcional. | Must | Solo `ADMIN`; exige motivo, autorización y referencia; se ejecuta directamente sin segunda aprobación; no edita ni borra el movimiento original (D-08b). |
 | RF-MOV-09 | Validar que el origen coincida con la colocación actual. | Must | Origen distinto devuelve 409 `ORIGIN_MISMATCH` y no cambia nada. |
 | RF-MOV-10 | Ejecutar movimiento y actualización de estado/colocación en una transacción. | Must | Si falla cualquier paso, no queda movimiento ni cambio de estado parcial. |
 | RF-MOV-11 | Mantener historial inmutable y ordenado. | Must | No hay endpoints de edición/borrado; secuencia por activo única; línea de tiempo ordenada. |
@@ -88,7 +88,8 @@ La matriz detallada está en `docs/diseno-api.md`. Los permisos se validan siemp
 | RF-MOV-13 | Evitar movimientos duplicados por reintento o doble clic. | Must | La misma clave de idempotencia devuelve el resultado previo; no crea otra fila. |
 | RF-MOV-14 | Resolver conflictos de concurrencia. | Must | Dos movimientos simultáneos: uno se confirma, el otro devuelve 409 y no corrompe el estado. |
 | RF-MOV-15 | Consultar historial por activo y movimientos globales filtrados. | Must | Paginación, filtros por tipo/fecha/usuario/ubicación y orden descendente/ascendente. |
-| RF-MOV-16 | Adjuntar referencia documental al movimiento. | Should | Campo `document_ref` obligatorio para mantenimiento, baja y ajuste; archivo adjunto en segunda fase. |
+| RF-MOV-16 | Adjuntar referencia documental al movimiento. | Should | Campo `document_ref` obligatorio para mantenimiento externo, baja y ajuste; archivo adjunto en segunda fase (D-08b). |
+| RF-MOV-17 | Ejecutar operaciones sensibles sin segunda aprobación en la aplicación. | Must | `BAJA` y `AJUSTE` se confirman con permiso, motivo y documento; no existen estados pendientes ni aprobación de otro usuario en el MVP (D-08b). |
 
 ### 2.5 Mantenimiento, recarga, reparación y prueba
 

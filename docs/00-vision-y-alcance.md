@@ -47,7 +47,7 @@ Los roles y permisos finales deben ser validados por la organización.
 
 ## 8. Decisiones que la organización debe confirmar
 - Sedes y estructura de ubicaciones reales.
-- Quién autoriza cada clase de movimiento.
+- Quién autoriza cada clase de movimiento (D-07 y D-08b: permisos por rol; la autorización externa se registra como nombre).
 - Tipos de extintor y campos técnicos obligatorios.
 - Qué fecha considera “vencimiento” la organización y de qué documento procede (resuelto en D-12: fecha documentada del fabricante + vida útil calculada por tipo, con la más temprana como fecha objetivo).
 - Umbral para alertar “por vencer” por cada tipo de evento (resuelto en D-11: el MVP arranca sin umbral; se configura cuando exista política aprobada).

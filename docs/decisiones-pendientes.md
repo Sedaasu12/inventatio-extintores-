@@ -1,6 +1,6 @@
 # Decisiones pendientes — SITE
 
-> **Estado:** las decisiones de este documento **no están aprobadas**. Cada una tiene una recomendación técnica y un supuesto por defecto para no bloquear el análisis, pero el propietario del proceso debe confirmarlas antes de la fase indicada.
+> **Estado:** las decisiones aprobadas figuran en §2.2 a §2.4. Las decisiones **abiertas** (§6) conservan una recomendación técnica y un supuesto por defecto para no bloquear el análisis, pero el propietario del proceso debe confirmarlas antes de la fase indicada.
 >
 > **Regla:** si una decisión no se responde, se implementa el supuesto por defecto y se registra como supuesto, no como regla del negocio. Las decisiones que cambian el modelo de datos o la seguridad se consideran bloqueantes.
 
@@ -31,7 +31,7 @@ Estado al 2026-11-12. El registro formal de aprobaciones está en §2.2 a §2.4;
 | 2 | D-04 | Códigos existentes/manuales vs generados | Solo generado por el servidor; sin importación en el MVP. | Aprobada | Fase 4 |
 | 3 | D-05 | Contenido del QR: código vs URL | Código plano `EXT-000125`. | Aprobada | Fase 4/9 |
 | 4 | D-07 | Roles y quién autoriza cada operación | Cuatro roles como semilla, permisos granulares. | Aprobada | Fase 2 |
-| 5 | D-08 | Evidencia de autorización/recepción | Nombre del receptor + referencia documental; aprobación en app pendiente (D-08b). | Parcial | Fase 5 |
+| 5 | D-08 | Evidencia de autorización/recepción | Nombre del receptor + referencia documental; sin segunda aprobación en la app (D-08b). | Aprobada | Fase 5 |
 | 6 | D-10 | Condición técnica tras mantenimiento | Resultado como evidencia; cambio explícito y auditado. | Aprobada | Fase 6 |
 | 7 | D-11 | Intervalos y umbrales de alerta | Solo fecha indicada; sin umbral inicial; configurable después. | Aprobada | Fase 7 |
 | 8 | D-12 | Vencimiento del equipo | Documentada del fabricante + vida útil por tipo; `EQUIPO` usa la más temprana. | Aprobada | Fase 4/7 |
@@ -54,7 +54,7 @@ Hechos declarados por el propietario; el detalle está en `docs/levantamiento-pr
 | D-04 | No hay códigos internos; solo número de serie de fábrica. | La importación de códigos pierde su caso principal; el código generado queda como opción natural. |
 | D-05 | No hay etiquetas propias; todos los equipos requieren etiqueta nueva. | Sin efecto sobre el payload; sí sobre el esfuerzo de despliegue. |
 | D-07 | No hay autoridad formal constante para salidas ni bajas. | La matriz propuesta es una semilla, no una descripción de roles existentes. |
-| D-08 | Evidencia mínima definida (referencia + receptor). | **Aprobada parcialmente**; el flujo de aprobación sigue abierto. |
+| D-08 | Evidencia mínima definida (referencia + receptor). | **Aprobada**: sin segunda aprobación en la aplicación (D-08b). |
 | D-09 | La confirmación de llegada varía y con frecuencia no ocurre. | Un modelo de dos pasos es riesgoso: los equipos quedarían en tránsito. |
 | D-10 | No hay autoridad constante que declare operatividad. | El mapeo automático resultado → condición no es viable sin decisiones adicionales. |
 | D-17 | La autoridad de baja varía. | La regla de `authorized_by` obligatorio debe revisarse. |
@@ -103,7 +103,7 @@ El propietario revisó las decisiones una por una y **confirmó** las once, sin 
 
 **Correcciones aplicadas durante la revisión:** BR-003 y la nota de API sobre `assetCode` (D-04); BR-089, modelo, RF-MAN-05 y T-MAN-15 sobre ausencia de mapeo automático (D-10).
 
-### 2.4 Confirmaciones adicionales (2026-11-11)
+### 2.4 Confirmaciones adicionales (2026-11-11 a 2026-11-12)
 
 | ID | Opción confirmada |
 |---|---|
@@ -118,6 +118,7 @@ El propietario revisó las decisiones una por una y **confirmó** las once, sin 
 | D-28 | A — la inspección no cambia la condición automáticamente (2026-11-12) |
 | D-12 | A ampliada — fecha documentada + vida útil por tipo; `EQUIPO` usa la más temprana (2026-11-12) |
 | D-11 | A + C — solo fecha indicada y sin umbral inicial (2026-11-12) |
+| D-08b | A — sin aprobación de otro usuario en la aplicación; RBAC + auditoría (2026-11-12) |
 
 ---
 
@@ -348,7 +349,16 @@ El propietario revisó las decisiones una por una y **confirmó** las once, sin 
 
 **Si no se responde (parte restante):** A; `authorized_by` obligatorio en baja/ajuste/mantenimiento.
 
-**Bloquea:** fase 5 (movimientos). **Estado:** aprobada parcialmente (evidencia); flujo de aprobación pendiente.
+**Decisión aprobada (2026-11-12) — D-08b, opción A (sin aprobación en la aplicación):**
+
+- No existe flujo de segunda aprobación ni estado `PENDIENTE` en el MVP. Ninguna operación queda en espera de otro usuario.
+- Quien tiene el permiso ejecuta la operación y registra `authorized_by` (nombre de la persona que autoriza), `reason` y `document_ref` cuando corresponda.
+- El control es RBAC del servidor más auditoría; la autorización ocurre fuera del sistema (correo, acta, jefatura) y se documenta en el movimiento.
+- `authorized_by` es un **snapshot de nombre**, no una FK a `users`; el receptor o autorizador externo puede no tener cuenta.
+- `BAJA` y `AJUSTE` siguen exigiendo permiso específico, motivo y documento; sin ellos la API responde 403/422.
+- La aprobación de cuatro ojos (opción B) y la aprobación de todos los movimientos (opción C) quedan diferidas; podrían añadirse después sin rehacer el historial.
+
+**Bloquea:** fase 5 (movimientos). **Estado:** aprobada (evidencia y flujo de aprobación).
 
 ---
 
@@ -796,7 +806,7 @@ El propietario revisó las decisiones una por una y **confirmó** las once, sin 
 - Motivo obligatorio (5–500 caracteres).
 - Evidencia documental **opcional** en este endpoint; el certificado o acta se registra en el servicio o la inspección.
 - El cambio no altera ubicación ni estado logístico; genera auditoría con valor anterior, valor nuevo, usuario, fecha y motivo.
-- `ALMACEN` con aprobación queda fuera del MVP y depende de D-08b.
+- `ALMACEN` con aprobación queda fuera del MVP; D-08b confirmó que no hay segunda aprobación en la aplicación.
 
 **Bloquea:** fase 2. **Estado:** aprobada.
 
@@ -912,8 +922,9 @@ El propietario revisó las decisiones una por una y **confirmó** las once, sin 
 | S-19 | Retención indefinida por defecto. | D-21 |
 | S-20 | Un solo `ADMIN` puede ajustar; Seguridad puede baja/condición. | D-07/D-27 |
 | S-21 | El vencimiento del equipo combina fecha documentada y vida útil calculada por tipo; sin datos queda sin fecha. | D-12 |
+| S-22 | Sin segunda aprobación en la aplicación: quien tiene el permiso ejecuta y registra `authorized_by`, motivo y documento; el control es RBAC + auditoría. | D-08b |
 
-**Tras las aprobaciones del 2026-11-10 al 2026-11-12**, S-01, S-02, S-04, S-06 a S-12, S-16, S-20 y S-21 pasan a decisiones aprobadas (ver §2.2 y §2.4). S-11 se ajusta: **no** existe mapeo automático de resultado a condición. Siguen como supuesto S-03, S-05, S-13, S-14, S-15, S-17, S-18 y S-19.
+**Tras las aprobaciones del 2026-11-10 al 2026-11-12**, S-01, S-02, S-04, S-06 a S-12, S-16, S-20, S-21 y S-22 pasan a decisiones aprobadas (ver §2.2 y §2.4). S-11 se ajusta: **no** existe mapeo automático de resultado a condición. Siguen como supuesto S-03, S-05, S-13, S-14, S-15, S-17, S-18 y S-19.
 
 ---
 
@@ -938,17 +949,16 @@ Estas decisiones se usaron para escribir los documentos, pero **no están aproba
 
 Para no bloquear el diseño, se propone esta secuencia. Solo figuran las decisiones **abiertas** al 2026-11-12; las aprobadas están en §2.2 y §2.4, y ya se reflejaron en los documentos. Cada respuesta se registra aquí y se refleja en el modelo/API antes de avanzar.
 
-1. **D-08b:** ¿se requiere flujo de aprobación en la aplicación? (fase 5)
-2. **D-13:** ¿adjuntos, fotos o firmas en el MVP? (fase 6)
-3. **D-19:** ¿qué formatos de reporte se necesitan? (fase 7)
-4. **D-20:** ¿qué notificaciones se requieren? (fase 7)
-5. **D-21:** ¿cuánto tiempo se conserva el historial y la auditoría? (transversal)
-6. **D-22:** ¿cuál es el volumen esperado? (transversal)
-7. **D-23:** ¿dónde se despliega y cuál es el objetivo de respaldo? (transversal)
-8. **D-14:** ¿se requiere operación sin internet? (transversal)
-9. **D-25:** ¿se necesitan movimientos por lote? (fase 5)
-10. **D-29:** ¿se registran costos de mantenimiento? (fase 6)
-11. **D-30:** ¿idioma y localización? (transversal)
+1. **D-13:** ¿adjuntos, fotos o firmas en el MVP? (fase 6)
+2. **D-19:** ¿qué formatos de reporte se necesitan? (fase 7)
+3. **D-20:** ¿qué notificaciones se requieren? (fase 7)
+4. **D-21:** ¿cuánto tiempo se conserva el historial y la auditoría? (transversal)
+5. **D-22:** ¿cuál es el volumen esperado? (transversal)
+6. **D-23:** ¿dónde se despliega y cuál es el objetivo de respaldo? (transversal)
+7. **D-14:** ¿se requiere operación sin internet? (transversal)
+8. **D-25:** ¿se necesitan movimientos por lote? (fase 5)
+9. **D-29:** ¿se registran costos de mantenimiento? (fase 6)
+10. **D-30:** ¿idioma y localización? (transversal)
 
 ---
 

@@ -56,7 +56,7 @@ El repositorio es un **punto de partida documental**, no un proyecto iniciado. L
 
 - **No hay trabajo previo que destruir.** Los documentos existentes se conservan como línea base; los nuevos documentos los detallan y, en algunos puntos, los refinan.
 - **Hay que crear el proyecto desde cero.** La primera fase debe incluir control de versiones, versiones fijadas, lint, typecheck, pruebas y build antes de escribir reglas de negocio.
-- **Las decisiones de negocio bloquean la migración.** El modelo de datos definitivo depende de decisiones como el alcance multi-sede, el significado de la fecha de vencimiento del equipo, los umbrales de alerta y quién autoriza cada movimiento.
+- **Las decisiones de negocio ya resueltas permiten fijar la migración.** El alcance single-tenant (D-01), el vencimiento del equipo (D-12), los umbrales de alerta (D-11) y la autorización de movimientos (D-07/D-08b) están aprobados; quedan decisiones abiertas que no cambian el núcleo del modelo (adjuntos, reportes, notificaciones, retención, volumen, despliegue y lotes).
 
 ---
 
@@ -432,6 +432,7 @@ Se registran como supuestos explícitos; no son reglas aprobadas. El detalle y l
 | S-17 | Un extintor `NO_OPERATIVO` no puede estar asignado a un área; solo se ubica en almacén, taller o proveedor (D-26b). |
 | S-18 | El vencimiento del equipo combina la fecha documentada del fabricante y la vida útil calculada por tipo; la categoría `EQUIPO` usa la más temprana y no se inventan fechas (D-12). |
 | S-19 | La próxima fecha de inspección/mantenimiento/recarga/prueba se registra solo si el documento la indica; el MVP arranca sin umbrales de “por vencer” (D-11). |
+| S-20 | No existe segunda aprobación en la aplicación: quien tiene el permiso ejecuta la operación y registra `authorized_by`, motivo y documento; el control es RBAC + auditoría (D-08b). |
 
 ### 9.1 Realidad operativa declarada (levantamiento 2026-11-10; precisión D-02 el 2026-11-11)
 
@@ -460,10 +461,9 @@ Hechos aportados por el propietario. **No son reglas aprobadas**; el detalle y l
 
 ## 10. Decisiones que requieren respuesta antes de implementar
 
-> **Estado al 2026-11-12:** el levantamiento está cerrado y las decisiones aprobadas figuran en `docs/decisiones-pendientes.md` (§2.2 y §2.4), incluidas D-11 y D-12. Lo que sigue son las decisiones abiertas que bloquean fases concretas.
+> **Estado al 2026-11-12:** el levantamiento está cerrado y las decisiones aprobadas figuran en `docs/decisiones-pendientes.md` (§2.2 y §2.4), incluidas D-08b, D-11 y D-12. Lo que sigue son las decisiones abiertas que bloquean fases concretas.
 
-1. **D-08b — Flujo de aprobación:** ¿basta la evidencia textual o se requiere aprobación en la aplicación? Bloquea la fase 5.
-2. **D-13/D-14/D-19/D-20/D-21/D-22/D-23/D-25/D-29/D-30:** adjuntos, operación sin internet, reportes, notificaciones, retención, volumen, despliegue, lotes, costos e idioma.
+1. **D-13/D-14/D-19/D-20/D-21/D-22/D-23/D-25/D-29/D-30:** adjuntos, operación sin internet, reportes, notificaciones, retención, volumen, despliegue, lotes, costos e idioma.
 
 El detalle, la recomendación y el supuesto de cada una está en `docs/decisiones-pendientes.md`.
 
@@ -486,7 +486,7 @@ El detalle, la recomendación y el supuesto de cada una está en `docs/decisione
 
 ## 12. Próximo paso
 
-1. Completar las decisiones abiertas de `decisiones-pendientes.md` (siguiente: D-08b, D-13 y D-19).
+1. Completar las decisiones abiertas de `decisiones-pendientes.md` (siguiente: D-13, D-19 y D-20).
 2. Cerrar el alcance de la fase 1 (esquema y migración inicial) con las decisiones ya aprobadas.
 3. Autorizar la fase 1 antes de escribir módulos funcionales.
 

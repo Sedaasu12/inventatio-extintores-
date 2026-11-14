@@ -199,6 +199,10 @@ Estructura D-02: `SEDE` es la raíz; `ALMACEN`, `TALLER` y `AREA` son hijos. Los
 | T-MOV-25 | Integración | Mover un equipo `NO_OPERATIVO` a un `AREA` | 422 `CONDITION_NOT_ASSIGNABLE`; sin cambios. | D-26b / BR-014A |
 | T-MOV-26 | Integración | Mover un equipo `NO_OPERATIVO` a almacén o taller | 201; destino permitido. | D-26b / BR-014B |
 | T-MOV-27 | Integración | Cambiar a `NO_OPERATIVO` un equipo `ASIGNADO` en área | 422; indica retirarlo primero a almacén o taller. | D-26b / BR-014D |
+| T-MOV-28 | Integración | `BAJA` ejecutada por usuario con `extinguishers.retire` | 201 inmediato; no queda en estado pendiente ni requiere segundo usuario (D-08b). | D-08b / BR-165 |
+| T-MOV-29 | Integración | `BAJA` sin `authorizedBy` o sin `documentRef` | 422; no se crea el movimiento. | D-08b / BR-165 |
+| T-MOV-30 | Integración | `BAJA` por usuario sin `extinguishers.retire` | 403; no se crea el movimiento. | D-08b / BR-160 |
+| T-MOV-31 | Integración | `AJUSTE` por `ADMIN` sin `documentRef` | 422; no se crea el movimiento. | D-08b / BR-071 |
 
 ### 4.6 Mantenimiento
 
@@ -455,8 +459,8 @@ Verificar `EXPLAIN` de las consultas principales y que se usen los índices defi
 | Mantenimiento | RF-MAN-01..09, RF-MOV-05/06 | T-MAN-01..15, E2E-01 |
 | Inspección | RF-INS-01..06 | T-INS-01..06 |
 | Alertas | RF-ALE-01..09 | T-ALE-01..17 |
-| Baja | RF-MOV-07 | T-MOV-21/22/23, E2E-01 |
-| Ajuste | RF-MOV-08 | T-MOV-19/20 |
+| Baja | RF-MOV-07 | T-MOV-21/22/23/28/29/30, E2E-01 |
+| Ajuste | RF-MOV-08 | T-MOV-19/20/31 |
 | QR | RF-QR-01..06 | T-QR-01..10 |
 | Permisos | RF-AUT-06 | T-AUT-07, T-SEC-02, E2E-03 |
 | Auditoría | RF-AUD-01..05 | T-AUD-01..03 |

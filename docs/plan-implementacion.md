@@ -438,7 +438,7 @@ Implementar el corazón de la trazabilidad: movimientos atómicos, validación d
 ### Dependencias
 
 - Fase 4.
-- D-08 (evidencia), D-09 (tránsito), D-17 (baja), D-26b (efecto de la condición).
+- D-08 (evidencia, aprobada), D-08b (sin segunda aprobación, aprobada), D-09 (tránsito), D-17 (baja), D-26b (efecto de la condición).
 
 ### Alcance
 
@@ -449,7 +449,7 @@ Implementar el corazón de la trazabilidad: movimientos atómicos, validación d
 - Historial por activo y global.
 - `row_version` y manejo de 409.
 - Auditoría transaccional.
-- Endpoint de baja y ajuste.
+- Endpoint de baja y ajuste; ambos se ejecutan directamente con permiso, motivo, `authorizedBy` y `documentRef`, sin flujo de aprobación (D-08b).
 
 ### Archivos esperados
 

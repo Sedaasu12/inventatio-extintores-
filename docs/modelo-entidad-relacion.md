@@ -451,12 +451,12 @@ erDiagram
 | `destination_external_party_id` | `CHAR(36)` | Sí | FK `external_parties.id`. |
 | `destination_label` | `VARCHAR(255)` | No | Snapshot. |
 | `moved_at` | `DATETIME(3)` | No | Fecha del hecho; UTC. |
-| `requested_by` | `VARCHAR(150)` | Sí | |
-| `authorized_by` | `VARCHAR(150)` | Sí | |
+| `requested_by` | `VARCHAR(150)` | Sí | Snapshot de nombre; no FK. |
+| `authorized_by` | `VARCHAR(150)` | Sí | Snapshot de nombre; no FK (D-08b). |
 | `delivered_by` | `VARCHAR(150)` | Sí | |
 | `received_by` | `VARCHAR(150)` | Sí | |
 | `reason` | `VARCHAR(500)` | No | Longitud mínima 5. |
-| `document_ref` | `VARCHAR(100)` | Sí | Obligatorio por tipo. |
+| `document_ref` | `VARCHAR(100)` | Sí | Referencia textual; obligatorio por tipo. |
 | `notes` | `TEXT` | Sí | |
 | `corrects_movement_id` | `CHAR(36)` | Sí | FK `movements.id`; solo `AJUSTE`. |
 | `created_by` | `CHAR(36)` | No | FK `users.id`; tomado de la sesión. |
@@ -476,6 +476,8 @@ erDiagram
 
 Sin `updated_at`: es inmutable. `asset_sequence` refleja el orden de inserción; la línea de tiempo para el usuario se ordena por `moved_at` y, en empate, por `asset_sequence`. Un `AJUSTE` retroactivo puede tener una secuencia mayor pero una fecha menor; se muestra con su justificación.
 
+> **Sin flujo de aprobación (D-08b):** `requested_by`, `authorized_by`, `delivered_by` y `received_by` son **snapshots de nombre** (`VARCHAR`), no FK a `users`; la persona puede no tener cuenta. No existe tabla, estado `PENDIENTE` ni endpoint de aprobación en el MVP. `document_ref` es una referencia textual, no un archivo.
+
 ### 4.8 `maintenance_orders`
 
 | Columna | Tipo | Nulo | Restricción / nota |
@@ -491,7 +493,7 @@ Sin `updated_at`: es inmutable. `asset_sequence` refleja el orden de inserción;
 | `expected_return_date` | `DATE` | Sí | No anterior al envío. |
 | `closed_at` | `DATETIME(3)` | Sí | |
 | `reason` | `VARCHAR(500)` | No | |
-| `authorized_by` | `VARCHAR(150)` | Sí | |
+| `authorized_by` | `VARCHAR(150)` | Sí | Snapshot de nombre; no FK (D-08b). |
 | `document_ref` | `VARCHAR(100)` | Sí | |
 | `notes` | `TEXT` | Sí | |
 | `created_by` | `CHAR(36)` | No | FK `users.id`. |

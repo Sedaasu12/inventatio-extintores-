@@ -13,7 +13,7 @@ Este es un modelo lógico de partida. Debe revisarse antes de generar la migraci
 | `extinguisher_types` | id, name, agent, capacity_unit, useful_life_years, description | Tipos/clases configurables; vida útil opcional por tipo (D-12). |
 | `extinguishers` | id, asset_code, serial_number, type_id, brand, model, capacity, manufacture_date, acquired_at, commissioned_at, manufacturer_expiry_date, logistics_status, technical_condition, current_location_id, active | Ficha individual del equipo. |
 | `external_parties` | id, name, party_type, contact, active | Proveedores/talleres/contrapartes externas. |
-| `movements` | id, extinguisher_id, movement_type, origin_location_id, destination_location_id, external_party_id, moved_at, requested_by, authorized_by, delivered_by, received_by, reason, document_ref, notes, created_by, created_at | Historial inmutable de movimientos. |
+| `movements` | id, extinguisher_id, movement_type, origin_location_id, destination_location_id, external_party_id, moved_at, requested_by, authorized_by, delivered_by, received_by, reason, document_ref, notes, created_by, created_at | Historial inmutable de movimientos; responsables como snapshot de nombre y sin flujo de aprobación (D-08b). |
 | `inspections` | id, extinguisher_id, inspected_at, inspector_id, result, checklist_data, next_due_date, notes, created_by | Inspecciones y su evidencia. |
 | `maintenance_records` | id, extinguisher_id, service_type, performed_at, provider_id, certificate_no, result, next_due_date, cost, notes, created_by | Mantenimiento, recarga, reparación y prueba. |
 | `alert_settings` | id, event_type, days_before, enabled, scope | Parámetros de alertas configurables. |

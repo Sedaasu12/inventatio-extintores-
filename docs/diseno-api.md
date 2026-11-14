@@ -233,8 +233,8 @@ Los roles son una agrupación de permisos; el backend verifica permisos, no nomb
 | GET | `/extinguishers/:id/timeline` | `movements.read` | Movimientos + inspecciones + servicios (segunda fase si se complica). |
 | GET | `/extinguishers/:id/qr` | `extinguishers.read` | PNG/SVG del QR; query `format`, `size`. |
 | GET | `/extinguishers/:id/label` | `extinguishers.read` | HTML/PDF de etiqueta; PDF en segunda fase. |
-| POST | `/extinguishers/:id/retire` | `extinguishers.retire` | Baja; crea movimiento `BAJA`. Requiere `Idempotency-Key`. |
-| POST | `/extinguishers/:id/adjustments` | `movements.adjust` | Ajuste excepcional; requiere `Idempotency-Key`. |
+| POST | `/extinguishers/:id/retire` | `extinguishers.retire` | Baja; crea movimiento `BAJA` directamente, sin segunda aprobación; exige `authorizedBy`, motivo y `documentRef` (D-08b). Requiere `Idempotency-Key`. |
+| POST | `/extinguishers/:id/adjustments` | `movements.adjust` | Ajuste excepcional directo, sin segunda aprobación; exige `authorizedBy`, motivo y `documentRef` (D-08b). Requiere `Idempotency-Key`. |
 
 #### Filtros de `GET /extinguishers`
 
@@ -572,11 +572,13 @@ Al cambiar `usefulLifeYears`, el servidor recalcula la fecha objetivo `EQUIPO` d
 | `originLocationId` / `originExternalPartyId` | UUID | Según tipo | Debe coincidir con la colocación actual. |
 | `destinationLocationId` / `destinationExternalPartyId` | UUID | Según tipo | Activo, distinto del origen, tipo correcto. |
 | `movedAt` | datetime | Sí | Con offset; ≤ ahora + 5 min; ≥ alta; ≥ último movimiento normal. |
-| `requestedBy`, `authorizedBy`, `deliveredBy`, `receivedBy` | string | Según matriz | Longitud 2..150. |
+| `requestedBy`, `authorizedBy`, `deliveredBy`, `receivedBy` | string | Según matriz | Longitud 2..150; son **snapshots de nombre**, no usuarios (D-08b). |
 | `reason` | string | Sí | 5..500. |
-| `documentRef` | string | Según tipo | Obligatorio en `INGRESO` y en mantenimiento externo (D-18); máx. 100. |
+| `documentRef` | string | Según tipo | Obligatorio en `INGRESO`, mantenimiento externo, `BAJA` y `AJUSTE` (D-18, D-08b); máx. 100. |
 | `notes` | string | No | Máx. 2000. |
 | `rowVersion` | int | Recomendado | Si se envía y no coincide, 409. |
+
+> **Sin flujo de aprobación (D-08b):** no existe endpoint de aprobación, estado `PENDIENTE` ni tabla de solicitudes. Quien tiene el permiso ejecuta el movimiento; `authorizedBy` registra el nombre de quien autoriza fuera del sistema. `BAJA` y `AJUSTE` siguen exigiendo permiso específico, motivo y `documentRef`; sin ellos la API responde 403 o 422.
 
 ### 5.4 DTO de inspección/servicio
 
