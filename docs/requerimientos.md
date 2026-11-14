@@ -134,7 +134,8 @@ La matriz detallada está en `docs/diseno-api.md`. Los permisos se validan siemp
 | RF-ALE-07 | Mostrar resumen por categoría y estado. | Must | Dashboard y endpoint de resumen con conteos consistentes. |
 | RF-ALE-08 | Soportar activos sin fecha documentada. | Must | Se muestran como `SIN_FECHA_CONFIGURADA`; no se inventa una fecha. |
 | RF-ALE-09 | Alertar retornos de mantenimiento pendientes. | Should | Segunda fase o reporte separado; no mezclar con vencimiento técnico. |
-| RF-ALE-10 | Enviar notificaciones por correo u otro canal. | Could | Fuera del MVP; requiere aprobación y configuración. |
+| RF-ALE-10 | Mostrar todas las alertas dentro de la aplicación. | Must | Dashboard, ficha y reportes; cualquier usuario con `alerts.read`; sin suscripciones ni envío externo (D-20). |
+| RF-ALE-11 | Enviar notificaciones por correo, WhatsApp o SMS. | Could | Fase 2; requiere proveedor, destinatarios, frecuencia y una nueva decisión (D-20). |
 
 ### 2.8 Dashboard y reportes
 
@@ -229,7 +230,7 @@ La matriz detallada está en `docs/diseno-api.md`. Los permisos se validan siemp
 | RF-12 | RF-INS-01..08 |
 | RF-13 | RF-MAN-02..06 |
 | RF-14 | RF-MAN-02, RF-INS-07 |
-| RF-15 | RF-ALE-01..09 |
+| RF-15 | RF-ALE-01..10 |
 | RF-16 | RF-DASH-01..05 |
 | RF-17 | RF-EXT-06, RF-MOV-15 |
 | RF-18 | RF-REP-01..04, RF-REP-06 |

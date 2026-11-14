@@ -41,7 +41,7 @@
 | 422 | Validación de negocio/DTO. |
 | 429 | Rate limit. |
 | 500 | Error interno no controlado. |
-| 503 | Dependencia no disponible (DB/correo futuro). |
+| 503 | Dependencia no disponible (base de datos). |
 
 ### 1.2 Formato de listas
 
@@ -441,6 +441,8 @@ Respuesta `201` con inspección y fecha objetivo actualizada; no cambia la condi
 | GET | `/alert-settings` | `alerts.read` | Umbrales configurados; `daysBefore` puede ser `null` (sin umbral). |
 | PUT | `/alert-settings/:eventType` | `alerts.settings` | Configura `daysBefore` y `enabled`; no se siembran valores por defecto (D-11). |
 | GET | `/dashboard/summary` | `dashboard.read` | Totales, estados, condiciones, mantenimiento y alertas. |
+
+> **Sin canal externo (D-20):** las alertas se consultan solo en la aplicación. El MVP no expone endpoints de suscripción, envío de correo, WhatsApp ni SMS, y no configura SMTP. El autoservicio de recuperación de contraseña por correo tampoco existe (D-06b).
 
 #### Ejemplo de alertas
 

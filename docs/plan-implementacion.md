@@ -587,7 +587,7 @@ Convertir las fechas documentadas en información operativa, sin inventar period
 ### Dependencias
 
 - Fase 6.
-- D-11 (umbrales, aprobada: solo fecha indicada y sin umbral inicial), D-12 (vencimiento del equipo, aprobada: documentada + vida útil por tipo), D-19 (formatos, aprobada: JSON + CSV en el MVP).
+- D-11 (umbrales, aprobada: solo fecha indicada y sin umbral inicial), D-12 (vencimiento del equipo, aprobada: documentada + vida útil por tipo), D-19 (formatos, aprobada: JSON + CSV en el MVP), D-20 (notificaciones, aprobada: solo alertas en la aplicación).
 
 ### Alcance
 
@@ -598,6 +598,7 @@ Convertir las fechas documentadas en información operativa, sin inventar period
 - Dashboard.
 - Reportes de inventario, movimientos, mantenimiento, inspecciones y bajas.
 - Exportación CSV de cada reporte con `reports.export`; PDF/Excel quedan para fase 2 (D-19).
+- Alertas solo en la aplicación: sin SMTP, cola de envío ni canales externos (D-20).
 - Filtros y paginación.
 
 ### Archivos esperados

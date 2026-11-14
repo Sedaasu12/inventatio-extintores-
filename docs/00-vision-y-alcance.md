@@ -34,7 +34,7 @@ Los roles y permisos finales deben ser validados por la organización.
 2. Cada extintor será controlado como unidad individual; no se registrará solamente “20 extintores” como una cantidad agregada.
 3. La primera versión funcionará con conexión al servidor. El modo offline se evaluará después si el lugar de operación lo exige.
 4. La cámara de un celular será el método inicial de escaneo; el lector 2D será compatible, pero no obligatorio para empezar.
-5. Se usarán alertas dentro del sistema. Correo, WhatsApp o SMS se dejan para una fase posterior.
+5. Se usarán alertas dentro del sistema (D-20). Correo, WhatsApp o SMS quedan para una fase posterior.
 6. Las fechas y frecuencias técnicas procederán de documentos, fabricante, proveedor o responsable autorizado. No se inventarán intervalos.
 
 ## 7. Fuera del MVP
@@ -54,3 +54,4 @@ Los roles y permisos finales deben ser validados por la organización.
 - Si los proveedores externos de mantenimiento deben tener ficha propia.
 - Si se exige operación sin internet en almacenes o sedes.
 - Si se requiere firma, foto o documento adjunto como evidencia de entrega/recepción (resuelto en D-13: solo referencia textual en el MVP; archivos y firmas en fase posterior).
+- Qué notificaciones se requieren y por qué canal (resuelto en D-20: solo alertas en la aplicación; sin correo, WhatsApp ni SMS en el MVP).

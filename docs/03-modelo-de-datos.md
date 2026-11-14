@@ -17,7 +17,7 @@ Este es un modelo lógico de partida. Debe revisarse antes de generar la migraci
 | `inspections` | id, extinguisher_id, inspected_at, inspector_id, result, checklist_data, next_due_date, notes, created_by | Inspecciones y su evidencia. |
 | `maintenance_records` | id, extinguisher_id, service_type, performed_at, provider_id, certificate_no, result, next_due_date, cost, notes, created_by | Mantenimiento, recarga, reparación y prueba. |
 | `alert_settings` | id, event_type, days_before, enabled, scope | Parámetros de alertas configurables. |
-| `alerts` | id, extinguisher_id, event_type, target_date, alert_status, generated_at, resolved_at | Alertas generadas y su ciclo de vida. |
+| `alerts` | id, extinguisher_id, event_type, target_date, alert_status, generated_at, resolved_at | Reservada para fase 2; no se usa en el MVP: las alertas se calculan desde `due_dates` (D-11). |
 | `audit_logs` | id, user_id, entity, entity_id, action, before_data, after_data, created_at | Auditoría de acciones sensibles. |
 
 ## Relaciones
@@ -36,6 +36,7 @@ Este es un modelo lógico de partida. Debe revisarse antes de generar la migraci
 - No usar borrado en cascada para historial de movimientos o servicios.
 - Si un extintor se da de baja, conservar su ficha y su historial.
 - No modelar tabla de adjuntos en el MVP: la evidencia es `document_ref` textual (D-13).
+- No modelar tablas de notificaciones, suscripciones ni colas de envío en el MVP: las alertas son consultas calculadas y no salen de la aplicación (D-20).
 
 ## Nota de diseño importante
 La ubicación actual puede guardarse en `extinguishers.current_location_id` para consultas rápidas, pero esa columna es una proyección del último movimiento confirmado. Solo el servicio de movimientos puede modificarla y debe hacerlo dentro de la misma transacción que inserta el movimiento. Para destinos externos, usa un campo/relación explícito que permita identificar la contraparte y estado externo; no simules que el activo está en un almacén interno.

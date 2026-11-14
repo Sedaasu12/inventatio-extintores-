@@ -51,6 +51,7 @@
 | P-20 | Aprobación de operaciones sensibles | D-08b | Respondida y aplicada |
 | P-21 | Adjuntos, fotos o firmas | D-13 | Respondida y aplicada |
 | P-22 | Formatos de reporte | D-19 | Respondida y aplicada |
+| P-23 | Notificaciones y canal de alertas | D-20 | Respondida y aplicada |
 
 ---
 
@@ -654,7 +655,7 @@
 
 **Qué NO se concluye todavía:**
 
-- La recuperación por correo (autoservicio), que depende del canal de notificaciones (D-20).
+- La recuperación por correo (autoservicio): D-20 aprobó solo alertas en la aplicación y ningún canal de mensajería en el MVP.
 - Si en el futuro se exigirá MFA; el diseño no lo impide.
 
 **Implicaciones:** D-06b se aprueba con opción A. El backend valida la política y rechaza contraseñas comunes; el reset administrativo obliga cambio.
@@ -843,6 +844,32 @@
 
 ---
 
+### P-23 — Notificaciones y canal de alertas
+
+**Pregunta:** ¿Basta mostrar alertas en la app o se requiere correo/WhatsApp/SMS? ¿A quién se notifica?
+
+**Respuesta del propietario (2026-11-13):** basta con alertas dentro de la aplicación. No se envía correo, WhatsApp ni SMS.
+
+**Lectura:**
+
+- Las alertas se consultan en el dashboard, la ficha del activo y los reportes; cualquier usuario con `alerts.read` las ve.
+- No hay suscripciones individuales, preferencias de envío ni destinatarios sin cuenta.
+- El correo exige SMTP, plantillas, rebotes y pruebas; WhatsApp/SMS exigen proveedor y costo. Nada de eso es necesario para el alcance actual.
+- El autoservicio de recuperación de contraseña por correo sigue fuera del MVP; el reset es administrativo (D-06b).
+
+**Qué NO se concluye todavía:**
+
+- Si en fase 2 se enviará un digest por correo: requiere nueva decisión con proveedor, destinatarios y frecuencia.
+- Si se integrará WhatsApp/SMS o IoT: fuera del alcance del MVP.
+
+**Implicaciones:** D-20 se aprueba con opción A. No hay SMTP, cola de envío, plantillas ni endpoints de suscripción; la alerta es una consulta calculada.
+
+**Decisiones afectadas:** D-20 (aprobada), D-06b, D-11.
+
+**Documentos actualizados:** este registro (P-23, H-29), `decisiones-pendientes.md`, `reglas-de-negocio.md` (BR-131A/BR-131B), `diseno-api.md` (§4.6), `plan-de-pruebas.md` (T-ALE-18/19), `plan-implementacion.md` (fase 7), `requerimientos.md` (RF-ALE-10/RF-ALE-11) y `analisis-funcional.md`.
+
+---
+
 ## 4. Contradicciones y hallazgos
 
 | ID | Hallazgo | Efecto |
@@ -875,9 +902,10 @@
 | H-26 | No estaba definido si las operaciones sensibles requerían aprobación de otro usuario en la aplicación. | D-08b: sin segunda aprobación; `authorized_by` es un nombre registrado y el control es RBAC + auditoría. |
 | H-27 | No estaba definido si la evidencia documental requería archivos, fotos o firmas. | D-13: solo referencia textual; sin adjuntos ni firma electrónica en el MVP. |
 | H-28 | No estaba definido el nivel de formato de los reportes ni si se requería PDF/Excel desde el inicio. | D-19: JSON + CSV en el MVP; PDF/Excel en fase 2, con plantillas definidas después. |
+| H-29 | No estaba definido si las alertas debían salir de la aplicación por correo, WhatsApp o SMS. | D-20: solo alertas en la aplicación; sin SMTP ni canales externos en el MVP. |
 
 ---
 
 ## 5. Próxima pregunta
 
-Levantamiento cerrado el 2026-11-10 y ampliado con D-02, D-06, D-06b, D-08b, D-11, D-12, D-13, D-19, D-26, D-26b, D-27 y D-28. No quedan preguntas de ubicaciones, identidad, política de acceso, condición técnica, inspecciones, vencimiento del equipo, umbrales de alerta, aprobación de operaciones sensibles, adjuntos ni formatos de reporte pendientes. La siguiente decisión abierta por impacto es **D-20 (notificaciones)**, seguida de **D-21 (retención)** y **D-22 (volumen)**. No se inicia implementación funcional sin aprobación.
+Levantamiento cerrado el 2026-11-10 y ampliado con D-02, D-06, D-06b, D-08b, D-11, D-12, D-13, D-19, D-20, D-26, D-26b, D-27 y D-28. No quedan preguntas de ubicaciones, identidad, política de acceso, condición técnica, inspecciones, vencimiento del equipo, umbrales de alerta, aprobación de operaciones sensibles, adjuntos, formatos de reporte ni canal de notificaciones pendientes. La siguiente decisión abierta por impacto es **D-21 (retención)**, seguida de **D-22 (volumen)** y **D-23 (despliegue)**. No se inicia implementación funcional sin aprobación.

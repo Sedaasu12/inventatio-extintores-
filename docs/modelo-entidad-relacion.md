@@ -728,7 +728,7 @@ Con 10 000 activos y 100 000 movimientos, los listados deben paginarse y filtrar
 |---|---|
 | Se separan `maintenance_orders` y `maintenance_services`. | El envío/retorno externo es un ciclo con orden, proveedor y retorno; los servicios son eventos técnicos inmutables. |
 | Se agrega `due_dates` como proyección. | Evita mezclar fechas y permite alertas deterministas y consultas indexadas. |
-| No se persiste `alerts` en el MVP. | Se calculan desde `due_dates` + `alert_settings`; no se duplican. Se reserva una tabla de notificaciones para fase 2. |
+| No se persiste `alerts` en el MVP. | Se calculan desde `due_dates` + `alert_settings`; no se duplican. No hay tabla de notificaciones ni cola de envío: solo alertas en la aplicación (D-20). |
 | Se agrega `code_counters`. | Generación segura y no reutilizable de `asset_code`. |
 | Se agregan `permissions`, `role_permissions`, `refresh_tokens`. | RBAC granular y sesión con refresh rotativo. |
 | `extinguishers.active` se reemplaza por estado logístico. | Evita duplicar “activo” con `DADO_DE_BAJA`. |

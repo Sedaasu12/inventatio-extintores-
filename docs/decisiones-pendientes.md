@@ -43,6 +43,7 @@ Estado al 2026-11-12. El registro formal de aprobaciones está en §2.2 a §2.4;
 | 14 | D-16 | Unicidad del número de serie | No único; advertir y reportar duplicados. | Aprobada | Fase 4 |
 | 15 | D-13 | Adjuntos, fotos o firmas | Solo referencia textual; sin archivos ni firmas en el MVP. | Aprobada | Fase 2/6 |
 | 16 | D-19 | Formatos de reporte | JSON + CSV en el MVP; PDF/Excel en fase 2. | Aprobada | Fase 7 |
+| 17 | D-20 | Notificaciones | Solo alertas en la aplicación; sin correo, WhatsApp ni SMS. | Aprobada | Fase 7 |
 
 ---
 
@@ -123,6 +124,7 @@ El propietario revisó las decisiones una por una y **confirmó** las once, sin 
 | D-08b | A — sin aprobación de otro usuario en la aplicación; RBAC + auditoría (2026-11-12) |
 | D-13 | A — solo referencia textual; sin adjuntos, fotos ni firmas en el MVP (2026-11-13) |
 | D-19 | A — JSON + CSV en el MVP; PDF/Excel en fase 2 (2026-11-13) |
+| D-20 | A — solo alertas en la aplicación; sin correo, WhatsApp ni SMS (2026-11-13) |
 
 ---
 
@@ -305,7 +307,7 @@ El propietario revisó las decisiones una por una y **confirmó** las once, sin 
 - Se rechazan contraseñas comunes o triviales mediante una lista local versionada.
 - El usuario cambia su contraseña con la actual (`/auth/change-password`).
 - El reset administrativo lo ejecuta `ADMIN` con `users.manage` y obliga cambio en el siguiente ingreso.
-- Sin autoservicio de recuperación por correo hasta que D-20 defina el canal; sin MFA en el MVP.
+- Sin autoservicio de recuperación por correo: D-20 aprobó solo alertas en la aplicación y ningún canal de mensajería (2026-11-13); sin MFA en el MVP.
 - No se almacenan pistas de contraseña ni historial de contraseñas en el MVP.
 
 **Bloquea:** fase 2. **Estado:** aprobada.
@@ -639,9 +641,15 @@ El propietario revisó las decisiones una por una y **confirmó** las once, sin 
 
 **Recomendación:** A; B en fase 2.
 
-**Si no se responde:** A.
+**Decisión aprobada (2026-11-13):** opción **A** — solo alertas en la aplicación.
 
-**Bloquea:** no bloquea MVP. **Estado:** abierta.
+- Las alertas de vencimiento se muestran en el dashboard, la ficha del activo y los reportes; no se envían correos, WhatsApp ni SMS.
+- No se implementa servidor SMTP, plantillas de mensaje, cola de envío, rebotes ni preferencias de notificación en el MVP.
+- El destinatario es cualquier usuario con permiso `alerts.read`; no hay suscripciones individuales ni envío a personas sin cuenta.
+- El autoservicio de recuperación de contraseña por correo sigue fuera del MVP (D-06b); el reset continúa siendo administrativo.
+- Correo y otros canales quedan para fase 2, con proveedor, destinatarios y frecuencia definidos en una nueva decisión.
+
+**Bloquea:** no bloquea el MVP. **Estado:** aprobada.
 
 ---
 
@@ -932,14 +940,14 @@ El propietario revisó las decisiones una por una y **confirmó** las once, sin 
 | S-15 | Interfaz en español. | D-30 |
 | S-16 | Condición técnica como enum en MVP. | D-26 |
 | S-17 | Costos opcionales, sin reporte financiero. | D-29 |
-| S-18 | Sin notificaciones por correo en MVP. | D-20 |
+| S-18 | Sin notificaciones por correo, WhatsApp ni SMS en el MVP; solo alertas en la aplicación (D-20). | D-20 |
 | S-19 | Retención indefinida por defecto. | D-21 |
 | S-20 | Un solo `ADMIN` puede ajustar; Seguridad puede baja/condición. | D-07/D-27 |
 | S-21 | El vencimiento del equipo combina fecha documentada y vida útil calculada por tipo; sin datos queda sin fecha. | D-12 |
 | S-22 | Sin segunda aprobación en la aplicación: quien tiene el permiso ejecuta y registra `authorized_by`, motivo y documento; el control es RBAC + auditoría. | D-08b |
 | S-23 | Reportes en pantalla y exportación CSV en el MVP; PDF/Excel en fase 2. | D-19 |
 
-**Tras las aprobaciones del 2026-11-10 al 2026-11-13**, S-01, S-02, S-04, S-06 a S-13, S-16, S-20, S-21, S-22 y S-23 pasan a decisiones aprobadas (ver §2.2 y §2.4). S-11 se ajusta: **no** existe mapeo automático de resultado a condición. Siguen como supuesto S-03, S-05, S-14, S-15, S-17, S-18 y S-19.
+**Tras las aprobaciones del 2026-11-10 al 2026-11-13**, S-01, S-02, S-04, S-06 a S-13, S-16, S-18, S-20, S-21, S-22 y S-23 pasan a decisiones aprobadas (ver §2.2 y §2.4). S-11 se ajusta: **no** existe mapeo automático de resultado a condición. Siguen como supuesto S-03, S-05, S-14, S-15, S-17 y S-19.
 
 ---
 
@@ -964,14 +972,13 @@ Estas decisiones se usaron para escribir los documentos, pero **no están aproba
 
 Para no bloquear el diseño, se propone esta secuencia. Solo figuran las decisiones **abiertas** al 2026-11-13; las aprobadas están en §2.2 y §2.4, y ya se reflejaron en los documentos. Cada respuesta se registra aquí y se refleja en el modelo/API antes de avanzar.
 
-1. **D-20:** ¿qué notificaciones se requieren? (fase 7)
-2. **D-21:** ¿cuánto tiempo se conserva el historial y la auditoría? (transversal)
-3. **D-22:** ¿cuál es el volumen esperado? (transversal)
-4. **D-23:** ¿dónde se despliega y cuál es el objetivo de respaldo? (transversal)
-5. **D-14:** ¿se requiere operación sin internet? (transversal)
-6. **D-25:** ¿se necesitan movimientos por lote? (fase 5)
-7. **D-29:** ¿se registran costos de mantenimiento? (fase 6)
-8. **D-30:** ¿idioma y localización? (transversal)
+1. **D-21:** ¿cuánto tiempo se conserva el historial y la auditoría? (transversal)
+2. **D-22:** ¿cuál es el volumen esperado? (transversal)
+3. **D-23:** ¿dónde se despliega y cuál es el objetivo de respaldo? (transversal)
+4. **D-14:** ¿se requiere operación sin internet? (transversal)
+5. **D-25:** ¿se necesitan movimientos por lote? (fase 5)
+6. **D-29:** ¿se registran costos de mantenimiento? (fase 6)
+7. **D-30:** ¿idioma y localización? (transversal)
 
 ---
 

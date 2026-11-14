@@ -257,6 +257,8 @@ stateDiagram-v2
 | BR-129 | Un umbral negativo o no numérico se rechaza. | Validación. |
 | BR-130 | Una categoría deshabilitada no se muestra en alertas operativas. | `enabled=false`; filtro. |
 | BR-131 | La alerta muestra activo, ubicación, categoría, fecha objetivo, días restantes/atraso y fuente. | Respuesta de API/UI. |
+| BR-131A | Las alertas se entregan solo dentro de la aplicación (dashboard, ficha y reportes); el MVP no envía correo, WhatsApp ni SMS (D-20). | Sin SMTP, cola de envío ni plantillas; prueba de que no existe canal externo. |
+| BR-131B | Cualquier usuario con `alerts.read` ve las alertas; no hay suscripciones individuales ni destinatarios sin cuenta (D-20). | Autorización por permiso; sin tabla de preferencias. |
 
 ---
 
@@ -313,7 +315,7 @@ stateDiagram-v2
 | BR-179D | Sin MFA en el MVP; el diseño no impide añadirlo después. | Sin campos de segundo factor. |
 | BR-179E | No se guardan pistas ni historial de contraseñas. | Esquema y auditoría. |
 
-> La recuperación de acceso por correo queda fuera hasta que D-20 defina el canal de notificaciones.
+> La recuperación de acceso por correo queda fuera del MVP: D-20 aprobó solo alertas en la aplicación y ningún canal de mensajería (2026-11-13).
 
 ---
 

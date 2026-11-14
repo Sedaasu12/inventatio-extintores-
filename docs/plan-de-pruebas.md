@@ -262,6 +262,8 @@ Estructura D-02: `SEDE` es la raíz; `ALMACEN`, `TALLER` y `AREA` son hijos. Los
 | T-ALE-15 | Integración | `EQUIPO` sin documentada ni calculable | `SIN_FECHA_CONFIGURADA`; no se inventa fecha. | D-12 / RF-ALE-08 |
 | T-ALE-16 | Integración | Inspección/servicio sin `nextDueDate` | La categoría queda `SIN_FECHA_CONFIGURADA`; el servidor no calcula un intervalo. | D-11 / BR-108A |
 | T-ALE-17 | Integración | Instalación sin umbrales sembrados | `alert_settings.days_before` nulo; no aparecen `POR_VENCER`. | D-11 / BR-125A |
+| T-ALE-18 | Integración | Consultar alertas con cualquier rol que tenga `alerts.read` | Las alertas se ven en la app; no se genera correo, WhatsApp ni SMS. | D-20 / BR-131A |
+| T-ALE-19 | Integración | Buscar endpoint de suscripción o envío de alertas | 404; el MVP no expone canal externo. | D-20 / BR-131A |
 
 ### 4.9 Dashboard, reportes y auditoría
 
@@ -462,7 +464,7 @@ Verificar `EXPLAIN` de las consultas principales y que se usen los índices defi
 | Retorno almacén | RF-MOV-04 | T-MOV-06 |
 | Mantenimiento | RF-MAN-01..09, RF-MOV-05/06 | T-MAN-01..15, E2E-01 |
 | Inspección | RF-INS-01..06 | T-INS-01..06 |
-| Alertas | RF-ALE-01..09 | T-ALE-01..17 |
+| Alertas | RF-ALE-01..10 | T-ALE-01..19 |
 | Reportes | RF-REP-01..06 | T-REP-01..05 |
 | Baja | RF-MOV-07 | T-MOV-21/22/23/28/29/30, E2E-01 |
 | Ajuste | RF-MOV-08 | T-MOV-19/20/31 |
