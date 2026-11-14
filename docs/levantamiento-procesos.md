@@ -50,6 +50,7 @@
 | P-19 | Intervalos y umbrales de alerta | D-11 | Respondida y aplicada |
 | P-20 | Aprobación de operaciones sensibles | D-08b | Respondida y aplicada |
 | P-21 | Adjuntos, fotos o firmas | D-13 | Respondida y aplicada |
+| P-22 | Formatos de reporte | D-19 | Respondida y aplicada |
 
 ---
 
@@ -816,6 +817,32 @@
 
 ---
 
+### P-22 — Formatos de reporte
+
+**Pregunta:** ¿Basta consultar en pantalla y exportar CSV, o se requieren PDF/Excel con formato oficial?
+
+**Respuesta del propietario (2026-11-13):** basta JSON + CSV en el MVP. PDF/Excel quedan para una fase posterior.
+
+**Lectura:**
+
+- El CSV cubre el uso operativo: se abre en Excel y se archiva fuera del sistema.
+- La consulta en pantalla se mantiene para el trabajo diario, con filtros y paginación de servidor.
+- El PDF/Excel con formato oficial exige plantillas, librerías y pruebas de formato; conviene definirlo cuando exista un requisito de presentación concreto.
+- No se generan archivos persistentes: la exportación se entrega en la respuesta y no se almacena en el servidor.
+
+**Qué NO se concluye todavía:**
+
+- Qué plantillas y campos exactos llevará cada PDF/Excel: se define en fase 2.
+- Si se requiere firma o sello digital en los reportes: fuera del MVP (ver D-13).
+
+**Implicaciones:** D-19 se aprueba con opción A. La exportación exige el permiso `reports.export` y usa los mismos filtros que la consulta; los endpoints de PDF/Excel no existen en el MVP.
+
+**Decisiones afectadas:** D-19 (aprobada), D-13.
+
+**Documentos actualizados:** este registro (P-22, H-28), `decisiones-pendientes.md`, `requerimientos.md` (RF-REP-01..06), `diseno-api.md` (§4.7), `plan-de-pruebas.md` (T-REP-01..05), `plan-implementacion.md` (fase 7) y `analisis-funcional.md`.
+
+---
+
 ## 4. Contradicciones y hallazgos
 
 | ID | Hallazgo | Efecto |
@@ -847,9 +874,10 @@
 | H-25 | No había una política de intervalos ni umbrales de “por vencer”. | D-11: solo fecha indicada, sin cálculo de intervalos y sin umbrales iniciales. |
 | H-26 | No estaba definido si las operaciones sensibles requerían aprobación de otro usuario en la aplicación. | D-08b: sin segunda aprobación; `authorized_by` es un nombre registrado y el control es RBAC + auditoría. |
 | H-27 | No estaba definido si la evidencia documental requería archivos, fotos o firmas. | D-13: solo referencia textual; sin adjuntos ni firma electrónica en el MVP. |
+| H-28 | No estaba definido el nivel de formato de los reportes ni si se requería PDF/Excel desde el inicio. | D-19: JSON + CSV en el MVP; PDF/Excel en fase 2, con plantillas definidas después. |
 
 ---
 
 ## 5. Próxima pregunta
 
-Levantamiento cerrado el 2026-11-10 y ampliado con D-02, D-06, D-06b, D-08b, D-11, D-12, D-13, D-26, D-26b, D-27 y D-28. No quedan preguntas de ubicaciones, identidad, política de acceso, condición técnica, inspecciones, vencimiento del equipo, umbrales de alerta, aprobación de operaciones sensibles ni adjuntos pendientes. La siguiente decisión abierta por impacto es **D-19 (reportes)**, seguida de **D-20 (notificaciones)** y **D-21 (retención)**. No se inicia implementación funcional sin aprobación.
+Levantamiento cerrado el 2026-11-10 y ampliado con D-02, D-06, D-06b, D-08b, D-11, D-12, D-13, D-19, D-26, D-26b, D-27 y D-28. No quedan preguntas de ubicaciones, identidad, política de acceso, condición técnica, inspecciones, vencimiento del equipo, umbrales de alerta, aprobación de operaciones sensibles, adjuntos ni formatos de reporte pendientes. La siguiente decisión abierta por impacto es **D-20 (notificaciones)**, seguida de **D-21 (retención)** y **D-22 (volumen)**. No se inicia implementación funcional sin aprobación.

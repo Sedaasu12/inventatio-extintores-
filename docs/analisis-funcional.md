@@ -56,7 +56,7 @@ El repositorio es un **punto de partida documental**, no un proyecto iniciado. L
 
 - **No hay trabajo previo que destruir.** Los documentos existentes se conservan como línea base; los nuevos documentos los detallan y, en algunos puntos, los refinan.
 - **Hay que crear el proyecto desde cero.** La primera fase debe incluir control de versiones, versiones fijadas, lint, typecheck, pruebas y build antes de escribir reglas de negocio.
-- **Las decisiones de negocio ya resueltas permiten fijar la migración.** El alcance single-tenant (D-01), el vencimiento del equipo (D-12), los umbrales de alerta (D-11), la autorización de movimientos (D-07/D-08b) y la evidencia textual (D-13) están aprobados; quedan decisiones abiertas que no cambian el núcleo del modelo (reportes, notificaciones, retención, volumen, despliegue y lotes).
+- **Las decisiones de negocio ya resueltas permiten fijar la migración.** El alcance single-tenant (D-01), el vencimiento del equipo (D-12), los umbrales de alerta (D-11), la autorización de movimientos (D-07/D-08b), la evidencia textual (D-13) y los formatos de reporte (D-19) están aprobados; quedan decisiones abiertas que no cambian el núcleo del modelo (notificaciones, retención, volumen, despliegue y lotes).
 
 ---
 
@@ -376,6 +376,7 @@ El detalle completo está en:
 | Fechas separadas y alertas | Sí | | |
 | Historial y auditoría | Sí | | |
 | Dashboard y reportes básicos | Sí | | |
+| Exportación CSV | Sí | | |
 | Adjuntos/firmas/fotos | | Sí | |
 | Exportación PDF/Excel | | Sí | |
 | Correo | | Sí | |
@@ -461,9 +462,9 @@ Hechos aportados por el propietario. **No son reglas aprobadas**; el detalle y l
 
 ## 10. Decisiones que requieren respuesta antes de implementar
 
-> **Estado al 2026-11-13:** el levantamiento está cerrado y las decisiones aprobadas figuran en `docs/decisiones-pendientes.md` (§2.2 y §2.4), incluidas D-08b, D-11, D-12 y D-13. Lo que sigue son las decisiones abiertas que bloquean fases concretas.
+> **Estado al 2026-11-13:** el levantamiento está cerrado y las decisiones aprobadas figuran en `docs/decisiones-pendientes.md` (§2.2 y §2.4), incluidas D-08b, D-11, D-12, D-13 y D-19. Lo que sigue son las decisiones abiertas que bloquean fases concretas.
 
-1. **D-14/D-19/D-20/D-21/D-22/D-23/D-25/D-29/D-30:** operación sin internet, reportes, notificaciones, retención, volumen, despliegue, lotes, costos e idioma.
+1. **D-14/D-20/D-21/D-22/D-23/D-25/D-29/D-30:** operación sin internet, notificaciones, retención, volumen, despliegue, lotes, costos e idioma.
 
 El detalle, la recomendación y el supuesto de cada una está en `docs/decisiones-pendientes.md`.
 
@@ -486,7 +487,7 @@ El detalle, la recomendación y el supuesto de cada una está en `docs/decisione
 
 ## 12. Próximo paso
 
-1. Completar las decisiones abiertas de `decisiones-pendientes.md` (siguiente: D-19, D-20 y D-21).
+1. Completar las decisiones abiertas de `decisiones-pendientes.md` (siguiente: D-20, D-21 y D-22).
 2. Cerrar el alcance de la fase 1 (esquema y migración inicial) con las decisiones ya aprobadas.
 3. Autorizar la fase 1 antes de escribir módulos funcionales.
 

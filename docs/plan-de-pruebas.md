@@ -270,7 +270,9 @@ Estructura D-02: `SEDE` es la raíz; `ALMACEN`, `TALLER` y `AREA` son hijos. Los
 | T-DASH-01 | Integración | Consultar resumen | Conteos coinciden con datos; bajas excluidas. | RF-DASH-01..04 |
 | T-REP-01 | Integración | Inventario por ubicación/estado | Totales y filas consistentes; paginación. | RF-REP-01 |
 | T-REP-02 | Integración | Movimientos por periodo/tipo | Filtros y totales correctos. | RF-REP-02 |
-| T-REP-03 | Integración | Exportar CSV con permiso | Archivo válido; sin datos de más; sin permiso 403. | RF-REP-05 |
+| T-REP-03 | Integración | Exportar CSV con permiso | Archivo válido; sin datos de más; sin permiso 403. | RF-REP-06 / D-19 |
+| T-REP-04 | Integración | Exportar CSV sin `reports.export` | 403; no se genera archivo. | RF-REP-06 / D-19 |
+| T-REP-05 | Integración | Solicitar PDF o Excel en el MVP | 404/501; solo CSV está disponible. | RF-REP-05 / D-19 |
 | T-AUD-01 | Integración | Alta/edición/movimiento | Auditoría con actor, entidad, antes/después, request ID. | RF-AUD-01..03 |
 | T-AUD-02 | Integración | Intentar editar/borrar auditoría | No existe endpoint; DB restringe; 404/405. | RF-AUD-04 |
 | T-AUD-03 | Integración | Revisar auditoría | No contiene contraseñas, tokens ni secretos. | BR-182 |
@@ -461,6 +463,7 @@ Verificar `EXPLAIN` de las consultas principales y que se usen los índices defi
 | Mantenimiento | RF-MAN-01..09, RF-MOV-05/06 | T-MAN-01..15, E2E-01 |
 | Inspección | RF-INS-01..06 | T-INS-01..06 |
 | Alertas | RF-ALE-01..09 | T-ALE-01..17 |
+| Reportes | RF-REP-01..06 | T-REP-01..05 |
 | Baja | RF-MOV-07 | T-MOV-21/22/23/28/29/30, E2E-01 |
 | Ajuste | RF-MOV-08 | T-MOV-19/20/31 |
 | Evidencia textual | RF-MOV-16, RF-MOV-17 | T-MOV-32/33 |

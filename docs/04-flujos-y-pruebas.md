@@ -59,6 +59,7 @@
 | PT-15 | Cámara denegada | Se ofrece código manual/lector externo. |
 | PT-16 | Sin umbral configurado | No aparece “por vencer”; solo vencido, vigente o sin fecha (D-11). |
 | PT-17 | Intentar adjuntar un archivo a un movimiento | No existe carga de archivos; solo se acepta referencia textual (D-13). |
+| PT-18 | Exportar un reporte a CSV | Descarga con los mismos filtros de la consulta; sin permiso, se rechaza (D-19). |
 
 ## 7. Cierre de cada entrega
 - Migración ejecutada desde una base vacía.

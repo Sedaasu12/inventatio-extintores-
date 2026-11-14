@@ -22,7 +22,7 @@
 | RF-16 | Mostrar dashboard con cantidades por ubicación, estado y alertas. | Should |
 | RF-17 | Buscar y filtrar por código, serie, tipo, ubicación, condición y fechas. | Must |
 | RF-18 | Emitir reportes de inventario, movimientos, inspecciones y servicios. | Should |
-| RF-19 | Exportar reportes a Excel/PDF. | Could |
+| RF-19 | Exportar reportes a CSV en el MVP; Excel/PDF en segunda fase (D-19). | Could |
 | RF-20 | Registrar auditoría de cambios relevantes. | Must |
 | RF-21 | Permitir lectura QR desde cámara del navegador. | Must |
 | RF-22 | Permitir ingreso manual y lector USB 2D en modo teclado. | Should |

@@ -587,7 +587,7 @@ Convertir las fechas documentadas en información operativa, sin inventar period
 ### Dependencias
 
 - Fase 6.
-- D-11 (umbrales, aprobada: solo fecha indicada y sin umbral inicial), D-12 (vencimiento del equipo, aprobada: documentada + vida útil por tipo), D-19 (formatos).
+- D-11 (umbrales, aprobada: solo fecha indicada y sin umbral inicial), D-12 (vencimiento del equipo, aprobada: documentada + vida útil por tipo), D-19 (formatos, aprobada: JSON + CSV en el MVP).
 
 ### Alcance
 
@@ -597,7 +597,7 @@ Convertir las fechas documentadas en información operativa, sin inventar period
 - Resumen por categoría/estado.
 - Dashboard.
 - Reportes de inventario, movimientos, mantenimiento, inspecciones y bajas.
-- Exportación CSV (si D-19 lo permite).
+- Exportación CSV de cada reporte con `reports.export`; PDF/Excel quedan para fase 2 (D-19).
 - Filtros y paginación.
 
 ### Archivos esperados
@@ -958,7 +958,7 @@ Cada puerta requiere evidencia de pruebas y revisión de los documentos actualiz
 
 | Riesgo | Probabilidad | Impacto | Mitigación | Responsable |
 |---|---|---|---|---|
-| Reglas técnicas no confirmadas | Baja | Medio | D-10/D-11/D-12 aprobadas; D-19 pendiente; no inventar; configuración explícita. | Propietario/seguridad |
+| Reglas técnicas no confirmadas | Baja | Medio | D-10/D-11/D-12/D-19 aprobadas; no inventar; configuración explícita. | Propietario/seguridad |
 | Datos existentes de baja calidad | Media | Alto | D-24; dry-run; reporte de errores. | Almacén/administración |
 | Permisos ambiguos | Media | Alto | D-07; matriz; pruebas 403. | Propietario |
 | Concurrencia/doble envío | Media | Alto | Bloqueo, versión, idempotencia, pruebas. | Desarrollo |

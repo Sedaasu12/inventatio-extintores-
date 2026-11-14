@@ -485,9 +485,9 @@ GET /api/v1/alerts?eventType=INSPECCION&status=POR_VENCER&page=1&pageSize=20
 | GET | `/reports/maintenance` | `reports.read` | Órdenes, servicios y retornos pendientes. |
 | GET | `/reports/inspections` | `reports.read` | Inspecciones y próximas fechas. |
 | GET | `/reports/retired` | `reports.read` | Bajas y ajustes con motivo. |
-| GET | `/reports/:type/export` | `reports.export` | CSV en MVP; PDF/Excel en fase 2. |
+| GET | `/reports/:type/export` | `reports.export` | CSV en el MVP; PDF/Excel en fase 2 (D-19). |
 
-Todos los reportes usan filtros de servidor y paginación; los totales se calculan en SQL, no en el cliente.
+Todos los reportes usan filtros de servidor y paginación; los totales se calculan en SQL, no en el cliente. La consulta devuelve JSON y la exportación CSV usa los mismos filtros; no se generan ni almacenan archivos persistentes (D-19).
 
 ### 4.8 Auditoría y salud
 

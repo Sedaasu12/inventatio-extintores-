@@ -145,11 +145,12 @@ La matriz detallada está en `docs/diseno-api.md`. Los permisos se validan siemp
 | RF-DASH-03 | Mostrar equipos en mantenimiento y retornos pendientes. | Must | Listado con proveedor y fecha prevista. |
 | RF-DASH-04 | Mostrar alertas por categoría y estado. | Must | Enlaces al listado filtrado. |
 | RF-DASH-05 | Mostrar movimientos recientes. | Should | Últimos movimientos con activo, tipo, origen/destino y usuario. |
-| RF-REP-01 | Reporte de inventario por ubicación/estado/condición. | Must | Exportable en JSON; CSV/PDF en segunda fase. |
-| RF-REP-02 | Reporte de movimientos por periodo/tipo/usuario/ubicación. | Must | Filtros y paginación; totales consistentes. |
-| RF-REP-03 | Reporte de inspecciones y servicios próximos/vencidos. | Must | Separado por categoría. |
-| RF-REP-04 | Reporte de bajas y ajustes con motivo. | Must | Incluye autorización y usuario registrador. |
-| RF-REP-05 | Exportar a Excel/PDF. | Could | Segunda fase; no bloquea MVP. |
+| RF-REP-01 | Reporte de inventario por ubicación/estado/condición. | Must | Consulta en pantalla y exportación CSV; PDF/Excel en fase 2 (D-19). |
+| RF-REP-02 | Reporte de movimientos por periodo/tipo/usuario/ubicación. | Must | Filtros y paginación; totales consistentes; exportación CSV (D-19). |
+| RF-REP-03 | Reporte de inspecciones y servicios próximos/vencidos. | Must | Separado por categoría; exportación CSV (D-19). |
+| RF-REP-04 | Reporte de bajas y ajustes con motivo. | Must | Incluye autorización y usuario registrador; exportación CSV (D-19). |
+| RF-REP-05 | Exportar a PDF/Excel con formato oficial. | Could | Fase 2; no bloquea el MVP (D-19). |
+| RF-REP-06 | Exportar cualquier reporte a CSV con permiso. | Must | `reports.export`; mismos filtros de servidor; sin archivos persistidos (D-19). |
 
 ### 2.9 Auditoría
 
@@ -231,7 +232,7 @@ La matriz detallada está en `docs/diseno-api.md`. Los permisos se validan siemp
 | RF-15 | RF-ALE-01..09 |
 | RF-16 | RF-DASH-01..05 |
 | RF-17 | RF-EXT-06, RF-MOV-15 |
-| RF-18 | RF-REP-01..04 |
+| RF-18 | RF-REP-01..04, RF-REP-06 |
 | RF-19 | RF-REP-05 |
 | RF-20 | RF-AUD-01..05 |
 | RF-21 | RF-QR-01 |
