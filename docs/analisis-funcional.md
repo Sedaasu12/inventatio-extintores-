@@ -56,7 +56,7 @@ El repositorio es un **punto de partida documental**, no un proyecto iniciado. L
 
 - **No hay trabajo previo que destruir.** Los documentos existentes se conservan como línea base; los nuevos documentos los detallan y, en algunos puntos, los refinan.
 - **Hay que crear el proyecto desde cero.** La primera fase debe incluir control de versiones, versiones fijadas, lint, typecheck, pruebas y build antes de escribir reglas de negocio.
-- **Las decisiones de negocio ya resueltas permiten fijar la migración.** El alcance single-tenant (D-01), el vencimiento del equipo (D-12), los umbrales de alerta (D-11), la autorización de movimientos (D-07/D-08b), la evidencia textual (D-13), los formatos de reporte (D-19), el canal de alertas (D-20), la retención (D-21) y el volumen (D-22) están aprobados; quedan decisiones abiertas que no cambian el núcleo del modelo (despliegue y lotes).
+- **Las decisiones de negocio ya resueltas permiten fijar la migración.** El alcance single-tenant (D-01), el vencimiento del equipo (D-12), los umbrales de alerta (D-11), la autorización de movimientos (D-07/D-08b), la evidencia textual (D-13), los formatos de reporte (D-19), el canal de alertas (D-20), la retención (D-21), el volumen (D-22) y el despliegue con respaldo (D-23) están aprobados; quedan decisiones abiertas que no cambian el núcleo del modelo (lotes, costos e idioma).
 
 ---
 
@@ -436,6 +436,7 @@ Se registran como supuestos explícitos; no son reglas aprobadas. El detalle y l
 | S-20 | No existe segunda aprobación en la aplicación: quien tiene el permiso ejecuta la operación y registra `authorized_by`, motivo y documento; el control es RBAC + auditoría (D-08b). |
 | S-21 | Las alertas se consultan solo dentro de la aplicación; no hay correo, WhatsApp ni SMS en el MVP (D-20). |
 | S-22 | El historial y la auditoría se conservan indefinidamente en el MVP; no hay purga, archivo ni anonimización (D-21). |
+| S-23 | App y API en nube con HTTPS; MySQL on-premise por red privada o túnel cifrado; respaldo diario cifrado con RPO 24 h / RTO 4 h (D-23). |
 
 ### 9.1 Realidad operativa declarada (levantamiento 2026-11-10; precisión D-02 el 2026-11-11)
 
@@ -464,9 +465,9 @@ Hechos aportados por el propietario. **No son reglas aprobadas**; el detalle y l
 
 ## 10. Decisiones que requieren respuesta antes de implementar
 
-> **Estado al 2026-11-14:** el levantamiento está cerrado y las decisiones aprobadas figuran en `docs/decisiones-pendientes.md` (§2.2 y §2.4), incluidas D-08b, D-11, D-12, D-13, D-19, D-20, D-21 y D-22. Lo que sigue son las decisiones abiertas que bloquean fases concretas.
+> **Estado al 2026-11-14:** el levantamiento está cerrado y las decisiones aprobadas figuran en `docs/decisiones-pendientes.md` (§2.2 y §2.4), incluidas D-08b, D-11, D-12, D-13, D-19, D-20, D-21, D-22 y D-23. Lo que sigue son las decisiones abiertas que bloquean fases concretas.
 
-1. **D-14/D-23/D-25/D-29/D-30:** operación sin internet, despliegue, lotes, costos e idioma.
+1. **D-14/D-25/D-29/D-30:** operación sin internet, lotes, costos e idioma.
 
 El detalle, la recomendación y el supuesto de cada una está en `docs/decisiones-pendientes.md`.
 
@@ -489,7 +490,7 @@ El detalle, la recomendación y el supuesto de cada una está en `docs/decisione
 
 ## 12. Próximo paso
 
-1. Completar las decisiones abiertas de `decisiones-pendientes.md` (siguiente: D-23, D-14 y D-25).
+1. Completar las decisiones abiertas de `decisiones-pendientes.md` (siguiente: D-14, D-25 y D-29).
 2. Cerrar el alcance de la fase 1 (esquema y migración inicial) con las decisiones ya aprobadas.
 3. Autorizar la fase 1 antes de escribir módulos funcionales.
 

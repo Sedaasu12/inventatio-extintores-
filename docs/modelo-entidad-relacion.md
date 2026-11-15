@@ -763,5 +763,6 @@ Con 10 000 activos y 100 000 movimientos, los listados deben paginarse y filtrar
 - **Auditoría:** append-only; no se elimina desde la aplicación ni se archiva en el MVP (D-21).
 - **Usuarios:** se desactivan, no se borran.
 - **Ubicaciones/catálogos:** se desactivan si están referenciados.
-- **Respaldos:** copia diaria cifrada de MySQL; prueba de restauración al menos trimestral o antes de cada despliegue mayor. RPO/RTO a confirmar (D-23).
+- **Respaldos:** copia diaria cifrada de MySQL en el servidor de la organización; RPO 24 h / RTO 4 h; prueba de restauración antes de producción y al menos trimestral (D-23).
+- **Despliegue (D-23):** aplicación y API en nube con HTTPS; MySQL on-premise, sin exposición directa a Internet; conexión por red privada o túnel cifrado.
 - **Datos de desarrollo:** seed separado, identificado, nunca restaurado sobre producción.

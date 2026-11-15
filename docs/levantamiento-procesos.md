@@ -54,6 +54,7 @@
 | P-23 | Notificaciones y canal de alertas | D-20 | Respondida y aplicada |
 | P-24 | Retención del historial y la auditoría | D-21 | Respondida y aplicada |
 | P-25 | Volumen esperado | D-22 | Respondida y aplicada |
+| P-26 | Despliegue y respaldo | D-23 | Respondida y aplicada |
 
 ---
 
@@ -924,6 +925,34 @@
 
 ---
 
+### P-26 — Despliegue y respaldo
+
+**Pregunta:** ¿Dónde se despliega el sistema? ¿Quién administra MySQL? ¿Qué pérdida de datos y tiempo de recuperación se aceptan?
+
+**Respuesta del propietario (2026-11-14):** despliegue híbrido: aplicación y API en nube con HTTPS, MySQL en un servidor de la organización. RPO 24 h / RTO 4 h.
+
+**Lectura:**
+
+- La cámara del navegador exige HTTPS, así que la aplicación no puede quedar en HTTP simple.
+- Mantener MySQL en las instalaciones responde a la necesidad de que los datos no salgan de la organización.
+- El esquema híbrido obliga a una conexión segura entre la API y la base: red privada o túnel cifrado, nunca MySQL expuesto a Internet.
+- Un respaldo completo diario es suficiente para el RPO de 24 h; el RTO de 4 h exige que la restauración esté probada, no solo documentada.
+- La conservación indefinida (D-21) implica que el respaldo debe conservar todo el historial, no una ventana recortada.
+
+**Qué NO se concluye todavía:**
+
+- El proveedor de nube concreto y el costo mensual: se definen al contratar, antes de producción.
+- La herramienta exacta de respaldo y su retención operativa: la define el responsable de operación, respetando RPO/RTO.
+- El procedimiento de conmutación y los responsables de guardia: se documentan en el runbook de la fase 11.
+
+**Implicaciones:** D-23 se aprueba con opción C (híbrido): app en nube + MySQL on-premise, RPO 24 h / RTO 4 h. Se añaden controles de HTTPS, red privada/túnel y respaldo cifrado verificado.
+
+**Decisiones afectadas:** D-23 (aprobada), D-21, D-22.
+
+**Documentos actualizados:** este registro (P-26, H-32), `decisiones-pendientes.md`, `02-arquitectura.md` (§9), `modelo-entidad-relacion.md` (§10), `01-requerimientos.md` (RNF-12), `plan-de-pruebas.md` (T-SEC-16/17, T-MIG-08..10), `plan-implementacion.md` (fase 11) y `analisis-funcional.md`.
+
+---
+
 ## 4. Contradicciones y hallazgos
 
 | ID | Hallazgo | Efecto |
@@ -959,9 +988,10 @@
 | H-29 | No estaba definido si las alertas debían salir de la aplicación por correo, WhatsApp o SMS. | D-20: solo alertas en la aplicación; sin SMTP ni canales externos en el MVP. |
 | H-30 | No había una política de retención del historial ni de la auditoría. | D-21: conservación indefinida; sin purga, archivo ni anonimización en el MVP. |
 | H-31 | No había cifras confirmadas de activos, usuarios, movimientos ni sedes. | D-22: se confirma 10 000 activos, 100 000 movimientos y <100 usuarios; revisar si se supera 10×. |
+| H-32 | No estaba definido dónde desplegar ni qué pérdida de datos y tiempo de recuperación se aceptan. | D-23: híbrido (app en nube + MySQL on-premise), HTTPS, red privada/túnel y RPO 24 h / RTO 4 h. |
 
 ---
 
 ## 5. Próxima pregunta
 
-Levantamiento cerrado el 2026-11-10 y ampliado con D-02, D-06, D-06b, D-08b, D-11, D-12, D-13, D-19, D-20, D-21, D-22, D-26, D-26b, D-27 y D-28. No quedan preguntas de ubicaciones, identidad, política de acceso, condición técnica, inspecciones, vencimiento del equipo, umbrales de alerta, aprobación de operaciones sensibles, adjuntos, formatos de reporte, canal de notificaciones, retención ni volumen pendientes. La siguiente decisión abierta por impacto es **D-23 (despliegue)**, seguida de **D-14 (sin conexión)** y **D-25 (lotes)**. No se inicia implementación funcional sin aprobación.
+Levantamiento cerrado el 2026-11-10 y ampliado con D-02, D-06, D-06b, D-08b, D-11, D-12, D-13, D-19, D-20, D-21, D-22, D-23, D-26, D-26b, D-27 y D-28. No quedan preguntas de ubicaciones, identidad, política de acceso, condición técnica, inspecciones, vencimiento del equipo, umbrales de alerta, aprobación de operaciones sensibles, adjuntos, formatos de reporte, canal de notificaciones, retención, volumen ni despliegue pendientes. La siguiente decisión abierta por impacto es **D-14 (sin conexión)**, seguida de **D-25 (lotes)** y **D-29 (costos)**. No se inicia implementación funcional sin aprobación.

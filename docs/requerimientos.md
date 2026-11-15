@@ -188,7 +188,7 @@ La matriz detallada está en `docs/diseno-api.md`. Los permisos se validan siemp
 | RNF-06 | Rendimiento. | Must | Listados paginados; p95 < 500 ms para consultas típicas con 10 000 activos; dashboard < 1 s. |
 | RNF-07 | Disponibilidad y manejo de errores. | Must | Errores de red/cámara/lector tienen mensaje y reintento; no se simula éxito. |
 | RNF-08 | Mantenibilidad. | Must | Módulos separados, migraciones versionadas, lint/typecheck/build en CI. |
-| RNF-09 | Respaldo y restauración. | Must | Procedimiento documentado y probado; backup cifrado; RPO/RTO a confirmar. |
+| RNF-09 | Respaldo y restauración. | Must | Procedimiento documentado y probado; backup diario cifrado; RPO 24 h / RTO 4 h (D-23). |
 | RNF-10 | Privacidad y minimización. | Must | QR sin PII; nombres de responsables con acceso restringido; no exponer datos en logs. |
 | RNF-11 | Compatibilidad. | Must | Chrome/Edge/Safari actuales; cámara requiere HTTPS o localhost. |
 | RNF-12 | Observabilidad. | Should | Logs estructurados con request ID; health checks; sin datos sensibles. |
@@ -208,7 +208,7 @@ La matriz detallada está en `docs/diseno-api.md`. Los permisos se validan siemp
 | RF-DAT-04 | Contraparte externa explícita. | Must | No se simula un proveedor como almacén interno. |
 | RF-DAT-05 | Historial inmutable. | Must | `onDelete: Restrict`; sin endpoints de borrado; auditoría de correcciones. |
 | RF-DAT-06 | Datos de catálogo desactivables. | Must | No se borran si están referenciados; se marcan inactivos. |
-| RF-DAT-07 | Retención de historial y auditoría. | Should | Política a confirmar; por defecto no se elimina automáticamente. |
+| RF-DAT-07 | Retención de historial y auditoría. | Should | Conservación indefinida en el MVP; sin purga, archivo ni anonimización (D-21). |
 | RF-DAT-08 | Importación reproducible. | Should | Script/seed identificado como datos de desarrollo; importación real separada y auditada. |
 
 ---

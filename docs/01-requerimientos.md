@@ -41,6 +41,7 @@
 - RNF-09 Privacidad: QR sin datos personales ni atributos sensibles; acceso protegido.
 - RNF-10 Calidad: pruebas unitarias, integración y E2E para flujos críticos.
 - RNF-11 Retención: historial y auditoría con conservación indefinida en el MVP; sin purga, archivo ni anonimización (D-21).
+- RNF-12 Despliegue y respaldo: app y API en nube con HTTPS; MySQL on-premise por red privada o túnel cifrado; respaldo diario cifrado con RPO 24 h / RTO 4 h (D-23).
 
 ## 3. Reglas de negocio
 - RN-01 Un extintor es un activo individual; su código no se reutiliza.

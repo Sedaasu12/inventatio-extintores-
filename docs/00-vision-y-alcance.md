@@ -55,3 +55,6 @@ Los roles y permisos finales deben ser validados por la organización.
 - Si se exige operación sin internet en almacenes o sedes.
 - Si se requiere firma, foto o documento adjunto como evidencia de entrega/recepción (resuelto en D-13: solo referencia textual en el MVP; archivos y firmas en fase posterior).
 - Qué notificaciones se requieren y por qué canal (resuelto en D-20: solo alertas en la aplicación; sin correo, WhatsApp ni SMS en el MVP).
+- Cuánto historial se conserva y si se archiva o elimina (resuelto en D-21: conservación indefinida en el MVP; sin purga, archivo ni anonimización).
+- Qué volumen debe soportar el sistema (resuelto en D-22: hasta 10 000 extintores, 100 000 movimientos y menos de 100 usuarios; revisar si se supera 10×).
+- Dónde se despliega y qué respaldo se exige (resuelto en D-23: app y API en nube con HTTPS, MySQL on-premise por red privada o túnel cifrado, respaldo diario cifrado con RPO 24 h / RTO 4 h).

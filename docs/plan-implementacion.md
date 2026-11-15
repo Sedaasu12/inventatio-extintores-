@@ -868,7 +868,7 @@ Pasar de “funciona en desarrollo” a “operable con seguridad y respaldo”.
 ### Dependencias
 
 - Fase 10.
-- D-21 (retención, aprobada: conservación indefinida en el MVP), D-22 (volumen, aprobado: 10 000 activos y 100 000 movimientos), D-23 (hosting/backup).
+- D-21 (retención, aprobada: conservación indefinida en el MVP), D-22 (volumen, aprobado: 10 000 activos y 100 000 movimientos), D-23 (despliegue y respaldo, aprobado: híbrido con RPO 24 h / RTO 4 h).
 
 ### Alcance
 
@@ -878,6 +878,8 @@ Pasar de “funciona en desarrollo” a “operable con seguridad y respaldo”.
 - Revisión de accesibilidad.
 - Migración desde cero y desde versión anterior.
 - Backup/restauración probada.
+- Despliegue híbrido: app en nube con HTTPS y MySQL on-premise por red privada o túnel cifrado (D-23).
+- Respaldo diario cifrado y restauración cronometrada dentro de RPO 24 h / RTO 4 h (D-23).
 - Verificación de conservación indefinida: sin jobs de purga, archivo ni anonimización (D-21).
 - Configuración de producción (HTTPS, CORS, secrets, logs, health).
 - Runbook de operación, respaldo, restauración e incidentes.

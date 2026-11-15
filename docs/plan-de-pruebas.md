@@ -373,6 +373,8 @@ Después de cada operación, ejecutar consultas de verificación:
 | T-SEC-13 | CSRF en refresh | `SameSite=Strict` + validación de origen; no acepta peticiones cruzadas. |
 | T-SEC-14 | Fuerza bruta de códigos QR | Rate limit; no revela datos sin autenticación. |
 | T-SEC-15 | Dependencias vulnerables | `npm audit` sin críticos/altos abiertos o con excepción documentada. |
+| T-SEC-16 | Acceso por HTTP sin TLS en producción | Redirección a HTTPS o rechazo; HSTS activo; la cámara no se ofrece en contexto inseguro (D-23). |
+| T-SEC-17 | Intento de conexión directa a MySQL desde Internet | Puerto no expuesto; solo accesible por red privada o túnel cifrado (D-23). |
 
 ---
 
@@ -416,6 +418,9 @@ Verificar `EXPLAIN` de las consultas principales y que se usen los índices defi
 | T-MIG-05 | Restaurar backup en base limpia | Datos y relaciones consistentes; app funciona. |
 | T-MIG-06 | Reinicio con datos de prueba | App y pruebas E2E funcionan. |
 | T-MIG-07 | Verificar constraints | Intentos de violar unicidad/placement/órdenes activas fallan. |
+| T-MIG-08 | Respaldo diario programado de MySQL | Copia completa generada y cifrada; registro de éxito/fallo y alerta al responsable si falla (D-23). |
+| T-MIG-09 | Restauración cronometrada en entorno limpio | Se restaura el último respaldo dentro de **RTO 4 h** y el punto recuperado no supera **RPO 24 h** (D-23). |
+| T-MIG-10 | Verificar cifrado y acceso al respaldo | El archivo está cifrado, requiere credencial y no es accesible públicamente (D-23). |
 
 ---
 
@@ -474,7 +479,8 @@ Verificar `EXPLAIN` de las consultas principales y que se usen los índices defi
 | QR | RF-QR-01..06 | T-QR-01..10 |
 | Permisos | RF-AUT-06 | T-AUT-07, T-SEC-02, E2E-03 |
 | Auditoría | RF-AUD-01..05 | T-AUD-01..05 |
-| Migración | RNF-08/09 | T-MIG-01..07 |
+| Migración | RNF-08/09 | T-MIG-01..10 |
+| Despliegue y respaldo | RNF-08, RNF-12 | T-SEC-16/17, T-MIG-08..10 |
 
 ---
 
@@ -553,5 +559,5 @@ Formato sugerido: `docs/evidencias/AAAA-MM-DD-fase.md` (se crea en la fase 0).
 - Los umbrales, intervalos y fechas de prueba son ficticios y deben reemplazarse por datos aprobados.
 - Las pruebas de cámara/lector requieren hardware y HTTPS; se simulan en E2E y se validan manualmente en el entorno real.
 - Las pruebas de rendimiento requieren una base con volumen sintético; aún no existe.
-- La política de retención, respaldo y RPO/RTO debe confirmarse.
+- La retención es indefinida (D-21) y el respaldo híbrido apunta a RPO 24 h / RTO 4 h (D-23); ambos deben verificarse en el entorno real de producción.
 - La matriz de permisos es una propuesta; debe aprobarse antes de las pruebas de autorización definitivas.

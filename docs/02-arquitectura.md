@@ -59,12 +59,14 @@ No confundir “ubicación” con “condición técnica”. Un extintor podría
 - HTTPS en despliegue.
 - Registro de acciones sensibles.
 - Rate limiting en autenticación y resolución de códigos.
-- Backups y procedimiento de restauración probado.
+- Backups diarios cifrados y procedimiento de restauración probado (D-23).
 
 ## 7. Alertas
-Un proceso programado consulta las fechas próximas. El umbral de aviso debe ser configurable por tipo de evento (p. ej. 30 días antes es solo un ejemplo de configuración, no una norma universal). Evita generar alertas duplicadas cada vez que se ejecuta el proceso; define clave única por activo + tipo de fecha + fecha objetivo + umbral.
+Las alertas se calculan al consultar, desde las fechas objetivo (`due_dates`) y los umbrales configurados (`alert_settings`); no se persisten filas duplicadas ni se requiere un job que las genere (D-11). El umbral de aviso es configurable por tipo de evento; 30 días es solo un ejemplo de configuración, no una norma universal. Sin umbral configurado no se genera `POR_VENCER` (D-11).
 
-En cada alerta muestra: extintor, ubicación, categoría de fecha, fecha objetivo, días restantes/atraso y responsable sugerido.
+Las alertas se muestran solo dentro de la aplicación (dashboard, ficha y reportes); el MVP no envía correo, WhatsApp ni SMS (D-20).
+
+Cada alerta muestra: extintor, ubicación, categoría de fecha, fecha objetivo, días restantes/atraso y responsable sugerido.
 
 ## 8. Decisiones de implementación
 - API REST con versionado inicial `/api/v1`.
@@ -73,3 +75,12 @@ En cada alerta muestra: extintor, ubicación, categoría de fecha, fecha objetiv
 - Transacciones al registrar movimientos.
 - Migraciones de Prisma versionadas y ejecutadas en orden.
 - Docker Compose puede ser opcional para desarrollo; el proyecto también debe documentar una instalación local de MySQL para no depender del uso de contenedores.
+
+## 9. Despliegue y respaldo (D-23)
+
+- **Aplicación y API en nube**, servidas por HTTPS con dominio propio; el navegador exige contexto seguro para la cámara.
+- **MySQL en un servidor de la organización** (on-premise), administrado por la organización y sin exposición directa a Internet.
+- La API se conecta a MySQL por red privada o túnel cifrado; las credenciales se inyectan por variables de entorno y no se versionan.
+- **Respaldo:** copia completa diaria, cifrada, con retención definida por el responsable de operación; prueba de restauración antes de producción y al menos trimestral.
+- **RPO 24 h / RTO 4 h:** se acepta perder hasta un día de movimientos; la recuperación objetivo es de cuatro horas.
+- Monitoreo de API, conexión a MySQL y resultado del respaldo; alertas al responsable de operación.
