@@ -387,7 +387,7 @@ Después de cada operación, ejecutar consultas de verificación:
 | T-PER-05 | Búsqueda por código/QR | p95 < 200 ms. |
 | T-PER-06 | Exportación CSV de 10 000 filas | < 10 s; streaming si es necesario. |
 
-Verificar `EXPLAIN` de las consultas principales y que se usen los índices definidos. Los umbrales son objetivos iniciales; se ajustan con el volumen real (D-22).
+Verificar `EXPLAIN` de las consultas principales y que se usen los índices definidos. El escenario de volumen está confirmado en D-22 (10 000 activos, 100 000 movimientos, <100 usuarios); si se supera 10×, se revisan los umbrales y el diseño.
 
 ---
 

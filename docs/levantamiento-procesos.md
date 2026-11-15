@@ -53,6 +53,7 @@
 | P-22 | Formatos de reporte | D-19 | Respondida y aplicada |
 | P-23 | Notificaciones y canal de alertas | D-20 | Respondida y aplicada |
 | P-24 | Retención del historial y la auditoría | D-21 | Respondida y aplicada |
+| P-25 | Volumen esperado | D-22 | Respondida y aplicada |
 
 ---
 
@@ -881,7 +882,7 @@
 
 - El historial de movimientos, inspecciones, servicios, bajas y auditoría es la evidencia de trazabilidad; destruirlo contradice BR-181/BR-183.
 - No hay una política legal u organizacional declarada que fije un plazo; inventar uno sería tan riesgoso como no tenerlo.
-- La base puede crecer, pero el volumen esperado se evalúa en D-22 y el respaldo en D-23.
+- La base puede crecer, pero el volumen confirmado (D-22) y el respaldo (D-23) acotan el riesgo.
 - Los nombres de responsables se conservan porque son parte del movimiento; si en el futuro se exige minimización de datos, se decide junto con la política de retención.
 
 **Qué NO se concluye todavía:**
@@ -894,6 +895,32 @@
 **Decisiones afectadas:** D-21 (aprobada), D-22, D-23.
 
 **Documentos actualizados:** este registro (P-24, H-30), `decisiones-pendientes.md`, `reglas-de-negocio.md` (BR-186/BR-186A), `modelo-entidad-relacion.md` (§10), `plan-de-pruebas.md` (T-AUD-04/05), `plan-implementacion.md` (fase 11) y `analisis-funcional.md`.
+
+---
+
+### P-25 — Volumen esperado
+
+**Pregunta:** ¿Cuántos extintores, usuarios, movimientos y sedes se esperan en 12–24 meses?
+
+**Respuesta del propietario (2026-11-14):** se confirma el supuesto: hasta 10 000 extintores, 100 000 movimientos acumulados, menos de 100 usuarios y pocas sedes.
+
+**Lectura:**
+
+- El escenario cabe en MySQL 8 con los índices previstos y paginación de servidor.
+- Las pruebas de rendimiento (`T-PER-01..06`) ya usan esas cifras y siguen vigentes.
+- No se requiere particionado, archivo histórico ni una arquitectura distinta para el MVP.
+- Si el volumen real supera 10 veces el supuesto, se revisará antes de producción.
+
+**Qué NO se concluye todavía:**
+
+- La cantidad exacta de sedes y áreas: se irá registrando en la carga inicial (D-02).
+- Si el crecimiento futuro exige particionado o réplica de lectura: se evalúa con datos reales.
+
+**Implicaciones:** D-22 se aprueba con opción A. El volumen no cambia reglas ni modelo; solo confirma el dimensionamiento y las pruebas.
+
+**Decisiones afectadas:** D-22 (aprobada), D-21, D-23.
+
+**Documentos actualizados:** este registro (P-25, H-31), `decisiones-pendientes.md`, `plan-de-pruebas.md` (§7), `plan-implementacion.md` (fase 11) y `analisis-funcional.md`.
 
 ---
 
@@ -931,9 +958,10 @@
 | H-28 | No estaba definido el nivel de formato de los reportes ni si se requería PDF/Excel desde el inicio. | D-19: JSON + CSV en el MVP; PDF/Excel en fase 2, con plantillas definidas después. |
 | H-29 | No estaba definido si las alertas debían salir de la aplicación por correo, WhatsApp o SMS. | D-20: solo alertas en la aplicación; sin SMTP ni canales externos en el MVP. |
 | H-30 | No había una política de retención del historial ni de la auditoría. | D-21: conservación indefinida; sin purga, archivo ni anonimización en el MVP. |
+| H-31 | No había cifras confirmadas de activos, usuarios, movimientos ni sedes. | D-22: se confirma 10 000 activos, 100 000 movimientos y <100 usuarios; revisar si se supera 10×. |
 
 ---
 
 ## 5. Próxima pregunta
 
-Levantamiento cerrado el 2026-11-10 y ampliado con D-02, D-06, D-06b, D-08b, D-11, D-12, D-13, D-19, D-20, D-21, D-26, D-26b, D-27 y D-28. No quedan preguntas de ubicaciones, identidad, política de acceso, condición técnica, inspecciones, vencimiento del equipo, umbrales de alerta, aprobación de operaciones sensibles, adjuntos, formatos de reporte, canal de notificaciones ni retención pendientes. La siguiente decisión abierta por impacto es **D-22 (volumen)**, seguida de **D-23 (despliegue)** y **D-14 (sin conexión)**. No se inicia implementación funcional sin aprobación.
+Levantamiento cerrado el 2026-11-10 y ampliado con D-02, D-06, D-06b, D-08b, D-11, D-12, D-13, D-19, D-20, D-21, D-22, D-26, D-26b, D-27 y D-28. No quedan preguntas de ubicaciones, identidad, política de acceso, condición técnica, inspecciones, vencimiento del equipo, umbrales de alerta, aprobación de operaciones sensibles, adjuntos, formatos de reporte, canal de notificaciones, retención ni volumen pendientes. La siguiente decisión abierta por impacto es **D-23 (despliegue)**, seguida de **D-14 (sin conexión)** y **D-25 (lotes)**. No se inicia implementación funcional sin aprobación.

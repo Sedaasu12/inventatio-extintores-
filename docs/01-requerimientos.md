@@ -34,7 +34,7 @@
 - RNF-02 Integridad: movimientos y actualización de ubicación en una única transacción.
 - RNF-03 Trazabilidad: historial no editable silenciosamente; toda corrección debe quedar auditada.
 - RNF-04 Usabilidad: interfaz responsive para PC, tablet y celular.
-- RNF-05 Rendimiento: búsqueda paginada y filtros en servidor; índices adecuados.
+- RNF-05 Rendimiento: búsqueda paginada y filtros en servidor; índices adecuados para 10 000 activos y 100 000 movimientos (D-22).
 - RNF-06 Disponibilidad: manejo claro de errores de red y del lector/cámara.
 - RNF-07 Mantenibilidad: módulos separados, migraciones versionadas y documentación de instalación.
 - RNF-08 Respaldo: procedimiento probado de copia y restauración de la base de datos.

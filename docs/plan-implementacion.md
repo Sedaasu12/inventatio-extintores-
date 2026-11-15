@@ -868,7 +868,7 @@ Pasar de “funciona en desarrollo” a “operable con seguridad y respaldo”.
 ### Dependencias
 
 - Fase 10.
-- D-21 (retención, aprobada: conservación indefinida en el MVP), D-23 (hosting/backup).
+- D-21 (retención, aprobada: conservación indefinida en el MVP), D-22 (volumen, aprobado: 10 000 activos y 100 000 movimientos), D-23 (hosting/backup).
 
 ### Alcance
 
