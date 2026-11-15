@@ -61,6 +61,7 @@
 | PT-17 | Intentar adjuntar un archivo a un movimiento | No existe carga de archivos; solo se acepta referencia textual (D-13). |
 | PT-18 | Exportar un reporte a CSV | Descarga con los mismos filtros de la consulta; sin permiso, se rechaza (D-19). |
 | PT-19 | Revisar alertas vencidas | Se ven en la aplicación; no se envía correo, WhatsApp ni SMS (D-20). |
+| PT-20 | Consultar historial antiguo o auditoría | Los registros siguen completos; no existe purga ni archivo (D-21). |
 
 ## 7. Cierre de cada entrega
 - Migración ejecutada desde una base vacía.

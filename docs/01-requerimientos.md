@@ -40,6 +40,7 @@
 - RNF-08 Respaldo: procedimiento probado de copia y restauración de la base de datos.
 - RNF-09 Privacidad: QR sin datos personales ni atributos sensibles; acceso protegido.
 - RNF-10 Calidad: pruebas unitarias, integración y E2E para flujos críticos.
+- RNF-11 Retención: historial y auditoría con conservación indefinida en el MVP; sin purga, archivo ni anonimización (D-21).
 
 ## 3. Reglas de negocio
 - RN-01 Un extintor es un activo individual; su código no se reutiliza.

@@ -500,6 +500,8 @@ Todos los reportes usan filtros de servidor y paginación; los totales se calcul
 | GET | `/health/ready` | Público interno | DB y dependencias. |
 | GET | `/api/docs` | Restringido en producción | Swagger/OpenAPI. |
 
+> **Sin purga ni archivo (D-21):** la API no expone endpoints para borrar, anonimizar o archivar historial y auditoría. La retención es indefinida en el MVP; los respaldos conservan todo el historial.
+
 ---
 
 ## 5. DTOs y validaciones

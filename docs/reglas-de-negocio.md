@@ -329,7 +329,8 @@ stateDiagram-v2
 | BR-183 | Las entidades referenciadas no se borran físicamente. | `active`/estado; FK `RESTRICT`. |
 | BR-184 | Los datos de desarrollo se identifican como tales. | Seed separado; nunca en producción. |
 | BR-185 | Las exportaciones respetan permisos y no incluyen más datos de los necesarios. | Autorización; columnas mínimas. |
-| BR-186 | La retención de historial/auditoría se define con el propietario. `[D-21]` | Política documentada; por defecto no se elimina. |
+| BR-186 | El MVP aplica conservación indefinida: no se borra, anonimiza ni archiva historial ni auditoría (D-21 aprobada). | Sin jobs de purga ni endpoints de borrado; respaldos completos. |
+| BR-186A | Si una política legal u organizacional aprobada exige archivo, se implementará después con el plazo que indique esa política, nunca con un valor supuesto. | Decisión futura documentada; sin plazo inventado. |
 | BR-187 | Los logs de aplicación no incluyen PII innecesaria ni cuerpos completos con datos sensibles. | Configuración de logger. |
 
 ---

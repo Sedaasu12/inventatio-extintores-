@@ -44,6 +44,7 @@ Estado al 2026-11-12. El registro formal de aprobaciones está en §2.2 a §2.4;
 | 15 | D-13 | Adjuntos, fotos o firmas | Solo referencia textual; sin archivos ni firmas en el MVP. | Aprobada | Fase 2/6 |
 | 16 | D-19 | Formatos de reporte | JSON + CSV en el MVP; PDF/Excel en fase 2. | Aprobada | Fase 7 |
 | 17 | D-20 | Notificaciones | Solo alertas en la aplicación; sin correo, WhatsApp ni SMS. | Aprobada | Fase 7 |
+| 18 | D-21 | Retención del historial | Conservación indefinida en el MVP; archivo solo si una política aprobada lo exige. | Aprobada | Transversal |
 
 ---
 
@@ -125,6 +126,7 @@ El propietario revisó las decisiones una por una y **confirmó** las once, sin 
 | D-13 | A — solo referencia textual; sin adjuntos, fotos ni firmas en el MVP (2026-11-13) |
 | D-19 | A — JSON + CSV en el MVP; PDF/Excel en fase 2 (2026-11-13) |
 | D-20 | A — solo alertas en la aplicación; sin correo, WhatsApp ni SMS (2026-11-13) |
+| D-21 | A — conservación indefinida; sin purga ni anonimización en el MVP (2026-11-13) |
 
 ---
 
@@ -667,9 +669,15 @@ El propietario revisó las decisiones una por una y **confirmó** las once, sin 
 
 **Recomendación:** A en MVP; definir política antes de producción.
 
-**Si no se responde:** A.
+**Decisión aprobada (2026-11-13):** opción **A** — conservación indefinida en el MVP.
 
-**Bloquea:** no bloquea MVP. **Estado:** abierta.
+- No se eliminan ni anonimizan movimientos, inspecciones, servicios, bajas ni registros de auditoría.
+- No se implementan jobs de purga, tablas de archivo ni endpoints de borrado histórico.
+- Los respaldos conservan el historial completo; la restauración no recorta datos por antigüedad.
+- Antes de producción, el propietario confirmará si existe una política legal u organizacional de retención; si la hay, se implementará como archivo (**B**) con el plazo que indique esa política, nunca con un valor supuesto.
+- Los datos personales de los movimientos (nombres de responsables) se conservan como parte de la trazabilidad exigida por BR-181/BR-183.
+
+**Bloquea:** no bloquea el MVP. **Estado:** aprobada.
 
 ---
 
@@ -941,13 +949,13 @@ El propietario revisó las decisiones una por una y **confirmó** las once, sin 
 | S-16 | Condición técnica como enum en MVP. | D-26 |
 | S-17 | Costos opcionales, sin reporte financiero. | D-29 |
 | S-18 | Sin notificaciones por correo, WhatsApp ni SMS en el MVP; solo alertas en la aplicación (D-20). | D-20 |
-| S-19 | Retención indefinida por defecto. | D-21 |
+| S-19 | Retención indefinida por defecto; sin borrado ni anonimización programada en el MVP (D-21). | D-21 |
 | S-20 | Un solo `ADMIN` puede ajustar; Seguridad puede baja/condición. | D-07/D-27 |
 | S-21 | El vencimiento del equipo combina fecha documentada y vida útil calculada por tipo; sin datos queda sin fecha. | D-12 |
 | S-22 | Sin segunda aprobación en la aplicación: quien tiene el permiso ejecuta y registra `authorized_by`, motivo y documento; el control es RBAC + auditoría. | D-08b |
 | S-23 | Reportes en pantalla y exportación CSV en el MVP; PDF/Excel en fase 2. | D-19 |
 
-**Tras las aprobaciones del 2026-11-10 al 2026-11-13**, S-01, S-02, S-04, S-06 a S-13, S-16, S-18, S-20, S-21, S-22 y S-23 pasan a decisiones aprobadas (ver §2.2 y §2.4). S-11 se ajusta: **no** existe mapeo automático de resultado a condición. Siguen como supuesto S-03, S-05, S-14, S-15, S-17 y S-19.
+**Tras las aprobaciones del 2026-11-10 al 2026-11-13**, S-01, S-02, S-04, S-06 a S-13, S-16, S-18, S-19, S-20, S-21, S-22 y S-23 pasan a decisiones aprobadas (ver §2.2 y §2.4). S-11 se ajusta: **no** existe mapeo automático de resultado a condición. Siguen como supuesto S-03, S-05, S-14, S-15 y S-17.
 
 ---
 
@@ -972,13 +980,12 @@ Estas decisiones se usaron para escribir los documentos, pero **no están aproba
 
 Para no bloquear el diseño, se propone esta secuencia. Solo figuran las decisiones **abiertas** al 2026-11-13; las aprobadas están en §2.2 y §2.4, y ya se reflejaron en los documentos. Cada respuesta se registra aquí y se refleja en el modelo/API antes de avanzar.
 
-1. **D-21:** ¿cuánto tiempo se conserva el historial y la auditoría? (transversal)
-2. **D-22:** ¿cuál es el volumen esperado? (transversal)
-3. **D-23:** ¿dónde se despliega y cuál es el objetivo de respaldo? (transversal)
-4. **D-14:** ¿se requiere operación sin internet? (transversal)
-5. **D-25:** ¿se necesitan movimientos por lote? (fase 5)
-6. **D-29:** ¿se registran costos de mantenimiento? (fase 6)
-7. **D-30:** ¿idioma y localización? (transversal)
+1. **D-22:** ¿cuál es el volumen esperado? (transversal)
+2. **D-23:** ¿dónde se despliega y cuál es el objetivo de respaldo? (transversal)
+3. **D-14:** ¿se requiere operación sin internet? (transversal)
+4. **D-25:** ¿se necesitan movimientos por lote? (fase 5)
+5. **D-29:** ¿se registran costos de mantenimiento? (fase 6)
+6. **D-30:** ¿idioma y localización? (transversal)
 
 ---
 

@@ -278,6 +278,8 @@ Estructura D-02: `SEDE` es la raíz; `ALMACEN`, `TALLER` y `AREA` son hijos. Los
 | T-AUD-01 | Integración | Alta/edición/movimiento | Auditoría con actor, entidad, antes/después, request ID. | RF-AUD-01..03 |
 | T-AUD-02 | Integración | Intentar editar/borrar auditoría | No existe endpoint; DB restringe; 404/405. | RF-AUD-04 |
 | T-AUD-03 | Integración | Revisar auditoría | No contiene contraseñas, tokens ni secretos. | BR-182 |
+| T-AUD-04 | Integración | Buscar job de purga, archivo o anonimización | No existe; el MVP conserva todo el historial y la auditoría. | D-21 / BR-186 |
+| T-AUD-05 | Integración | Consultar movimientos antiguos | Siguen disponibles sin recortes por antigüedad. | D-21 / BR-186 |
 
 ---
 
@@ -471,7 +473,7 @@ Verificar `EXPLAIN` de las consultas principales y que se usen los índices defi
 | Evidencia textual | RF-MOV-16, RF-MOV-17 | T-MOV-32/33 |
 | QR | RF-QR-01..06 | T-QR-01..10 |
 | Permisos | RF-AUT-06 | T-AUT-07, T-SEC-02, E2E-03 |
-| Auditoría | RF-AUD-01..05 | T-AUD-01..03 |
+| Auditoría | RF-AUD-01..05 | T-AUD-01..05 |
 | Migración | RNF-08/09 | T-MIG-01..07 |
 
 ---

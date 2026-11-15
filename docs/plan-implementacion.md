@@ -868,7 +868,7 @@ Pasar de “funciona en desarrollo” a “operable con seguridad y respaldo”.
 ### Dependencias
 
 - Fase 10.
-- D-21 (retención), D-23 (hosting/backup).
+- D-21 (retención, aprobada: conservación indefinida en el MVP), D-23 (hosting/backup).
 
 ### Alcance
 
@@ -878,6 +878,7 @@ Pasar de “funciona en desarrollo” a “operable con seguridad y respaldo”.
 - Revisión de accesibilidad.
 - Migración desde cero y desde versión anterior.
 - Backup/restauración probada.
+- Verificación de conservación indefinida: sin jobs de purga, archivo ni anonimización (D-21).
 - Configuración de producción (HTTPS, CORS, secrets, logs, health).
 - Runbook de operación, respaldo, restauración e incidentes.
 - Manual de usuario breve.

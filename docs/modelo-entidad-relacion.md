@@ -759,8 +759,8 @@ Con 10 000 activos y 100 000 movimientos, los listados deben paginarse y filtrar
 
 ## 10. Retención y respaldo
 
-- **Historial operativo:** se conserva indefinidamente por defecto; la política de archivo se define con el propietario (D-21).
-- **Auditoría:** append-only; no se elimina desde la aplicación.
+- **Historial operativo:** conservación indefinida en el MVP; sin borrado, anonimización ni job de archivo. Si una política legal u organizacional aprobada exige archivo, se implementa después con el plazo indicado (D-21).
+- **Auditoría:** append-only; no se elimina desde la aplicación ni se archiva en el MVP (D-21).
 - **Usuarios:** se desactivan, no se borran.
 - **Ubicaciones/catálogos:** se desactivan si están referenciados.
 - **Respaldos:** copia diaria cifrada de MySQL; prueba de restauración al menos trimestral o antes de cada despliegue mayor. RPO/RTO a confirmar (D-23).

@@ -52,6 +52,7 @@
 | P-21 | Adjuntos, fotos o firmas | D-13 | Respondida y aplicada |
 | P-22 | Formatos de reporte | D-19 | Respondida y aplicada |
 | P-23 | Notificaciones y canal de alertas | D-20 | Respondida y aplicada |
+| P-24 | Retención del historial y la auditoría | D-21 | Respondida y aplicada |
 
 ---
 
@@ -870,6 +871,32 @@
 
 ---
 
+### P-24 — Retención del historial y la auditoría
+
+**Pregunta:** ¿Existe una política de retención legal u organizacional? ¿Se archivan o eliminan datos antiguos?
+
+**Respuesta del propietario (2026-11-13):** conservación indefinida en el MVP. No se borra ni se archiva nada.
+
+**Lectura:**
+
+- El historial de movimientos, inspecciones, servicios, bajas y auditoría es la evidencia de trazabilidad; destruirlo contradice BR-181/BR-183.
+- No hay una política legal u organizacional declarada que fije un plazo; inventar uno sería tan riesgoso como no tenerlo.
+- La base puede crecer, pero el volumen esperado se evalúa en D-22 y el respaldo en D-23.
+- Los nombres de responsables se conservan porque son parte del movimiento; si en el futuro se exige minimización de datos, se decide junto con la política de retención.
+
+**Qué NO se concluye todavía:**
+
+- Si existe una norma legal aplicable que obligue a conservar o a eliminar tras cierto plazo: debe confirmarlo el propietario antes de producción.
+- Si se implementará archivo histórico: queda como opción B para una fase posterior, con el plazo de la política aprobada.
+
+**Implicaciones:** D-21 se aprueba con opción A. No hay jobs de purga, tablas de archivo, anonimización ni endpoints de borrado; los respaldos conservan todo el historial.
+
+**Decisiones afectadas:** D-21 (aprobada), D-22, D-23.
+
+**Documentos actualizados:** este registro (P-24, H-30), `decisiones-pendientes.md`, `reglas-de-negocio.md` (BR-186/BR-186A), `modelo-entidad-relacion.md` (§10), `plan-de-pruebas.md` (T-AUD-04/05), `plan-implementacion.md` (fase 11) y `analisis-funcional.md`.
+
+---
+
 ## 4. Contradicciones y hallazgos
 
 | ID | Hallazgo | Efecto |
@@ -903,9 +930,10 @@
 | H-27 | No estaba definido si la evidencia documental requería archivos, fotos o firmas. | D-13: solo referencia textual; sin adjuntos ni firma electrónica en el MVP. |
 | H-28 | No estaba definido el nivel de formato de los reportes ni si se requería PDF/Excel desde el inicio. | D-19: JSON + CSV en el MVP; PDF/Excel en fase 2, con plantillas definidas después. |
 | H-29 | No estaba definido si las alertas debían salir de la aplicación por correo, WhatsApp o SMS. | D-20: solo alertas en la aplicación; sin SMTP ni canales externos en el MVP. |
+| H-30 | No había una política de retención del historial ni de la auditoría. | D-21: conservación indefinida; sin purga, archivo ni anonimización en el MVP. |
 
 ---
 
 ## 5. Próxima pregunta
 
-Levantamiento cerrado el 2026-11-10 y ampliado con D-02, D-06, D-06b, D-08b, D-11, D-12, D-13, D-19, D-20, D-26, D-26b, D-27 y D-28. No quedan preguntas de ubicaciones, identidad, política de acceso, condición técnica, inspecciones, vencimiento del equipo, umbrales de alerta, aprobación de operaciones sensibles, adjuntos, formatos de reporte ni canal de notificaciones pendientes. La siguiente decisión abierta por impacto es **D-21 (retención)**, seguida de **D-22 (volumen)** y **D-23 (despliegue)**. No se inicia implementación funcional sin aprobación.
+Levantamiento cerrado el 2026-11-10 y ampliado con D-02, D-06, D-06b, D-08b, D-11, D-12, D-13, D-19, D-20, D-21, D-26, D-26b, D-27 y D-28. No quedan preguntas de ubicaciones, identidad, política de acceso, condición técnica, inspecciones, vencimiento del equipo, umbrales de alerta, aprobación de operaciones sensibles, adjuntos, formatos de reporte, canal de notificaciones ni retención pendientes. La siguiente decisión abierta por impacto es **D-22 (volumen)**, seguida de **D-23 (despliegue)** y **D-14 (sin conexión)**. No se inicia implementación funcional sin aprobación.
