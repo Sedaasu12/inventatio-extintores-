@@ -56,7 +56,7 @@ El repositorio es un **punto de partida documental**, no un proyecto iniciado. L
 
 - **No hay trabajo previo que destruir.** Los documentos existentes se conservan como línea base; los nuevos documentos los detallan y, en algunos puntos, los refinan.
 - **Hay que crear el proyecto desde cero.** La primera fase debe incluir control de versiones, versiones fijadas, lint, typecheck, pruebas y build antes de escribir reglas de negocio.
-- **Las decisiones de negocio ya resueltas permiten fijar la migración.** El alcance single-tenant (D-01), el vencimiento del equipo (D-12), los umbrales de alerta (D-11), la autorización de movimientos (D-07/D-08b), la evidencia textual (D-13), los formatos de reporte (D-19), el canal de alertas (D-20), la retención (D-21), el volumen (D-22) y el despliegue con respaldo (D-23) están aprobados; quedan decisiones abiertas que no cambian el núcleo del modelo (lotes, costos e idioma).
+- **Las decisiones de negocio ya resueltas permiten fijar la migración.** El alcance single-tenant (D-01), el vencimiento del equipo (D-12), los umbrales de alerta (D-11), la autorización de movimientos (D-07/D-08b), la evidencia textual (D-13), los formatos de reporte (D-19), el canal de alertas (D-20), la retención (D-21), el volumen (D-22), el despliegue con respaldo (D-23) y la operación sin conexión (D-14) están aprobados; quedan decisiones abiertas que no cambian el núcleo del modelo (lotes, costos e idioma).
 
 ---
 
@@ -98,6 +98,7 @@ Los nombres definitivos y la separación exacta de permisos deben confirmarse co
 - Inspecciones y servicios técnicos (mantenimiento, recarga, reparación, prueba hidrostática).
 - Fechas objetivo separadas y alertas calculadas con umbrales configurables.
 - Dashboard, búsqueda, filtros, reportes básicos y auditoría.
+- Operación sin conexión: lectura en caché y borradores de movimientos rutinarios e inspecciones que se confirman al sincronizar (D-14).
 - Pruebas de reglas críticas, transacciones, concurrencia y flujos E2E principales.
 
 **Segunda fase:**
@@ -107,7 +108,6 @@ Los nombres definitivos y la separación exacta de permisos deben confirmarse co
 - Notificaciones por correo.
 - Importación masiva de inventario existente.
 - Lotes de movimiento para trasladar varios equipos en una sola orden.
-- PWA y mejoras de operación móvil.
 - Alertas de retornos de mantenimiento pendientes.
 - Catálogos administrables de condiciones técnicas y tipos de inspección.
 
@@ -117,7 +117,6 @@ Los nombres definitivos y la separación exacta de permisos deben confirmarse co
 - Diseño de la instalación de extintores o cálculo de cobertura.
 - Compra/venta, facturación o integración contable.
 - App móvil nativa.
-- Operación offline con sincronización.
 - Integración con WhatsApp/SMS o IoT.
 - Multi-tenant (varias organizaciones aisladas) en el MVP.
 
@@ -347,6 +346,28 @@ El umbral `days_before` es configurable por categoría y no tiene un valor por d
 
 ---
 
+### 5.12 Operación sin conexión
+
+**Disparador:** el usuario pierde la conexión en un almacén o sede, o la red es intermitente.
+
+**Actor:** usuario autenticado con alcance descargado en un dispositivo registrado.
+
+**Pasos:**
+
+1. La aplicación detecta la falta de red y muestra el modo sin conexión.
+2. Permite consultar fichas y ubicaciones del alcance descargado.
+3. Al registrar un movimiento rutinario o una inspección, guarda un **borrador cifrado** y lo marca como pendiente; no muestra éxito.
+4. Al recuperar la conexión, envía los borradores por lote.
+5. El servidor valida origen, permisos y reglas: confirma y audita, o rechaza el ítem completo.
+6. Si rechaza, el borrador queda como conflicto con el motivo y el usuario lo corrige.
+7. Si pasan 7 días sin sincronizar, se bloquean nuevas escrituras hasta reconectar.
+
+**Restricciones:** `BAJA`, `AJUSTE`, cambio de condición y administración no se preparan sin conexión. Un borrador no altera la ubicación ni el estado hasta que el servidor lo confirma.
+
+**Fallbacks:** sincronización manual; aviso de borradores pendientes; cierre de sesión con advertencia si hay pendientes.
+
+---
+
 ## 6. Requisitos y reglas
 
 El detalle completo está en:
@@ -382,7 +403,7 @@ El detalle completo está en:
 | Correo | | Sí | |
 | Importación masiva | | Sí | |
 | Lotes de movimiento | | Sí | |
-| PWA / offline | | | Sí |
+| PWA / offline | Sí (lectura y borradores, D-14) | | |
 | App nativa | | | Sí |
 | Integraciones IoT/ERP | | | Sí |
 | Multi-tenant | | | Sí |
@@ -405,6 +426,7 @@ El detalle completo está en:
 | Pérdida de datos | Incumplimiento y pérdida de trazabilidad | Backups, restauración probada y migraciones versionadas. |
 | Etiquetas dañadas | Activo no localizable por QR | Código legible en la etiqueta y búsqueda manual. |
 | PII en campos libres | Exposición de datos | Minimización, control de acceso y no incluir PII en QR. |
+| Conflictos al sincronizar offline | Movimientos rechazados o duplicados | Borradores no confirmados, rechazo completo, `clientUuid` idempotente y UI de conflicto. |
 
 ---
 
@@ -416,7 +438,7 @@ Se registran como supuestos explícitos; no son reglas aprobadas. El detalle y l
 |---|---|
 | S-01 | Una sola organización en el MVP, con varias sedes; el almacén central y el taller dependen de una sede (D-02). |
 | S-02 | Zona horaria de operación `America/Lima`; eventos en UTC y fechas calendario sin hora. |
-| S-03 | Operación en línea; sin modo offline en el MVP. |
+| S-03 | Operación en línea con lectura en caché y borradores que se confirman al sincronizar (D-14). |
 | S-04 | Autenticación local con correo/contraseña a través de un `AuthProvider`; sin SSO obligatorio en el MVP, pero preparado para OIDC (D-06). |
 | S-05 | Un movimiento por activo; los lotes se evalúan en segunda fase. |
 | S-06 | Un extintor puede registrarse inicialmente en almacén o en un área interna, con `entry_source` y motivo (aprobado D-03). |
@@ -437,6 +459,7 @@ Se registran como supuestos explícitos; no son reglas aprobadas. El detalle y l
 | S-21 | Las alertas se consultan solo dentro de la aplicación; no hay correo, WhatsApp ni SMS en el MVP (D-20). |
 | S-22 | El historial y la auditoría se conservan indefinidamente en el MVP; no hay purga, archivo ni anonimización (D-21). |
 | S-23 | App y API en nube con HTTPS; MySQL on-premise por red privada o túnel cifrado; respaldo diario cifrado con RPO 24 h / RTO 4 h (D-23). |
+| S-24 | PWA con lectura en caché y borradores de movimientos rutinarios e inspecciones que se confirman al sincronizar; operaciones sensibles solo en línea; ventana de 7 días (D-14). |
 
 ### 9.1 Realidad operativa declarada (levantamiento 2026-11-10; precisión D-02 el 2026-11-11)
 
@@ -465,9 +488,9 @@ Hechos aportados por el propietario. **No son reglas aprobadas**; el detalle y l
 
 ## 10. Decisiones que requieren respuesta antes de implementar
 
-> **Estado al 2026-11-14:** el levantamiento está cerrado y las decisiones aprobadas figuran en `docs/decisiones-pendientes.md` (§2.2 y §2.4), incluidas D-08b, D-11, D-12, D-13, D-19, D-20, D-21, D-22 y D-23. Lo que sigue son las decisiones abiertas que bloquean fases concretas.
+> **Estado al 2026-11-14:** el levantamiento está cerrado y las decisiones aprobadas figuran en `docs/decisiones-pendientes.md` (§2.2 y §2.4), incluidas D-08b, D-11, D-12, D-13, D-14, D-19, D-20, D-21, D-22 y D-23. Lo que sigue son las decisiones abiertas que bloquean fases concretas.
 
-1. **D-14/D-25/D-29/D-30:** operación sin internet, lotes, costos e idioma.
+1. **D-25/D-29/D-30:** lotes, costos e idioma.
 
 El detalle, la recomendación y el supuesto de cada una está en `docs/decisiones-pendientes.md`.
 
@@ -490,7 +513,7 @@ El detalle, la recomendación y el supuesto de cada una está en `docs/decisione
 
 ## 12. Próximo paso
 
-1. Completar las decisiones abiertas de `decisiones-pendientes.md` (siguiente: D-14, D-25 y D-29).
+1. Completar las decisiones abiertas de `decisiones-pendientes.md` (siguiente: D-25, D-29 y D-30).
 2. Cerrar el alcance de la fase 1 (esquema y migración inicial) con las decisiones ya aprobadas.
 3. Autorizar la fase 1 antes de escribir módulos funcionales.
 

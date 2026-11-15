@@ -55,6 +55,7 @@
 | P-24 | Retención del historial y la auditoría | D-21 | Respondida y aplicada |
 | P-25 | Volumen esperado | D-22 | Respondida y aplicada |
 | P-26 | Despliegue y respaldo | D-23 | Respondida y aplicada |
+| P-27 | Operación sin conexión | D-14 | Respondida y aplicada |
 
 ---
 
@@ -895,7 +896,7 @@
 
 **Decisiones afectadas:** D-21 (aprobada), D-22, D-23.
 
-**Documentos actualizados:** este registro (P-24, H-30), `decisiones-pendientes.md`, `reglas-de-negocio.md` (BR-186/BR-186A), `modelo-entidad-relacion.md` (§10), `plan-de-pruebas.md` (T-AUD-04/05), `plan-implementacion.md` (fase 11) y `analisis-funcional.md`.
+**Documentos actualizados:** este registro (P-24, H-30), `decisiones-pendientes.md`, `reglas-de-negocio.md` (BR-186/BR-186A), `modelo-entidad-relacion.md` (§10), `plan-de-pruebas.md` (T-AUD-04/05), `plan-implementacion.md` (fase 12) y `analisis-funcional.md`.
 
 ---
 
@@ -921,7 +922,7 @@
 
 **Decisiones afectadas:** D-22 (aprobada), D-21, D-23.
 
-**Documentos actualizados:** este registro (P-25, H-31), `decisiones-pendientes.md`, `plan-de-pruebas.md` (§7), `plan-implementacion.md` (fase 11) y `analisis-funcional.md`.
+**Documentos actualizados:** este registro (P-25, H-31), `decisiones-pendientes.md`, `plan-de-pruebas.md` (§7), `plan-implementacion.md` (fase 12) y `analisis-funcional.md`.
 
 ---
 
@@ -943,13 +944,41 @@
 
 - El proveedor de nube concreto y el costo mensual: se definen al contratar, antes de producción.
 - La herramienta exacta de respaldo y su retención operativa: la define el responsable de operación, respetando RPO/RTO.
-- El procedimiento de conmutación y los responsables de guardia: se documentan en el runbook de la fase 11.
+- El procedimiento de conmutación y los responsables de guardia: se documentan en el runbook de la fase 12.
 
 **Implicaciones:** D-23 se aprueba con opción C (híbrido): app en nube + MySQL on-premise, RPO 24 h / RTO 4 h. Se añaden controles de HTTPS, red privada/túnel y respaldo cifrado verificado.
 
 **Decisiones afectadas:** D-23 (aprobada), D-21, D-22.
 
-**Documentos actualizados:** este registro (P-26, H-32), `decisiones-pendientes.md`, `02-arquitectura.md` (§9), `modelo-entidad-relacion.md` (§10), `01-requerimientos.md` (RNF-12), `plan-de-pruebas.md` (T-SEC-16/17, T-MIG-08..10), `plan-implementacion.md` (fase 11) y `analisis-funcional.md`.
+**Documentos actualizados:** este registro (P-26, H-32), `decisiones-pendientes.md`, `02-arquitectura.md` (§9), `modelo-entidad-relacion.md` (§10), `01-requerimientos.md` (RNF-12), `plan-de-pruebas.md` (T-SEC-16/17, T-MIG-08..10), `plan-implementacion.md` (fase 12) y `analisis-funcional.md`.
+
+---
+
+### P-27 — Operación sin conexión
+
+**Pregunta:** ¿Los almacenes o sedes operan sin conectividad? ¿Se deben registrar movimientos offline?
+
+**Respuesta del propietario (2026-11-14):** sí, sería ideal que el sistema funcione sin internet. Se acuerda: lectura en caché y borradores de movimientos rutinarios e inspecciones; operaciones sensibles solo en línea; ventana de 7 días.
+
+**Lectura:**
+
+- La conectividad no está garantizada en todas las sedes; la operación no puede detenerse por una caída de red.
+- Confirmar un movimiento en el dispositivo contradiría la validación de origen contra el estado vigente (BR-003/BR-005). Por eso el borrador **no** es un movimiento: se confirma en el servidor al sincronizar.
+- Las operaciones irreversibles o de alto impacto (`BAJA`, `AJUSTE`, cambio de condición) se reservan para conexión, donde la validación es inmediata.
+- La ventana de 7 días acota el riesgo de permisos revocados y datos obsoletos sin obligar a sincronizar a diario.
+- El cifrado local y el borrado al cerrar sesión protegen la información si el dispositivo se pierde.
+
+**Qué NO se concluye todavía:**
+
+- Si alguna sede requiere operación continua por más de 7 días sin red: se resolverá con conectividad o una nueva decisión.
+- Si se sincronizarán catálogos completos o solo el alcance asignado: el MVP descarga el alcance del usuario.
+- La herramienta exacta de cifrado local: se define en la fase 11.
+
+**Implicaciones:** D-14 se aprueba con opción B acotada a borradores. Se añaden dispositivos, `clientUuid`, `captureMode`, `deviceId` y `syncedAt`, endpoints de sincronización y pruebas T-OFF.
+
+**Decisiones afectadas:** D-14 (aprobada), D-06, D-09, D-13.
+
+**Documentos actualizados:** este registro (P-27, H-33), `decisiones-pendientes.md`, `reglas-de-negocio.md` (BR-188..194), `modelo-entidad-relacion.md` (§4.7, §4.10, §4.16), `03-modelo-de-datos.md`, `diseno-api.md` (§4.9, §6.1A), `requerimientos.md` (RF-OFF, RNF-16), `01-requerimientos.md` (RF-25, RNF-13), `02-arquitectura.md` (§10), `plan-de-pruebas.md` (T-OFF-01..12), `plan-implementacion.md` (fase 11) y `analisis-funcional.md`.
 
 ---
 
@@ -989,9 +1018,10 @@
 | H-30 | No había una política de retención del historial ni de la auditoría. | D-21: conservación indefinida; sin purga, archivo ni anonimización en el MVP. |
 | H-31 | No había cifras confirmadas de activos, usuarios, movimientos ni sedes. | D-22: se confirma 10 000 activos, 100 000 movimientos y <100 usuarios; revisar si se supera 10×. |
 | H-32 | No estaba definido dónde desplegar ni qué pérdida de datos y tiempo de recuperación se aceptan. | D-23: híbrido (app en nube + MySQL on-premise), HTTPS, red privada/túnel y RPO 24 h / RTO 4 h. |
+| H-33 | No estaba definido si la operación debía continuar sin internet. | D-14: PWA con lectura en caché y borradores confirmados al sincronizar; operaciones sensibles solo en línea; ventana de 7 días. |
 
 ---
 
 ## 5. Próxima pregunta
 
-Levantamiento cerrado el 2026-11-10 y ampliado con D-02, D-06, D-06b, D-08b, D-11, D-12, D-13, D-19, D-20, D-21, D-22, D-23, D-26, D-26b, D-27 y D-28. No quedan preguntas de ubicaciones, identidad, política de acceso, condición técnica, inspecciones, vencimiento del equipo, umbrales de alerta, aprobación de operaciones sensibles, adjuntos, formatos de reporte, canal de notificaciones, retención, volumen ni despliegue pendientes. La siguiente decisión abierta por impacto es **D-14 (sin conexión)**, seguida de **D-25 (lotes)** y **D-29 (costos)**. No se inicia implementación funcional sin aprobación.
+Levantamiento cerrado el 2026-11-10 y ampliado con D-02, D-06, D-06b, D-08b, D-11, D-12, D-13, D-14, D-19, D-20, D-21, D-22, D-23, D-26, D-26b, D-27 y D-28. No quedan preguntas de ubicaciones, identidad, política de acceso, condición técnica, inspecciones, vencimiento del equipo, umbrales de alerta, aprobación de operaciones sensibles, adjuntos, formatos de reporte, canal de notificaciones, retención, volumen, despliegue ni operación sin conexión pendientes. La siguiente decisión abierta por impacto es **D-25 (lotes)**, seguida de **D-29 (costos)** y **D-30 (idioma)**. No se inicia implementación funcional sin aprobación.

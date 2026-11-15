@@ -84,3 +84,14 @@ Cada alerta muestra: extintor, ubicación, categoría de fecha, fecha objetivo, 
 - **Respaldo:** copia completa diaria, cifrada, con retención definida por el responsable de operación; prueba de restauración antes de producción y al menos trimestral.
 - **RPO 24 h / RTO 4 h:** se acepta perder hasta un día de movimientos; la recuperación objetivo es de cuatro horas.
 - Monitoreo de API, conexión a MySQL y resultado del respaldo; alertas al responsable de operación.
+
+## 10. Operación sin conexión (D-14)
+
+- **PWA con Angular Service Worker:** cachea el shell y los datos del alcance asignado (sedes/áreas, fichas resumidas y catálogos) para lectura sin red.
+- **Borradores, no confirmaciones:** sin conexión se preparan movimientos rutinarios e inspecciones; la interfaz los marca como pendientes y nunca muestra éxito antes de la confirmación del servidor.
+- **Almacenamiento local cifrado:** IndexedDB con cifrado de aplicación (Web Crypto); el alcance se limita al usuario y a sus sedes/áreas.
+- **Sincronización por lotes:** `POST /sync/drafts` con `clientUuid` idempotente; cada ítem se confirma o rechaza por separado.
+- **Conflictos explícitos:** si el origen ya no coincide o el permiso fue revocado, el borrador se rechaza completo y se muestra para corrección; no hay aplicación parcial ni “last write wins”.
+- **Operaciones sensibles solo en línea:** `BAJA`, `AJUSTE`, cambio de condición y administración quedan bloqueados sin conexión.
+- **Ventana de 7 días:** pasado ese plazo sin sincronizar, se bloquean nuevas escrituras hasta reconectar; la lectura sigue disponible.
+- **Trazabilidad:** se guardan `deviceId`, la hora del hecho declarada por el dispositivo y `syncedAt`; la auditoría conserva ambos tiempos y advierte diferencias de reloj.

@@ -32,9 +32,10 @@
 | 8 | Frontend: base, login y shell | Fase 2 + Fase 7 (API estable) | M | Login, layout, guards, API client, accesibilidad base. |
 | 9 | Frontend: inventario y QR | Fase 8 + Fase 4 | L | Lista, ficha, alta, escaneo, etiqueta. |
 | 10 | Frontend: operaciones y administración | Fase 9 + Fases 5–7 | L | Movimientos, mantenimiento, inspecciones, alertas, reportes, admin. |
-| 11 | E2E, seguridad, rendimiento y despliegue | Fase 10 | L | Suite completa, hardening, backups, runbook. |
+| 11 | Operación sin conexión (PWA) | Fase 10 + D-14 | L | Caché de lectura, borradores cifrados, sincronización y conflictos. |
+| 12 | E2E, seguridad, rendimiento y despliegue | Fase 11 | L | Suite completa, hardening, backups, runbook. |
 
-**MVP demostrable:** fases 0–10. **Listo para producción:** fase 11 aprobada.
+**MVP demostrable:** fases 0–11. **Listo para producción:** fase 12 aprobada.
 
 ---
 
@@ -859,7 +860,79 @@ npm run e2e
 
 ---
 
-## 14. Fase 11 — E2E, seguridad, rendimiento y despliegue
+## 14. Fase 11 — Operación sin conexión (PWA)
+
+### Objetivo
+
+Permitir consultar y preparar movimientos e inspecciones sin red, sin comprometer la regla de validar el origen contra el estado vigente en el servidor.
+
+### Dependencias
+
+- Fase 10.
+- D-14 (offline aprobado: PWA con lectura en caché y borradores confirmados al sincronizar; ventana de 7 días).
+
+### Alcance
+
+- Service worker y caché del shell y de los datos del alcance asignado.
+- IndexedDB cifrada, limitada al usuario y a sus sedes/áreas.
+- Registro de dispositivos y permiso `devices.manage`.
+- Cola de borradores con `clientUuid` y estados pendiente/conflicto.
+- Endpoints `/sync/scope`, `/sync/drafts` y `/sync/status`.
+- Confirmación en servidor con validación de origen, permisos y reglas; rechazo completo sin cambios parciales.
+- Bloqueo de `BAJA`, `AJUSTE`, cambio de condición y administración sin conexión.
+- Ventana máxima de 7 días sin sincronizar, aplicada en cliente y servidor.
+- UI de sincronización: pendientes, conflictos y última sincronización.
+- Pruebas T-OFF-01..12.
+
+### Archivos esperados
+
+```text
+backend/src/sync/
+frontend/src/app/offline/
+frontend/src/app/core/offline/
+frontend/ngsw-config.json
+prisma/migrations/*_devices_and_capture_fields/
+docs/offline.md
+```
+
+### Criterios de aceptación
+
+- Un borrador nunca altera ubicación, estado, condición ni fechas antes de confirmarse.
+- Un conflicto de origen se rechaza completo y se muestra para corrección.
+- El reenvío del mismo `clientUuid` no duplica el registro.
+- Las operaciones sensibles se bloquean sin conexión en UI y API.
+- La ventana de 7 días se aplica en cliente y servidor.
+- Los datos locales están cifrados y se eliminan al cerrar sesión con advertencia si hay pendientes.
+- T-OFF-01..12 ejecutadas y reportadas.
+
+### Pruebas
+
+- T-OFF-01..12.
+- T-MOV-01..03 y T-INS-01..06 repetidas en modo offline.
+- T-SEC-02/03 para permisos al sincronizar.
+
+### Riesgos
+
+| Riesgo | Mitigación |
+|---|---|
+| Conflictos de origen frecuentes | Mostrar la ubicación vigente y permitir corregir; no aplicar cambios parciales. |
+| Pérdida de borradores | Cifrado local, aviso al cerrar sesión y sincronización temprana. |
+| Usuario revocado que sigue operando | Ventana de 7 días y revalidación de permisos en cada sincronización. |
+| Complejidad de la cola | Librería simple, pruebas de idempotencia y límites de alcance claros. |
+
+### Verificación
+
+```bash
+npm run test
+npm run e2e -- --grep offline
+npm run lint
+npm run typecheck
+npm run build
+```
+
+---
+
+## 15. Fase 12 — E2E, seguridad, rendimiento y despliegue
 
 ### Objetivo
 
@@ -867,7 +940,7 @@ Pasar de “funciona en desarrollo” a “operable con seguridad y respaldo”.
 
 ### Dependencias
 
-- Fase 10.
+- Fase 11.
 - D-21 (retención, aprobada: conservación indefinida en el MVP), D-22 (volumen, aprobado: 10 000 activos y 100 000 movimientos), D-23 (despliegue y respaldo, aprobado: híbrido con RPO 24 h / RTO 4 h).
 
 ### Alcance
@@ -881,6 +954,7 @@ Pasar de “funciona en desarrollo” a “operable con seguridad y respaldo”.
 - Despliegue híbrido: app en nube con HTTPS y MySQL on-premise por red privada o túnel cifrado (D-23).
 - Respaldo diario cifrado y restauración cronometrada dentro de RPO 24 h / RTO 4 h (D-23).
 - Verificación de conservación indefinida: sin jobs de purga, archivo ni anonimización (D-21).
+- Verificación de la operación offline en el entorno real: ventana de 7 días, conflictos y datos locales cifrados (D-14).
 - Configuración de producción (HTTPS, CORS, secrets, logs, health).
 - Runbook de operación, respaldo, restauración e incidentes.
 - Manual de usuario breve.
@@ -913,8 +987,9 @@ backend/test/
 
 ### Pruebas
 
-- T-MIG-01 a T-MIG-07.
-- T-SEC-01 a T-SEC-15.
+- T-MIG-01 a T-MIG-10.
+- T-SEC-01 a T-SEC-17.
+- T-OFF-01 a T-OFF-12.
 - T-PER-01 a T-PER-06.
 - Accesibilidad.
 - Simulacro de restauración.
@@ -940,7 +1015,7 @@ npm run test:perf
 
 ---
 
-## 15. Hitos y puertas de aprobación
+## 16. Hitos y puertas de aprobación
 
 | Hito | Fase | Qué debe aprobar el propietario |
 |---|---|---|
@@ -952,13 +1027,14 @@ npm run test:perf
 | H5 | 6 | Política de mantenimiento/inspección y condición técnica. |
 | H6 | 7 | Umbrales y reportes. |
 | H7 | 10 | Aceptación funcional del MVP. |
-| H8 | 11 | Autorización de producción. |
+| H8 | 11 | Aceptación de la operación sin conexión y sus conflictos. |
+| H9 | 12 | Autorización de producción. |
 
 Cada puerta requiere evidencia de pruebas y revisión de los documentos actualizados.
 
 ---
 
-## 16. Riesgos transversales
+## 17. Riesgos transversales
 
 | Riesgo | Probabilidad | Impacto | Mitigación | Responsable |
 |---|---|---|---|---|
@@ -970,19 +1046,19 @@ Cada puerta requiere evidencia de pruebas y revisión de los documentos actualiz
 | Zona horaria/fechas | Media | Medio | UTC + `DATE`; pruebas de borde. | Desarrollo |
 | Crecimiento de datos | Baja/Media | Medio | Índices, paginación, archivo. | Desarrollo/operaciones |
 | Pérdida de datos | Baja | Muy alto | Backups, restauración probada. | Operaciones |
+| Conflictos al sincronizar offline | Media | Medio | Rechazo completo, UI de conflicto y pruebas T-OFF. | Desarrollo/operaciones |
 | Scope creep | Alta | Medio | Congelar MVP; backlog fase 2. | Propietario |
 | Adopción del personal | Media | Alto | UX simple, capacitación, manual. | Operaciones |
 
 ---
 
-## 17. Backlog de segunda fase (no MVP)
+## 18. Backlog de segunda fase (no MVP)
 
 - Adjuntos, fotos, firmas y actas.
 - Exportación PDF/Excel.
 - Notificaciones por correo.
 - Importación masiva y conciliación.
 - Lotes de movimiento.
-- PWA/offline.
 - Catálogo administrable de condiciones.
 - Corrección de inspecciones/servicios desde UI.
 - Alertas de retornos pendientes.
@@ -995,7 +1071,7 @@ Cada elemento requiere su propio análisis de alcance, seguridad y pruebas; no s
 
 ---
 
-## 18. Primer paso propuesto tras la aprobación
+## 19. Primer paso propuesto tras la aprobación
 
 1. Responder las decisiones bloqueantes (empezando por D-03, D-04, D-05 y D-07).
 2. Aprobar este plan y el alcance del MVP.

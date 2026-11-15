@@ -36,6 +36,9 @@ erDiagram
     USERS ||--o{ IDEMPOTENCY_RECORDS : registra
     USERS |o--o{ AUDIT_LOGS : genera
     USERS ||--o{ EXTINGUISHERS : crea
+    USERS ||--o{ DEVICES : opera
+    DEVICES |o--o{ MOVEMENTS : captura
+    DEVICES |o--o{ INSPECTIONS : captura
 
     LOCATIONS |o--o{ LOCATIONS : padre_hijo
     LOCATIONS |o--o{ EXTINGUISHERS : ubicacion_actual
@@ -73,6 +76,15 @@ erDiagram
         string code UK
         string name
         boolean is_system
+    }
+
+    DEVICES {
+        uuid id PK
+        string code UK
+        string label
+        uuid assigned_user_id FK
+        datetime last_sync_at
+        boolean active
     }
 
     PERMISSIONS {
@@ -461,10 +473,15 @@ erDiagram
 | `corrects_movement_id` | `CHAR(36)` | Sí | FK `movements.id`; solo `AJUSTE`. |
 | `created_by` | `CHAR(36)` | No | FK `users.id`; tomado de la sesión. |
 | `created_at` | `DATETIME(3)` | No | Sello del servidor. |
+| `client_uuid` | `CHAR(36)` | Sí | Idempotencia de borradores offline; único cuando existe (D-14). |
+| `capture_mode` | `ENUM('ONLINE','OFFLINE')` | No | Default `ONLINE`; `OFFLINE` si llegó como borrador y se confirmó al sincronizar (D-14). |
+| `device_id` | `CHAR(36)` | Sí | FK `devices.id`; obligatorio si `capture_mode = 'OFFLINE'`. |
+| `synced_at` | `DATETIME(3)` | Sí | Hora del servidor al recibir el borrador; nulo si fue en línea. |
 
 Índices:
 
 - `UNIQUE(extinguisher_id, asset_sequence)`
+- `UNIQUE(client_uuid)`
 - `INDEX(extinguisher_id, moved_at)`
 - `INDEX(movement_type, moved_at)`
 - `INDEX(origin_location_id)`
@@ -472,6 +489,7 @@ erDiagram
 - `INDEX(origin_external_party_id)`
 - `INDEX(destination_external_party_id)`
 - `INDEX(created_by, created_at)`
+- `INDEX(device_id, synced_at)`
 - `INDEX(created_at)`
 
 Sin `updated_at`: es inmutable. `asset_sequence` refleja el orden de inserción; la línea de tiempo para el usuario se ordena por `moved_at` y, en empate, por `asset_sequence`. Un `AJUSTE` retroactivo puede tener una secuencia mayor pero una fecha menor; se muestra con su justificación.
@@ -549,8 +567,12 @@ Sin `updated_at`: inmutable; corrección = nueva fila.
 | `corrects_id` | `CHAR(36)` | Sí | FK `inspections.id`. |
 | `created_by` | `CHAR(36)` | No | FK `users.id`. |
 | `created_at` | `DATETIME(3)` | No | |
+| `client_uuid` | `CHAR(36)` | Sí | Idempotencia de borradores offline; único cuando existe (D-14). |
+| `capture_mode` | `ENUM('ONLINE','OFFLINE')` | No | Default `ONLINE`; `OFFLINE` si llegó como borrador y se confirmó al sincronizar (D-14). |
+| `device_id` | `CHAR(36)` | Sí | FK `devices.id`; obligatorio si `capture_mode = 'OFFLINE'`. |
+| `synced_at` | `DATETIME(3)` | Sí | Hora del servidor al recibir el borrador; nulo si fue en línea. |
 
-Índices: `INDEX(extinguisher_id, inspected_at)`, `INDEX(next_due_date)`, `INDEX(inspector_user_id)`, `INDEX(result)`.
+Índices: `UNIQUE(client_uuid)`, `INDEX(extinguisher_id, inspected_at)`, `INDEX(next_due_date)`, `INDEX(inspector_user_id)`, `INDEX(result)`, `INDEX(device_id, synced_at)`.
 
 > La inspección **no** escribe `extinguishers.technical_condition` (D-28). La ficha muestra el último `result` por `inspected_at`; el cambio de condición usa el endpoint dedicado de D-27.
 
@@ -635,6 +657,23 @@ No se siembran valores de días por defecto. La instalación crea las filas con 
 | `next_value` | `INT UNSIGNED` | No | Se incrementa bajo bloqueo. |
 | `padding` | `TINYINT UNSIGNED` | No | Ej. 6. |
 | `updated_at` | `DATETIME(3)` | No | |
+
+### 4.16 `devices`
+
+| Columna | Tipo | Nulo | Nota |
+|---|---|---:|---|
+| `id` | `CHAR(36)` | No | PK. |
+| `code` | `VARCHAR(30)` | No | Único; identificador estable del dispositivo. |
+| `label` | `VARCHAR(100)` | No | Nombre visible (ej. "Tablet almacén central"). |
+| `assigned_user_id` | `CHAR(36)` | No | FK `users.id`; usuario que opera el dispositivo. |
+| `last_sync_at` | `DATETIME(3)` | Sí | Última sincronización correcta; base para la ventana de 7 días (D-14). |
+| `active` | `BOOLEAN` | No | Default `true`; un dispositivo inactivo no puede sincronizar. |
+| `created_at` | `DATETIME(3)` | No | |
+| `updated_at` | `DATETIME(3)` | No | |
+
+Índices: `UNIQUE(code)`, `INDEX(assigned_user_id, active)`, `INDEX(last_sync_at)`.
+
+> **Borradores offline (D-14):** los borradores viven cifrados en el dispositivo (IndexedDB); el servidor solo guarda movimientos e inspecciones **confirmados** con `client_uuid`, `capture_mode`, `device_id` y `synced_at`. No existe tabla de borradores en el servidor. Un borrador rechazado se registra en auditoría y se devuelve al dispositivo como conflicto; no se persiste como movimiento.
 
 ---
 
@@ -766,3 +805,4 @@ Con 10 000 activos y 100 000 movimientos, los listados deben paginarse y filtrar
 - **Respaldos:** copia diaria cifrada de MySQL en el servidor de la organización; RPO 24 h / RTO 4 h; prueba de restauración antes de producción y al menos trimestral (D-23).
 - **Despliegue (D-23):** aplicación y API en nube con HTTPS; MySQL on-premise, sin exposición directa a Internet; conexión por red privada o túnel cifrado.
 - **Datos de desarrollo:** seed separado, identificado, nunca restaurado sobre producción.
+- **Datos locales offline:** cifrados en el dispositivo, limitados a las sedes/áreas asignadas y eliminados al cerrar sesión; no forman parte del respaldo del servidor (D-14).

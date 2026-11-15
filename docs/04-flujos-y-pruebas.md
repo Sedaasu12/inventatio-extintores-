@@ -63,6 +63,7 @@
 | PT-19 | Revisar alertas vencidas | Se ven en la aplicación; no se envía correo, WhatsApp ni SMS (D-20). |
 | PT-20 | Consultar historial antiguo o auditoría | Los registros siguen completos; no existe purga ni archivo (D-21). |
 | PT-21 | Entrar por HTTP sin TLS o restaurar el respaldo diario | El acceso se fuerza a HTTPS; la restauración cumple RPO 24 h / RTO 4 h (D-23). |
+| PT-22 | Preparar un movimiento sin red y sincronizar | El borrador no cambia la ubicación hasta confirmarse; si el origen cambió, se rechaza como conflicto (D-14). |
 
 ## 7. Cierre de cada entrega
 - Migración ejecutada desde una base vacía.

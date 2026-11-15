@@ -332,6 +332,13 @@ stateDiagram-v2
 | BR-186 | El MVP aplica conservación indefinida: no se borra, anonimiza ni archiva historial ni auditoría (D-21 aprobada). | Sin jobs de purga ni endpoints de borrado; respaldos completos. |
 | BR-186A | Si una política legal u organizacional aprobada exige archivo, se implementará después con el plazo que indique esa política, nunca con un valor supuesto. | Decisión futura documentada; sin plazo inventado. |
 | BR-187 | Los logs de aplicación no incluyen PII innecesaria ni cuerpos completos con datos sensibles. | Configuración de logger. |
+| BR-188 | Un borrador creado sin conexión no es un movimiento confirmado: no altera ubicación, estado, condición ni fechas objetivo hasta que el servidor lo valide y confirme (D-14). | Proyección y fechas se actualizan solo en la confirmación del servidor. |
+| BR-189 | El servidor valida origen, permisos y reglas al sincronizar; si algo falla, rechaza el borrador completo y lo marca como conflicto, sin aplicar cambios parciales (D-14). | Transacción por borrador; auditoría del rechazo. |
+| BR-190 | Cada borrador lleva un `client_uuid` idempotente; reenviarlo devuelve el resultado original y no duplica el movimiento ni la inspección (D-14). | Restricción única en servidor. |
+| BR-191 | Sin conexión solo se preparan movimientos rutinarios e inspecciones; `BAJA`, `AJUSTE`, cambio de condición y administración requieren conexión (D-14). | Validación en UI y rechazo en la API de sincronización. |
+| BR-192 | Un dispositivo puede operar sin sincronizar como máximo 7 días; después se bloquean nuevas escrituras hasta reconectar, sin impedir la lectura (D-14). | Marca de última sincronización; bloqueo local y validación en servidor. |
+| BR-193 | Todo registro confirmado desde un dispositivo conserva la hora del hecho declarada por el dispositivo (`moved_at`/`inspected_at`), `synced_at` (hora del servidor) y `device_id`; la auditoría conserva ambos tiempos y advierte diferencias de reloj (D-14). | Campos obligatorios cuando el origen es offline. |
+| BR-194 | Los datos locales del dispositivo se cifran, se limitan a las sedes/áreas asignadas y se eliminan al cerrar sesión; si hay borradores pendientes se advierte antes de borrarlos (D-14). | IndexedDB cifrada; alcance por usuario y sede. |
 
 ---
 

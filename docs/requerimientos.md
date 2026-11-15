@@ -174,6 +174,19 @@ La matriz detallada está en `docs/diseno-api.md`. Los permisos se validan siemp
 | RF-QR-05 | Informar códigos inexistentes o ilegibles. | Must | Mensaje claro; no se crea un activo automáticamente. |
 | RF-QR-06 | No incluir datos sensibles en el QR. | Must | Solo código estable o URL estable; sin ubicación, fechas, nombres ni PII. |
 
+### 2.11 Operación sin conexión
+
+| ID | Requisito | Prioridad | Criterio de aceptación |
+|---|---|---|---|
+| RF-OFF-01 | Consultar información descargada sin conexión. | Must | Fichas, ubicaciones y catálogos del alcance asignado se leen desde caché cifrada (D-14). |
+| RF-OFF-02 | Preparar borradores de movimientos rutinarios e inspecciones sin conexión. | Must | Se guardan localmente; la UI indica claramente que **no** están confirmados (D-14). |
+| RF-OFF-03 | Sincronizar borradores al recuperar la conexión. | Must | Envío por lote; resultado por ítem: confirmado, rechazado o duplicado (D-14). |
+| RF-OFF-04 | Confirmar en el servidor con validación de origen y permisos. | Must | Un borrador inválido se rechaza completo y se marca como conflicto; sin cambios parciales (D-14). |
+| RF-OFF-05 | Evitar duplicados al reintentar. | Must | `clientUuid` idempotente; reenvío devuelve el resultado original (D-14). |
+| RF-OFF-06 | Bloquear operaciones sensibles sin conexión. | Must | `BAJA`, `AJUSTE`, cambio de condición y administración exigen conexión (D-14). |
+| RF-OFF-07 | Limitar la ventana sin sincronizar. | Must | Máximo 7 días; después se bloquean escrituras hasta reconectar, sin impedir la lectura (D-14). |
+| RF-OFF-08 | Registrar dispositivo y tiempos. | Must | `deviceId`, hora del hecho declarada por el dispositivo y `syncedAt`; auditoría conserva ambos (D-14). |
+
 ---
 
 ## 3. Requisitos no funcionales
@@ -195,6 +208,7 @@ La matriz detallada está en `docs/diseno-api.md`. Los permisos se validan siemp
 | RNF-13 | Internacionalización. | Could | Español en MVP; fechas/números localizados; arquitectura preparada para i18n. |
 | RNF-14 | Portabilidad de despliegue. | Should | Variables de entorno; Docker opcional; instalación local de MySQL documentada. |
 | RNF-15 | Calidad de pruebas. | Must | Unitarias de reglas, integración de transacciones y E2E de flujos principales ejecutadas. |
+| RNF-16 | Operación sin conexión. | Must | PWA con caché de lectura y borradores cifrados; sincronización idempotente y conflictos explícitos (D-14). |
 
 ---
 
@@ -240,6 +254,7 @@ La matriz detallada está en `docs/diseno-api.md`. Los permisos se validan siemp
 | RF-22 | RF-QR-02, RF-QR-03 |
 | RF-23 | RF-MOV-07 |
 | RF-24 | RF-MOV-16, RF-MAN-02, RF-INS-07 (archivos en segunda fase) |
+| RF-25 | RF-OFF-01..08 |
 
 ---
 
@@ -249,7 +264,7 @@ La matriz detallada está en `docs/diseno-api.md`. Los permisos se validan siemp
 - Determinación de intervalos reglamentarios sin documento o responsable autorizado.
 - Firma electrónica con validez legal.
 - Facturación, compras o contabilidad.
-- App nativa, offline y sincronización.
+- App nativa; la operación sin conexión se cubre con PWA y borradores (D-14), no con una aplicación instalable.
 - Notificaciones por WhatsApp/SMS.
 - Multi-tenant y aislamiento entre organizaciones.
 - Integración con sistemas de bomberos, ERP o IoT.

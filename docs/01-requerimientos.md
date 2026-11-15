@@ -28,6 +28,7 @@
 | RF-22 | Permitir ingreso manual y lector USB 2D en modo teclado. | Should |
 | RF-23 | Registrar baja con motivo, fecha y autorización. | Must |
 | RF-24 | Adjuntar fotos, actas o constancias a movimientos y servicios. | Could | Fuera del MVP: solo referencia textual (D-13); archivos en fase posterior. |
+| RF-25 | Operar sin conexión: consultar en caché y preparar borradores de movimientos rutinarios e inspecciones que se confirman al sincronizar. | Must | Borradores no confirmados; operaciones sensibles solo en línea; ventana de 7 días (D-14). |
 
 ## 2. Requerimientos no funcionales
 - RNF-01 Seguridad: autenticación, autorización por rol y validación en backend.
@@ -42,6 +43,7 @@
 - RNF-10 Calidad: pruebas unitarias, integración y E2E para flujos críticos.
 - RNF-11 Retención: historial y auditoría con conservación indefinida en el MVP; sin purga, archivo ni anonimización (D-21).
 - RNF-12 Despliegue y respaldo: app y API en nube con HTTPS; MySQL on-premise por red privada o túnel cifrado; respaldo diario cifrado con RPO 24 h / RTO 4 h (D-23).
+- RNF-13 Operación sin conexión: PWA con caché de lectura y borradores cifrados; sincronización idempotente, conflictos explícitos y ventana máxima de 7 días (D-14).
 
 ## 3. Reglas de negocio
 - RN-01 Un extintor es un activo individual; su código no se reutiliza.
@@ -68,8 +70,8 @@
 - CA-10 El sistema permite registrar/consultar manualmente si no se dispone de cámara o lector.
 
 ## 5. Priorización del MVP
-**MVP obligatorio:** autenticación/roles, ubicaciones, ficha individual, QR, movimientos, historial, inspecciones/servicios básicos, alertas en pantalla y dashboard simple.
+**MVP obligatorio:** autenticación/roles, ubicaciones, ficha individual, QR, movimientos, historial, inspecciones/servicios básicos, alertas en pantalla, dashboard simple y operación sin conexión con borradores (D-14).
 
-**Siguiente iteración:** adjuntos, exportaciones, reportes avanzados, correo, modo PWA mejorado y auditoría ampliada.
+**Siguiente iteración:** adjuntos, exportaciones, reportes avanzados, correo y auditoría ampliada.
 
-**Fase opcional:** modo offline y sincronización, integración con otros sistemas y app móvil nativa.
+**Fase opcional:** integración con otros sistemas y app móvil nativa.

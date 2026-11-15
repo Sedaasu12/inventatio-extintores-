@@ -299,6 +299,23 @@ Estructura D-02: `SEDE` es la raíz; `ALMACEN`, `TALLER` y `AREA` son hijos. Los
 | T-SER-01 | Integración | Alta con serial duplicado | Se acepta; se devuelve advertencia y aparece en reporte de duplicados | D-16 |
 | T-QR-01 | Unit | Generar payload de etiqueta | Solo `asset_code`; sin URL, ubicación, fechas ni PII | D-05 / BR-140 |
 
+### 4.11 Operación sin conexión (D-14)
+
+| ID | Nivel | Acción | Resultado esperado | Regla |
+|---|---|---|---|---|
+| T-OFF-01 | E2E | Abrir la app sin red tras una sincronización previa | Se consultan fichas y ubicaciones del alcance; no hay error de red | RF-OFF-01 |
+| T-OFF-02 | E2E | Preparar un movimiento sin red | Se guarda como borrador marcado “pendiente”; ubicación y estado no cambian en el servidor | RF-OFF-02 / BR-188 |
+| T-OFF-03 | Integración | Sincronizar un borrador válido | Se confirma el movimiento, se actualiza la proyección y se audita con `captureMode = OFFLINE` | RF-OFF-03 / BR-189 |
+| T-OFF-04 | Integración | Sincronizar con origen ya modificado | Rechazo `ORIGIN_MISMATCH`, sin cambios parciales; queda como conflicto | RF-OFF-04 / BR-189 |
+| T-OFF-05 | Integración | Reenviar el mismo `clientUuid` | `DUPLICATE`; no se duplica el movimiento ni la inspección | RF-OFF-05 / BR-190 |
+| T-OFF-06 | Integración | Enviar borrador de `BAJA`, `AJUSTE` o cambio de condición | `422 OFFLINE_NOT_ALLOWED`; no se crea nada | RF-OFF-06 / BR-191 |
+| T-OFF-07 | Unit/E2E | Superar 7 días sin sincronizar | Se bloquean nuevas escrituras; la lectura sigue disponible; el servidor rechaza `SYNC_WINDOW_EXPIRED` | RF-OFF-07 / BR-192 |
+| T-OFF-08 | Integración | Sincronizar con permiso revocado | `PERMISSION_REVOKED`; no se confirma el borrador | RF-OFF-04 |
+| T-OFF-09 | Integración | Sincronizar con dispositivo inactivo | `DEVICE_INACTIVE`; no se confirma nada | RF-OFF-08 |
+| T-OFF-10 | Unit | Inspeccionar el almacenamiento local | Datos cifrados; no hay texto plano de fichas ni responsables | BR-194 |
+| T-OFF-11 | E2E | Cerrar sesión con borradores pendientes | Se advierte antes de borrar; tras confirmar, no quedan datos locales | BR-194 |
+| T-OFF-12 | Integración | Reloj del dispositivo adelantado o atrasado | Se guardan ambos tiempos; la auditoría advierte la diferencia sin alterar `syncedAt` | RF-OFF-08 / BR-193 |
+
 ---
 
 ## 5. Pruebas de transacción y concurrencia (detalle)
@@ -481,6 +498,7 @@ Verificar `EXPLAIN` de las consultas principales y que se usen los índices defi
 | Auditoría | RF-AUD-01..05 | T-AUD-01..05 |
 | Migración | RNF-08/09 | T-MIG-01..10 |
 | Despliegue y respaldo | RNF-08, RNF-12 | T-SEC-16/17, T-MIG-08..10 |
+| Operación sin conexión | RF-OFF-01..08, RNF-16 | T-OFF-01..12 |
 
 ---
 

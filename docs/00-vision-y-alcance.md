@@ -32,7 +32,7 @@ Los roles y permisos finales deben ser validados por la organización.
 ## 6. Suposiciones iniciales por confirmar
 1. La primera versión será para una organización, pero podrá administrar varias sedes y áreas.
 2. Cada extintor será controlado como unidad individual; no se registrará solamente “20 extintores” como una cantidad agregada.
-3. La primera versión funcionará con conexión al servidor. El modo offline se evaluará después si el lugar de operación lo exige.
+3. La primera versión funcionará con conexión al servidor y, además, con lectura en caché y borradores de movimientos rutinarios e inspecciones que se confirman al sincronizar (D-14).
 4. La cámara de un celular será el método inicial de escaneo; el lector 2D será compatible, pero no obligatorio para empezar.
 5. Se usarán alertas dentro del sistema (D-20). Correo, WhatsApp o SMS quedan para una fase posterior.
 6. Las fechas y frecuencias técnicas procederán de documentos, fabricante, proveedor o responsable autorizado. No se inventarán intervalos.
@@ -43,7 +43,7 @@ Los roles y permisos finales deben ser validados por la organización.
 - Venta o compra de extintores.
 - Aplicación móvil nativa independiente.
 - Integración con WhatsApp/SMS.
-- Operación offline con sincronización, hasta que se confirme su necesidad.
+- App nativa instalable; la operación sin conexión se cubre con PWA y borradores (D-14).
 
 ## 8. Decisiones que la organización debe confirmar
 - Sedes y estructura de ubicaciones reales.
@@ -52,9 +52,9 @@ Los roles y permisos finales deben ser validados por la organización.
 - Qué fecha considera “vencimiento” la organización y de qué documento procede (resuelto en D-12: fecha documentada del fabricante + vida útil calculada por tipo, con la más temprana como fecha objetivo).
 - Umbral para alertar “por vencer” por cada tipo de evento (resuelto en D-11: el MVP arranca sin umbral; se configura cuando exista política aprobada).
 - Si los proveedores externos de mantenimiento deben tener ficha propia.
-- Si se exige operación sin internet en almacenes o sedes.
 - Si se requiere firma, foto o documento adjunto como evidencia de entrega/recepción (resuelto en D-13: solo referencia textual en el MVP; archivos y firmas en fase posterior).
 - Qué notificaciones se requieren y por qué canal (resuelto en D-20: solo alertas en la aplicación; sin correo, WhatsApp ni SMS en el MVP).
 - Cuánto historial se conserva y si se archiva o elimina (resuelto en D-21: conservación indefinida en el MVP; sin purga, archivo ni anonimización).
 - Qué volumen debe soportar el sistema (resuelto en D-22: hasta 10 000 extintores, 100 000 movimientos y menos de 100 usuarios; revisar si se supera 10×).
 - Dónde se despliega y qué respaldo se exige (resuelto en D-23: app y API en nube con HTTPS, MySQL on-premise por red privada o túnel cifrado, respaldo diario cifrado con RPO 24 h / RTO 4 h).
+- Si se requiere operar sin internet (resuelto en D-14: PWA con lectura en caché y borradores que se confirman al sincronizar; operaciones sensibles solo en línea; ventana de 7 días).

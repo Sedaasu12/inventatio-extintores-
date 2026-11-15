@@ -46,7 +46,8 @@ Estado al 2026-11-14. El registro formal de aprobaciones está en §2.2 a §2.4;
 | 17 | D-20 | Notificaciones | Solo alertas en la aplicación; sin correo, WhatsApp ni SMS. | Aprobada | Fase 7 |
 | 18 | D-21 | Retención del historial | Conservación indefinida en el MVP; archivo solo si una política aprobada lo exige. | Aprobada | Transversal |
 | 19 | D-22 | Volumen esperado | 10 000 activos, 100 000 movimientos y <100 usuarios; revisar si se supera 10×. | Aprobada | Transversal |
-| 20 | D-23 | Despliegue y respaldo | Híbrido: app en nube + MySQL propio; RPO 24 h / RTO 4 h. | Aprobada | Fase 11 |
+| 20 | D-23 | Despliegue y respaldo | Híbrido: app en nube + MySQL propio; RPO 24 h / RTO 4 h. | Aprobada | Fase 12 |
+| 21 | D-14 | Operación sin internet | PWA con caché de lectura y borradores confirmados al sincronizar; ventana de 7 días. | Aprobada | Fase 11 |
 
 ---
 
@@ -109,7 +110,7 @@ El propietario revisó las decisiones una por una y **confirmó** las once, sin 
 
 **Correcciones aplicadas durante la revisión:** BR-003 y la nota de API sobre `assetCode` (D-04); BR-089, modelo, RF-MAN-05 y T-MAN-15 sobre ausencia de mapeo automático (D-10).
 
-### 2.4 Confirmaciones adicionales (2026-11-11 a 2026-11-12)
+### 2.4 Confirmaciones adicionales (2026-11-11 a 2026-11-14)
 
 | ID | Opción confirmada |
 |---|---|
@@ -131,6 +132,7 @@ El propietario revisó las decisiones una por una y **confirmó** las once, sin 
 | D-21 | A — conservación indefinida; sin purga ni anonimización en el MVP (2026-11-13) |
 | D-22 | A — 10 000 activos, 100 000 movimientos y <100 usuarios; revisar si se supera 10× (2026-11-14) |
 | D-23 | C — híbrido: app en nube + MySQL propio; RPO 24 h / RTO 4 h (2026-11-14) |
+| D-14 | B — PWA con lectura en caché y borradores confirmados al sincronizar; 7 días sin conexión (2026-11-14) |
 
 ---
 
@@ -514,9 +516,19 @@ El propietario revisó las decisiones una por una y **confirmó** las once, sin 
 
 **Recomendación:** A. Reevaluar si hay evidencia de falta de conectividad.
 
-**Si no se responde:** A.
+**Decisión aprobada (2026-11-14):** opción **B (PWA con caché de lectura y cola de escritura)**, limitada a **borradores** que el servidor confirma al sincronizar.
 
-**Bloquea:** no bloquea MVP; arquitectura. **Estado:** abierta.
+- Sin conexión se puede **consultar** la información descargada y **preparar borradores** de movimientos rutinarios e inspecciones.
+- Se permiten sin conexión: `INGRESO`, `SALIDA`, `TRASLADO`, `RETORNO`, `ENVIO_MANTENIMIENTO`, `RETORNO_MANTENIMIENTO` e inspecciones.
+- **No** se permiten sin conexión: `BAJA`, `AJUSTE`, cambio de condición técnica, administración de usuarios/catálogos ni configuración de umbrales.
+- Un borrador **no es un movimiento confirmado**: no altera ubicación, estado logístico, condición ni fechas objetivo. El servidor valida origen, permisos y reglas al sincronizar; solo entonces confirma, actualiza la proyección y audita.
+- Si el origen ya no coincide con la ubicación/estado vigente o el permiso fue revocado, el borrador se rechaza completo y se marca como **conflicto** para que el usuario lo corrija; no se aplica parcialmente.
+- Cada borrador lleva un `client_uuid` idempotente: reenviarlo no duplica el movimiento ni la inspección.
+- La ventana máxima sin sincronizar es de **7 días**. Pasado ese plazo, el dispositivo bloquea nuevas escrituras hasta reconectar; la lectura sigue disponible.
+- El dispositivo debe registrarse y el usuario autenticarse antes de descargar el alcance; los datos locales se cifran y se limitan a las sedes/áreas asignadas.
+- Se registran la hora del hecho declarada por el dispositivo (`moved_at`/`inspected_at`), `synced_at` (hora del servidor) y `device_id`. La auditoría conserva ambos tiempos y advierte si el reloj del dispositivo difiere del servidor.
+
+**Bloquea:** fase 11 (nueva). **Estado:** aprobada.
 
 ---
 
@@ -730,7 +742,7 @@ El propietario revisó las decisiones una por una y **confirmó** las once, sin 
 - **RPO 24 h / RTO 4 h** aceptados: se puede perder hasta un día de movimientos y el objetivo de recuperación es de cuatro horas.
 - Monitoreo de disponibilidad de la API, la conexión a MySQL y el resultado del respaldo; alertas al responsable de operación.
 
-**Bloquea:** no bloquea el MVP; se implementa en fase 11. **Estado:** aprobada.
+**Bloquea:** no bloquea el MVP; se implementa en fase 12. **Estado:** aprobada.
 
 ---
 
@@ -950,7 +962,7 @@ El propietario revisó las decisiones una por una y **confirmó** las once, sin 
 |---|---|---|
 | S-01 | Single-tenant, una organización con varias sedes. | D-01 |
 | S-02 | Zona horaria `America/Lima`. | D-15 |
-| S-03 | Online solamente; sin offline en MVP. | D-14 |
+| S-03 | PWA con lectura en caché y borradores confirmados al sincronizar; operaciones sensibles solo en línea (D-14). | D-14 |
 | S-04 | Auth local (correo + contraseña) con `AuthProvider` desacoplado; JWT + refresh. | D-06 |
 | S-05 | Un movimiento por activo; sin cabecera de lote. | D-25 |
 | S-06 | Alta en almacén o área interna. | D-03 |
@@ -972,8 +984,9 @@ El propietario revisó las decisiones una por una y **confirmó** las once, sin 
 | S-22 | Sin segunda aprobación en la aplicación: quien tiene el permiso ejecuta y registra `authorized_by`, motivo y documento; el control es RBAC + auditoría. | D-08b |
 | S-23 | Reportes en pantalla y exportación CSV en el MVP; PDF/Excel en fase 2. | D-19 |
 | S-24 | Despliegue híbrido: app y API en nube con HTTPS; MySQL on-premise por red privada o túnel cifrado; respaldo diario cifrado con RPO 24 h / RTO 4 h. | D-23 |
+| S-25 | PWA con lectura en caché y borradores de movimientos rutinarios e inspecciones que se confirman al sincronizar; ventana de 7 días; operaciones sensibles solo en línea. | D-14 |
 
-**Tras las aprobaciones del 2026-11-10 al 2026-11-14**, S-01, S-02, S-04, S-06 a S-14, S-16, S-18 a S-24 pasan a decisiones aprobadas (ver §2.2 y §2.4). S-11 se ajusta: **no** existe mapeo automático de resultado a condición. Siguen como supuesto S-03, S-05, S-15 y S-17.
+**Tras las aprobaciones del 2026-11-10 al 2026-11-14**, S-01, S-02, S-04, S-06 a S-14, S-16, S-18 a S-25 pasan a decisiones aprobadas (ver §2.2 y §2.4). S-11 se ajusta: **no** existe mapeo automático de resultado a condición. Siguen como supuesto S-05, S-15 y S-17.
 
 ---
 
@@ -998,10 +1011,9 @@ Estas decisiones se usaron para escribir los documentos, pero **no están aproba
 
 Para no bloquear el diseño, se propone esta secuencia. Solo figuran las decisiones **abiertas** al 2026-11-14; las aprobadas están en §2.2 y §2.4, y ya se reflejaron en los documentos. Cada respuesta se registra aquí y se refleja en el modelo/API antes de avanzar.
 
-1. **D-14:** ¿se requiere operación sin internet? (transversal)
-2. **D-25:** ¿se necesitan movimientos por lote? (fase 5)
-3. **D-29:** ¿se registran costos de mantenimiento? (fase 6)
-4. **D-30:** ¿idioma y localización? (transversal)
+1. **D-25:** ¿se necesitan movimientos por lote? (fase 5)
+2. **D-29:** ¿se registran costos de mantenimiento? (fase 6)
+3. **D-30:** ¿idioma y localización? (transversal)
 
 ---
 

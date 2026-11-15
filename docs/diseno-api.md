@@ -150,6 +150,7 @@ Set-Cookie: refresh_token=...; HttpOnly; Secure; SameSite=Strict; Path=/api/v1/a
 | `alerts.read`, `alerts.settings` | Alertas y umbrales |
 | `reports.read`, `reports.export` | Reportes |
 | `audit.read` | Auditoría |
+| `devices.manage` | Registro y baja de dispositivos offline (D-14) |
 
 ### 3.2 Matriz de roles propuesta
 
@@ -178,6 +179,7 @@ Set-Cookie: refresh_token=...; HttpOnly; Secure; SameSite=Strict; Path=/api/v1/a
 | `reports.read` | ✓ | ✓ | ✓ | ✓ |
 | `reports.export` | ✓ | | ✓ | |
 | `audit.read` | ✓ | | | ✓ |
+| `devices.manage` | ✓ | | | |
 
 \* `SEGURIDAD` actualiza campos técnicos, no ubicación/estado.
 \** `SEGURIDAD` crea movimientos vinculados a mantenimiento; la matriz definitiva debe confirmarse (D-07).
@@ -502,6 +504,23 @@ Todos los reportes usan filtros de servidor y paginación; los totales se calcul
 
 > **Sin purga ni archivo (D-21):** la API no expone endpoints para borrar, anonimizar o archivar historial y auditoría. La retención es indefinida en el MVP; los respaldos conservan todo el historial.
 
+### 4.9 Sincronización offline (D-14)
+
+| Método | Ruta | Permiso | Descripción |
+|---|---|---|---|
+| POST | `/devices` | `devices.manage` | Registra un dispositivo y lo asocia a un usuario; devuelve `deviceId`. |
+| GET | `/sync/scope` | Autenticado | Descarga el alcance: sedes/áreas asignadas, fichas resumidas, catálogos, permisos y hora del servidor. |
+| POST | `/sync/drafts` | Autenticado | Envía un lote de borradores; devuelve el resultado por ítem (`CONFIRMED`, `REJECTED`, `DUPLICATE`). |
+| GET | `/sync/status` | Autenticado | Última sincronización, ventana restante y estado del dispositivo. |
+
+Reglas del contrato:
+
+- Cada borrador incluye `clientUuid` (UUID v4 generado en el dispositivo), `deviceId`, `kind` (`MOVEMENT` o `INSPECTION`) y el payload equivalente al endpoint en línea.
+- El servidor procesa cada ítem en su propia transacción; un ítem rechazado no revierte los demás.
+- `REJECTED` devuelve `code` y `message` sin datos internos: `ORIGIN_MISMATCH`, `PERMISSION_REVOKED`, `RULE_VIOLATION`, `DEVICE_INACTIVE`, `SYNC_WINDOW_EXPIRED`, `DUPLICATE`.
+- `BAJA`, `AJUSTE`, cambio de condición, usuarios, catálogos y umbrales no aceptan borradores: `422 OFFLINE_NOT_ALLOWED`.
+- La confirmación actualiza proyección, fechas objetivo y auditoría igual que una operación en línea; `captureMode = OFFLINE`, `deviceId` y `syncedAt` quedan registrados.
+
 ---
 
 ## 5. DTOs y validaciones
@@ -614,6 +633,12 @@ Al cambiar `usefulLifeYears`, el servidor recalcula la fecha objetivo `EQUIPO` d
 - Si la clave existe con payload distinto: `409 IDEMPOTENCY_CONFLICT`.
 - Si la operación falla antes de confirmar, la transacción revierte el registro y la clave puede reutilizarse.
 - La limpieza de registros se ejecuta después de 24 h; no se reutilizan claves de operaciones completadas dentro de esa ventana.
+
+### 6.1A Idempotencia de borradores offline
+
+- Cada borrador usa `clientUuid` como clave idempotente, independiente del header `Idempotency-Key`.
+- `movements.client_uuid` e `inspections.client_uuid` son únicos; reenviar el mismo borrador devuelve `DUPLICATE` con el recurso ya confirmado.
+- La ventana de deduplicación es la de la operación: **7 días** desde la última sincronización (D-14). No se borra el `client_uuid` al confirmar.
 
 ### 6.2 Concurrencia
 

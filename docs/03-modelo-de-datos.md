@@ -19,6 +19,7 @@ Este es un modelo lógico de partida. Debe revisarse antes de generar la migraci
 | `alert_settings` | id, event_type, days_before, enabled, scope | Parámetros de alertas configurables. |
 | `alerts` | id, extinguisher_id, event_type, target_date, alert_status, generated_at, resolved_at | Reservada para fase 2; no se usa en el MVP: las alertas se calculan desde `due_dates` (D-11). |
 | `audit_logs` | id, user_id, entity, entity_id, action, before_data, after_data, created_at | Auditoría de acciones sensibles. |
+| `devices` | id, code, label, assigned_user_id, last_sync_at, active | Dispositivos que pueden operar sin conexión; ventana de 7 días y control de sincronización (D-14). |
 
 ## Relaciones
 - Un tipo de extintor tiene muchos extintores.
@@ -38,6 +39,7 @@ Este es un modelo lógico de partida. Debe revisarse antes de generar la migraci
 - No modelar tabla de adjuntos en el MVP: la evidencia es `document_ref` textual (D-13).
 - No modelar tablas de notificaciones, suscripciones ni colas de envío en el MVP: las alertas son consultas calculadas y no salen de la aplicación (D-20).
 - No modelar tablas de archivo histórico ni jobs de purga: la retención es indefinida en el MVP (D-21).
+- No modelar una tabla de borradores offline en el servidor: los borradores viven cifrados en el dispositivo y solo se persisten al confirmarse, con `client_uuid`, `capture_mode`, `device_id` y `synced_at` (D-14).
 
 ## Nota de diseño importante
 La ubicación actual puede guardarse en `extinguishers.current_location_id` para consultas rápidas, pero esa columna es una proyección del último movimiento confirmado. Solo el servicio de movimientos puede modificarla y debe hacerlo dentro de la misma transacción que inserta el movimiento. Para destinos externos, usa un campo/relación explícito que permita identificar la contraparte y estado externo; no simules que el activo está en un almacén interno.
