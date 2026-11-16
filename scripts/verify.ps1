@@ -1,4 +1,5 @@
-# Verificación de la fase 0. Ejecuta lint, typecheck, pruebas y build reales.
+# Verificación del proyecto. Ejecuta lint, typecheck, pruebas y build reales.
+# Requiere MySQL en marcha y un .env con DATABASE_URL.
 # Uso: ./scripts/verify.ps1
 $ErrorActionPreference = 'Stop'
 
@@ -21,9 +22,18 @@ if (-not $env:DATABASE_URL) {
 function Invoke-Step {
     param([string]$Name, [scriptblock]$Action)
     Write-Host ">> $Name"
-    & $Action
-    if ($LASTEXITCODE -ne 0) {
-        throw "Falló: $Name (código $LASTEXITCODE)"
+    # Jest y otras herramientas escriben su resumen en stderr; con
+    # ErrorActionPreference=Stop PowerShell lo trataría como excepción.
+    $previous = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'
+    try {
+        & $Action 2>&1 | ForEach-Object { Write-Host $_ }
+        $code = $LASTEXITCODE
+    } finally {
+        $ErrorActionPreference = $previous
+    }
+    if ($code -ne 0) {
+        throw "Falló: $Name (código $code)"
     }
 }
 
@@ -33,6 +43,7 @@ Invoke-Step 'lint' { npm run lint }
 Invoke-Step 'typecheck' { npm run typecheck }
 Invoke-Step 'test' { npm run test }
 Invoke-Step 'test:e2e' { npm run test:e2e }
+Invoke-Step 'test:integration' { npm run test:integration }
 Invoke-Step 'build' { npm run build }
 Invoke-Step 'prisma:validate' { npm run prisma:validate }
 

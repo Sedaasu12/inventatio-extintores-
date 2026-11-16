@@ -64,6 +64,32 @@ Para detener y eliminar los datos:
 docker compose down -v
 ```
 
+### Migraciones y datos de desarrollo
+
+```bash
+cd backend
+# Aplica las migraciones versionadas (no borra datos)
+npm run db:migrate
+
+# Carga datos ficticios de desarrollo; es idempotente
+npm run db:seed
+```
+
+La semilla crea el usuario `admin@site.local`. Si no defines
+`SEED_ADMIN_PASSWORD`, se genera una contraseña temporal y se muestra una sola vez
+en la consola; el administrador debe cambiarla en el primer inicio de sesión.
+
+Las pruebas de integración usan una base separada `site_test`, creada y migrada
+automáticamente por `backend/test/integration/global-setup.ts`:
+
+```bash
+npm run test:integration
+```
+
+El setup se niega a ejecutarse si `TEST_DATABASE_URL` apunta a `site`. Para usar
+otra base u otro administrador, define `TEST_DATABASE_URL` y
+`TEST_DATABASE_ADMIN_URL`.
+
 ## Ejecución en desarrollo
 
 ```bash

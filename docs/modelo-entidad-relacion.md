@@ -684,7 +684,7 @@ No se siembran valores de días por defecto. La instalación crea las filas con 
 | ID | Restricción | Implementación |
 |---|---|---|
 | C-01 | `asset_code` único | `UNIQUE` |
-| C-02 | `asset_code` con patrón estable | `CHECK (asset_code REGEXP '^[A-Z0-9][A-Z0-9_-]{2,19}$')`; el generador usa `EXT-` + 6 dígitos |
+| C-02 | `asset_code` con patrón estable | `CHECK (REGEXP_LIKE(asset_code, '^[A-Z0-9][A-Z0-9_-]{2,19}$', 'c'))`; el tercer argumento `'c'` fuerza comparación sensible a mayúsculas porque la colación del esquema es *case-insensitive*; el generador usa `EXT-` + 6 dígitos |
 | C-03 | Una colocación interna o externa, no ambas | `CHECK` sobre `placement_type` y FKs |
 | C-04 | `DADO_DE_BAJA` implica `placement_type='NONE'` y `retired_at` no nulo | `CHECK` |
 | C-05 | `retired_at` nulo si no está dado de baja | `CHECK` |
@@ -797,6 +797,13 @@ Con 10 000 activos y 100 000 movimientos, los listados deben paginarse y filtrar
 - No usar `onDelete: Cascade` en `movements`, `inspections`, `maintenance_services`, `maintenance_orders`, `due_dates` ni `audit_logs`.
 - Los enums de MySQL requieren migración para agregar valores; documentar el procedimiento.
 - Sembrar solo catálogos mínimos y datos ficticios de desarrollo; no sembrar umbrales ni fechas técnicas inventadas.
+
+### 9.1 Particularidades detectadas al generar la migración
+
+- **`active_key` solo existe en la base de datos.** La columna generada `maintenance_orders.active_key` y su índice único se agregan en SQL manual; no se declaran en `schema.prisma`. `prisma migrate diff --from-url ... --to-schema-datamodel` reportará un `DROP COLUMN active_key` que **no debe aplicarse**: es una diferencia esperada entre el esquema Prisma y la base. Cualquier otra diferencia sí es drift real.
+- **`onUpdate: Restrict` es obligatorio** en las columnas usadas por `CHECK` o por la columna generada. MySQL rechaza `ON UPDATE CASCADE` en columnas con `CHECK` (error 3823) y en columnas referenciadas por una columna generada (error 1215). Por eso `extinguishers.current_location_id`, `extinguishers.current_external_party_id`, `movements.origin_*`, `movements.destination_*`, `maintenance_orders.provider_id` y `maintenance_orders.workshop_location_id` usan `onUpdate: Restrict`.
+- **El patrón de `asset_code` exige comparación sensible a mayúsculas.** La colación del esquema es *case-insensitive*; `asset_code REGEXP '^[A-Z0-9...'` aceptaría minúsculas. La restricción usa `REGEXP_LIKE(asset_code, patrón, 'c')` (C-02).
+- **Las pruebas de integración usan una base dedicada.** `backend/test/integration/global-setup.ts` crea `site_test`, otorga permisos al usuario de la aplicación y ejecuta `prisma migrate deploy` antes de las pruebas. Se puede cambiar con `TEST_DATABASE_URL` y `TEST_DATABASE_ADMIN_URL`; el setup aborta si el destino es `site`.
 
 ---
 

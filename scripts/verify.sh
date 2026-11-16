@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Verificación de la fase 0. Ejecuta lint, typecheck, pruebas y build reales.
+# Verificación del proyecto. Ejecuta lint, typecheck, pruebas y build reales.
+# Requiere MySQL en marcha y un .env con DATABASE_URL.
 # Uso: ./scripts/verify.sh
 set -euo pipefail
 
@@ -20,6 +21,7 @@ npm run lint
 npm run typecheck
 npm run test
 npm run test:e2e
+npm run test:integration
 npm run build
 npm run prisma:validate
 

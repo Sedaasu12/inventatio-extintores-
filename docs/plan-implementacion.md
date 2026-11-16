@@ -176,9 +176,11 @@ Materializar el ERD aprobado en Prisma/MySQL, con restricciones, índices y dato
 backend/prisma/schema.prisma
 backend/prisma/migrations/0001_init/migration.sql
 backend/prisma/seed.ts
-backend/prisma/seed-data/
 backend/src/prisma/prisma.module.ts
 backend/src/prisma/prisma.service.ts
+backend/test/jest-integration.json
+backend/test/integration/global-setup.ts
+backend/test/integration/constraints.integration-spec.ts
 docs/modelo-entidad-relacion.md
 ```
 
@@ -214,6 +216,38 @@ npx prisma migrate deploy
 npx prisma db seed
 npm run test:integration -- --runInBand
 ```
+
+### Estado de ejecución (2026-11-16)
+
+Implementado:
+
+- `backend/prisma/schema.prisma`: 20 modelos, 16 enums, `@@map`/`@map`, índices y `onDelete: Restrict`.
+- `backend/prisma/migrations/0001_init/migration.sql`: DDL generado por Prisma + SQL manual para 14 `CHECK`, columna generada `active_key` y su índice único.
+- `backend/prisma/seed.ts`: semilla idempotente (26 permisos, 4 roles y su matriz, administrador, 4 ubicaciones, 2 tipos, 1 proveedor, 3 extintores con movimiento de ingreso, 5 umbrales con `days_before = NULL`, 2 contadores).
+- `backend/src/prisma/prisma.module.ts` y `prisma.service.ts`, registrados en `app.module.ts`.
+- `backend/test/jest-integration.json`, `test/integration/global-setup.ts` y `constraints.integration-spec.ts`.
+
+Resultados reales de la verificación:
+
+| Comando | Resultado |
+|---|---|
+| `npx prisma validate` | Esquema válido. |
+| `npx prisma migrate deploy` sobre `site` vacía | 21 tablas (20 modelos + `_prisma_migrations`), 14 `CHECK`, 44 FK, `active_key` `STORED GENERATED`. |
+| `npx prisma db seed` dos veces | Mismos conteos: 1 usuario, 4 roles, 26 permisos, 65 role_permissions, 4 ubicaciones, 3 extintores, 3 movimientos, 5 umbrales con `days_before` nulo y 0 filas en `due_dates`. |
+| `npm run test:integration` | 33 pruebas, 33 correctas (C-01..C-15, C-17, C-18, C-19). |
+| `npm run lint` | Sin errores. |
+| `npm run typecheck` | Sin errores. |
+| `npm test` | 6 pruebas, 6 correctas. |
+| `npm run test:e2e` | 2 pruebas, 2 correctas. |
+| `npm run build` | Compila. |
+
+Desviaciones y notas:
+
+- No se creó `backend/prisma/seed-data/`: una sola semilla `prisma/seed.ts` cubre el alcance.
+- Se añadió `bcryptjs` (coste 12) para que el administrador sembrado tenga un hash real, conforme a D-06b. La contraseña se toma de `SEED_ADMIN_PASSWORD` o se genera y muestra una sola vez.
+- C-16 y la validación de nombres de sede de C-17 son reglas de servicio: se prueban en la fase que implemente esos servicios. El `UNIQUE(parent_id, name)` de las hijas sí queda cubierto.
+- C-02 usa `REGEXP_LIKE(..., 'c')` porque la colación *case-insensitive* aceptaría códigos en minúsculas (ver `modelo-entidad-relacion.md` §9.1).
+- `active_key` no se declara en `schema.prisma`; la diferencia que reporta `prisma migrate diff` es esperada y no debe aplicarse.
 
 ---
 
