@@ -429,6 +429,15 @@ Verificar `EXPLAIN` de las consultas principales y que se usen los índices defi
 - Lector USB: el campo correcto recibe el foco; no se pierde el código.
 - Confirmación antes de baja/ajuste; no doble envío.
 
+### 8.1 Localización (D-30)
+
+| ID | Nivel | Acción | Resultado esperado | Requisito |
+|---|---|---|---|---|
+| T-UI-01 | Unitario | Formatear fechas, importes y moneda en la interfaz | Fecha `dd/mm/aaaa`, decimal con `.` y moneda `S/`; el valor transportado por la API no cambia | D-30 / BR-196 |
+| T-UI-02 | Revisión de código | Buscar cadenas visibles escritas en componentes | Todos los textos se resuelven por clave desde `shared/i18n/es-PE.ts`; no hay literales de interfaz | D-30 / BR-197 |
+| T-UI-03 | Integración | Provocar un error de negocio (por ejemplo, origen inválido) | El mensaje se muestra en español; el `code` estable no se traduce y se usa para la lógica del cliente | D-30 / BR-198 |
+| T-UI-04 | Unitario | Cargar el único archivo de idioma activo | No existe selector de idioma; cambiar de archivo de traducción no exige tocar componentes | D-30 / BR-195 |
+
 ---
 
 ## 9. Pruebas de migración, respaldo y restauración

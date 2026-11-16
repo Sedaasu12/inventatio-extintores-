@@ -34,6 +34,7 @@ El frontend nunca se conecta directamente a MySQL. Toda operación pasa por la A
 - Alertas.
 - Reportes.
 - Administración de usuarios y catálogos.
+- Localización: un solo idioma activo (español Perú) con textos en claves de traducción (D-30).
 
 ## 4. Decisión QR / código de barras
 Recomendación inicial: QR, porque permite lectura con cámara de celular y lectores 2D. Cada etiqueta debe mostrar también el código textual (p. ej., `EXT-000125`) para que se pueda escribir manualmente.
@@ -44,8 +45,8 @@ La cámara puede implementarse mediante una librería compatible con el navegado
 
 ## 5. Modelo de estados
 Mantener conceptos separados:
-- Estado logístico: `EN_ALMACEN`, `ASIGNADO`, `EN_MANTENIMIENTO`, `EN_TRANSITO` (solo si el proceso lo requiere), `DADO_DE_BAJA`.
-- Condición técnica: `OPERATIVO`, `OBSERVADO`, `NO_OPERATIVO`, `PENDIENTE_INSPECCION` (catálogo ajustable).
+- Estado logístico: `EN_ALMACEN`, `ASIGNADO`, `EN_MANTENIMIENTO`, `DADO_DE_BAJA`. No existe `EN_TRANSITO` (D-09).
+- Condición técnica: `OPERATIVO`, `OBSERVADO`, `NO_OPERATIVO`, `PENDIENTE_INSPECCION` (enum fijo; D-26).
 - Ubicación: ubicación interna actual o contraparte externa.
 
 No confundir “ubicación” con “condición técnica”. Un extintor podría estar en un área y estar observado, por ejemplo.
@@ -95,3 +96,11 @@ Cada alerta muestra: extintor, ubicación, categoría de fecha, fecha objetivo, 
 - **Operaciones sensibles solo en línea:** `BAJA`, `AJUSTE`, cambio de condición y administración quedan bloqueados sin conexión.
 - **Ventana de 7 días:** pasado ese plazo sin sincronizar, se bloquean nuevas escrituras hasta reconectar; la lectura sigue disponible.
 - **Trazabilidad:** se guardan `deviceId`, la hora del hecho declarada por el dispositivo y `syncedAt`; la auditoría conserva ambos tiempos y advierte diferencias de reloj.
+
+## 11. Localización (D-30)
+
+- **Un solo idioma activo:** español (Perú); no hay selector de idioma en el MVP.
+- **Claves de traducción:** todos los textos visibles se resuelven por clave; no se escriben cadenas en los componentes.
+- **Formatos locales:** fecha `dd/mm/aaaa`, separador decimal `.` y moneda `S/`; la API transporta ISO 8601 y decimales sin formato.
+- **Zona horaria:** `America/Lima` (D-15); las fechas calendario se guardan como `DATE` y los eventos como `DATETIME(3)` en UTC.
+- **Errores:** el `code` de la API es estable y no se traduce; el `message` se muestra en español.

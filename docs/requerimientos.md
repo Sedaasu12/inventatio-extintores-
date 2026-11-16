@@ -206,7 +206,7 @@ La matriz detallada está en `docs/diseno-api.md`. Los permisos se validan siemp
 | RNF-10 | Privacidad y minimización. | Must | QR sin PII; nombres de responsables con acceso restringido; no exponer datos en logs. |
 | RNF-11 | Compatibilidad. | Must | Chrome/Edge/Safari actuales; cámara requiere HTTPS o localhost. |
 | RNF-12 | Observabilidad. | Should | Logs estructurados con request ID; health checks; sin datos sensibles. |
-| RNF-13 | Internacionalización. | Could | Español en MVP; fechas/números localizados; arquitectura preparada para i18n. |
+| RNF-13 | Internacionalización. | Should | Español (Perú) en el MVP con claves de traducción preparadas; fechas `dd/mm/aaaa`, separador decimal `.` y moneda `S/` (D-30). |
 | RNF-14 | Portabilidad de despliegue. | Should | Variables de entorno; Docker opcional; instalación local de MySQL documentada. |
 | RNF-15 | Calidad de pruebas. | Must | Unitarias de reglas, integración de transacciones y E2E de flujos principales ejecutadas. |
 | RNF-16 | Operación sin conexión. | Must | PWA con caché de lectura y borradores cifrados; sincronización idempotente y conflictos explícitos (D-14). |
@@ -256,6 +256,8 @@ La matriz detallada está en `docs/diseno-api.md`. Los permisos se validan siemp
 | RF-23 | RF-MOV-07 |
 | RF-24 | RF-MOV-16, RF-MAN-02, RF-INS-07 (archivos en segunda fase) |
 | RF-25 | RF-OFF-01..08 |
+| RF-26 | RF-MAN-10 |
+| RF-27 | RNF-13 |
 
 ---
 

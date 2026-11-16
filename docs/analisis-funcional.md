@@ -56,7 +56,7 @@ El repositorio es un **punto de partida documental**, no un proyecto iniciado. L
 
 - **No hay trabajo previo que destruir.** Los documentos existentes se conservan como línea base; los nuevos documentos los detallan y, en algunos puntos, los refinan.
 - **Hay que crear el proyecto desde cero.** La primera fase debe incluir control de versiones, versiones fijadas, lint, typecheck, pruebas y build antes de escribir reglas de negocio.
-- **Las decisiones de negocio ya resueltas permiten fijar la migración.** El alcance single-tenant (D-01), el vencimiento del equipo (D-12), los umbrales de alerta (D-11), la autorización de movimientos (D-07/D-08b), la evidencia textual (D-13), los formatos de reporte (D-19), el canal de alertas (D-20), la retención (D-21), el volumen (D-22), el despliegue con respaldo (D-23), la operación sin conexión (D-14), los movimientos individuales con selección múltiple (D-25) y los costos opcionales sin reporte financiero (D-29) están aprobados; queda abierta solo la localización (D-30).
+- **Las decisiones de negocio ya resueltas permiten fijar la migración.** El alcance single-tenant (D-01), el vencimiento del equipo (D-12), los umbrales de alerta (D-11), la autorización de movimientos (D-07/D-08b), la evidencia textual (D-13), los formatos de reporte (D-19), el canal de alertas (D-20), la retención (D-21), el volumen (D-22), el despliegue con respaldo (D-23), la operación sin conexión (D-14), los movimientos individuales con selección múltiple (D-25), los costos opcionales sin reporte financiero (D-29) y la localización en español (D-30) están aprobados. No quedan decisiones abiertas.
 
 ---
 
@@ -411,6 +411,8 @@ El detalle completo está en:
 | Selección múltiple de movimientos | Sí (movimientos individuales, D-25) | | |
 | Cabecera de lote / documento único | | Sí | |
 | PWA / offline | Sí (lectura y borradores, D-14) | | |
+| Localización español (Perú) con claves de traducción | Sí (D-30) | | |
+| Segundo idioma | | Sí | |
 | App nativa | | | Sí |
 | Integraciones IoT/ERP | | | Sí |
 | Multi-tenant | | | Sí |
@@ -439,7 +441,7 @@ El detalle completo está en:
 
 ## 9. Supuestos adoptados para continuar
 
-Se registran como supuestos explícitos; no son reglas aprobadas. El detalle y las alternativas están en `decisiones-pendientes.md`.
+Se registraron como supuestos explícitos. **Al 2026-11-14 todos quedaron aprobados** y se reflejan en los documentos; el detalle y el historial están en `decisiones-pendientes.md`.
 
 | ID | Supuesto |
 |---|---|
@@ -457,7 +459,7 @@ Se registran como supuestos explícitos; no son reglas aprobadas. El detalle y l
 | S-12 | No se permite dar de baja un activo en mantenimiento externo; primero debe retornar o resolverse con un ajuste administrativo. |
 | S-13 | Los documentos/certificados se registran como referencia textual en el MVP; no hay archivos, fotos ni firmas (D-13). |
 | S-14 | El sistema será usado por menos de 100 usuarios y hasta 10 000 extintores con 100 000 movimientos acumulados; volumen confirmado (D-22). |
-| S-15 | Interfaz en español; no se requiere i18n en el MVP. |
+| S-15 | Interfaz en español (Perú) con claves de traducción preparadas; fechas `dd/mm/aaaa`, separador decimal `.` y moneda `S/` (D-30). |
 | S-16 | Contraseñas de 12–128 caracteres, sin composición obligatoria, caducidad ni MFA en el MVP; el reset es solo administrativo (D-06b). |
 | S-17 | Un extintor `NO_OPERATIVO` no puede estar asignado a un área; solo se ubica en almacén, taller o proveedor (D-26b). |
 | S-18 | El vencimiento del equipo combina la fecha documentada del fabricante y la vida útil calculada por tipo; la categoría `EQUIPO` usa la más temprana y no se inventan fechas (D-12). |
@@ -496,11 +498,9 @@ Hechos aportados por el propietario. **No son reglas aprobadas**; el detalle y l
 
 ## 10. Decisiones que requieren respuesta antes de implementar
 
-> **Estado al 2026-11-14:** el levantamiento está cerrado y las decisiones aprobadas figuran en `docs/decisiones-pendientes.md` (§2.2 y §2.4), incluidas D-08b, D-11, D-12, D-13, D-14, D-19, D-20, D-21, D-22, D-23, D-25 y D-29. Lo que sigue son las decisiones abiertas que bloquean fases concretas.
+> **Estado al 2026-11-14:** el levantamiento está cerrado y **todas las decisiones del registro están aprobadas** (D-01 a D-31, ver `docs/decisiones-pendientes.md` §2.1, §2.2 y §2.4), incluidas D-14, D-19, D-20, D-21, D-22, D-23, D-25, D-29 y D-30. No queda ninguna decisión de negocio abierta que bloquee el diseño o la migración.
 
-1. **D-30:** idioma y localización.
-
-El detalle, la recomendación y el supuesto de cada una está en `docs/decisiones-pendientes.md`.
+El siguiente paso es cerrar el alcance de la fase 1 (esquema Prisma y migración inicial) con estas decisiones y solicitar autorización para implementarla.
 
 ---
 
@@ -521,7 +521,7 @@ El detalle, la recomendación y el supuesto de cada una está en `docs/decisione
 
 ## 12. Próximo paso
 
-1. Completar las decisiones abiertas de `decisiones-pendientes.md` (siguiente: D-30).
+1. ~~Completar las decisiones abiertas de `decisiones-pendientes.md`.~~ Cerrado el 2026-11-14: no quedan decisiones abiertas.
 2. Cerrar el alcance de la fase 1 (esquema y migración inicial) con las decisiones ya aprobadas.
 3. Autorizar la fase 1 antes de escribir módulos funcionales.
 

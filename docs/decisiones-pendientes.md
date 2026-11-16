@@ -1,8 +1,8 @@
 # Decisiones pendientes — SITE
 
-> **Estado:** las decisiones aprobadas figuran en §2.2 a §2.4. Las decisiones **abiertas** (§6) conservan una recomendación técnica y un supuesto por defecto para no bloquear el análisis, pero el propietario del proceso debe confirmarlas antes de la fase indicada.
+> **Estado:** todas las decisiones del registro están **aprobadas y aplicadas** al 2026-11-14 (§2.1, §2.2 y §2.4). No quedan decisiones abiertas ni supuestos por defecto pendientes de confirmar.
 >
-> **Regla:** si una decisión no se responde, se implementa el supuesto por defecto y se registra como supuesto, no como regla del negocio. Las decisiones que cambian el modelo de datos o la seguridad se consideran bloqueantes.
+> **Regla:** si en el futuro surge una decisión nueva, se registra aquí con recomendación, supuesto por defecto y fase bloqueada; no se implementa como regla del negocio hasta que el propietario la apruebe.
 
 ---
 
@@ -50,12 +50,13 @@ Estado al 2026-11-14. El registro formal de aprobaciones está en §2.2 a §2.4;
 | 21 | D-14 | Operación sin internet | PWA con caché de lectura y borradores confirmados al sincronizar; ventana de 7 días. | Aprobada | Fase 11 |
 | 22 | D-25 | Movimientos por lote | Selección múltiple en UI; movimientos individuales; sin cabecera de lote. | Aprobada | Fase 5/10 |
 | 23 | D-29 | Costos de mantenimiento | Costo y moneda opcionales; sin reporte financiero en el MVP. | Aprobada | Fase 6 |
+| 24 | D-30 | Idioma y localización | Español (Perú) con claves de traducción preparadas; formatos locales. | Aprobada | Fase 8/10 |
 
 ---
 
 ## 2.1 Estado tras el levantamiento de procesos (2026-11-10)
 
-Hechos declarados por el propietario; el detalle está en `docs/levantamiento-procesos.md`. **No son decisiones aprobadas.**
+Hechos declarados por el propietario; el detalle está en `docs/levantamiento-procesos.md`. La tabla es una **fotografía histórica al 2026-11-10**: todas las decisiones que aparecen aquí fueron resueltas después (ver §2.2 y §2.4).
 
 | Decisión | Hallazgo | Efecto sobre el default |
 |---|---|---|
@@ -137,6 +138,7 @@ El propietario revisó las decisiones una por una y **confirmó** las once, sin 
 | D-14 | B — PWA con lectura en caché y borradores confirmados al sincronizar; 7 días sin conexión (2026-11-14) |
 | D-25 | A + C — selección múltiple en UI; movimientos individuales; sin cabecera de lote (2026-11-14) |
 | D-29 | A — costo y moneda opcionales; sin reporte financiero en el MVP (2026-11-14) |
+| D-30 | A — español (Perú) con claves de traducción preparadas; formatos locales (2026-11-14) |
 
 ---
 
@@ -947,9 +949,16 @@ El propietario revisó las decisiones una por una y **confirmó** las once, sin 
 
 **Recomendación:** A; dejar claves de traducción preparadas si es barato.
 
-**Si no se responde:** A.
+**Decisión aprobada (2026-11-14):** opción **A** — español (Perú) con claves de traducción preparadas.
 
-**Bloquea:** no bloquea MVP. **Estado:** abierta.
+- Un solo idioma activo en el MVP: español (Perú). No hay selector de idioma ni segundo archivo de traducción obligatorio.
+- Todos los textos visibles se centralizan en claves de traducción; no se escriben cadenas directamente en los componentes.
+- Formatos locales: fecha `dd/mm/aaaa`, separador decimal `.` y moneda `S/`; la API sigue transportando ISO 8601 y decimales sin formato.
+- La zona horaria sigue siendo `America/Lima` (D-15) y las fechas calendario se almacenan como `DATE`.
+- Los `code` de error de la API son estables y no se traducen; el `message` se muestra en español.
+- Añadir otro idioma en el futuro implica cargar un archivo de traducción y probar textos, no reescribir pantallas.
+
+**Bloquea:** fase 8 (base del frontend) y fase 10 (pantallas). **Estado:** aprobada.
 
 ---
 
@@ -973,7 +982,9 @@ El propietario revisó las decisiones una por una y **confirmó** las once, sin 
 
 ---
 
-## 4. Supuestos adoptados (no son decisiones aprobadas)
+## 4. Supuestos adoptados y su decisión de origen
+
+Todos los supuestos iniciales quedaron confirmados por una decisión aprobada; la tabla conserva la trazabilidad supuesto → decisión.
 
 | ID | Supuesto | Documento relacionado |
 |---|---|---|
@@ -991,7 +1002,7 @@ El propietario revisó las decisiones una por una y **confirmó** las once, sin 
 | S-12 | No se permite baja con orden de mantenimiento activa. | D-17 |
 | S-13 | Documentos como referencia textual; sin archivos, fotos ni firmas en el MVP (D-13). | D-13 |
 | S-14 | 10 000 activos, 100 000 movimientos y <100 usuarios; confirmado por el propietario (D-22). | D-22 |
-| S-15 | Interfaz en español. | D-30 |
+| S-15 | Español (Perú) con claves de traducción preparadas; formatos locales (D-30). | D-30 |
 | S-16 | Condición técnica como enum en MVP. | D-26 |
 | S-17 | Costos opcionales, sin reporte financiero (D-29). | D-29 |
 | S-18 | Sin notificaciones por correo, WhatsApp ni SMS en el MVP; solo alertas en la aplicación (D-20). | D-20 |
@@ -1003,13 +1014,13 @@ El propietario revisó las decisiones una por una y **confirmó** las once, sin 
 | S-24 | Despliegue híbrido: app y API en nube con HTTPS; MySQL on-premise por red privada o túnel cifrado; respaldo diario cifrado con RPO 24 h / RTO 4 h. | D-23 |
 | S-25 | PWA con lectura en caché y borradores de movimientos rutinarios e inspecciones que se confirman al sincronizar; ventana de 7 días; operaciones sensibles solo en línea. | D-14 |
 
-**Tras las aprobaciones del 2026-11-10 al 2026-11-14**, S-01, S-02, S-04, S-06 a S-14, S-16 a S-25 pasan a decisiones aprobadas (ver §2.2 y §2.4). S-11 se ajusta: **no** existe mapeo automático de resultado a condición. Solo queda como supuesto S-15.
+**Tras las aprobaciones del 2026-11-10 al 2026-11-14**, todos los supuestos del registro (S-01 a S-25) pasan a decisiones aprobadas (ver §2.2 y §2.4). S-11 se ajusta: **no** existe mapeo automático de resultado a condición. No queda ningún supuesto pendiente.
 
 ---
 
-## 5. Decisiones ya propuestas (pendientes de aprobación formal)
+## 5. Decisiones técnicas de diseño de la línea base
 
-Estas decisiones se usaron para escribir los documentos, pero **no están aprobadas**:
+Son decisiones **técnicas**, no reglas de negocio, y no requieren aprobación del propietario del proceso. Se adoptaron para escribir los documentos y se confirman o ajustan en la fase donde se implementan:
 
 1. Mantener el stack Angular + NestJS + MySQL 8 + Prisma sin cambios.
 2. Usar UUID `CHAR(36)` para identificadores.
@@ -1025,9 +1036,9 @@ Estas decisiones se usaron para escribir los documentos, pero **no están aproba
 
 ## 6. Orden recomendado para responder (una por una)
 
-Para no bloquear el diseño, se propone esta secuencia. Solo figuran las decisiones **abiertas** al 2026-11-14; las aprobadas están en §2.2 y §2.4, y ya se reflejaron en los documentos. Cada respuesta se registra aquí y se refleja en el modelo/API antes de avanzar.
+Todas las decisiones del registro están **aprobadas y aplicadas** al 2026-11-14. No quedan preguntas abiertas de negocio que bloqueen el diseño ni la migración.
 
-1. **D-30:** ¿idioma y localización? (transversal)
+El siguiente paso no es otra decisión, sino **cerrar el alcance de la fase 1** (esquema Prisma y migración inicial) con las decisiones ya aprobadas y solicitar autorización para implementarla.
 
 ---
 

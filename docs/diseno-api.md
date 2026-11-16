@@ -793,6 +793,8 @@ frontend/
           has-permission.directive.ts
         pipes/
           date-display.pipe.ts
+        i18n/
+          es-PE.ts
       layout/
         app-shell/
         sidebar/
@@ -835,6 +837,8 @@ frontend/
       app.config.ts
     environments/
 ```
+
+> **Localización (D-30):** un solo idioma activo (`es-PE`); los textos viven en `shared/i18n/es-PE.ts` y se consumen por clave. Los formatos de fecha, número y moneda se resuelven en el frontend; la API no envía texto formateado.
 
 ### 9.1 Rutas principales
 
@@ -914,6 +918,7 @@ JWT_REFRESH_SECRET=<valor-local>
 ACCESS_TOKEN_TTL=15m
 REFRESH_TOKEN_TTL=7d
 APP_TIMEZONE=America/Lima
+APP_LOCALE=es-PE
 CORS_ORIGINS=http://localhost:4200
 QR_BASE_URL=
 ASSET_CODE_PREFIX=EXT-

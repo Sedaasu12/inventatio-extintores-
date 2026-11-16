@@ -674,6 +674,7 @@ Crear la aplicación Angular real, segura y accesible, conectada a la API de aut
 - Directiva `hasPermission`.
 - Componentes compartidos: tabla, paginación, chips de estado, confirmación, vacío, errores.
 - Accesibilidad base.
+- Localización base: un solo idioma `es-PE`, textos en claves de traducción y pipes de fecha/número/moneda (D-30).
 - Entorno de API por configuración.
 
 ### Archivos esperados
@@ -683,6 +684,7 @@ frontend/src/app/core/auth/
 frontend/src/app/core/api/
 frontend/src/app/core/permissions/
 frontend/src/app/shared/components/
+frontend/src/app/shared/i18n/
 frontend/src/app/layout/
 frontend/src/app/features/auth/
 frontend/src/app/app.routes.ts

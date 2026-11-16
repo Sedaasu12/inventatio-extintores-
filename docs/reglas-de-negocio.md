@@ -449,7 +449,18 @@ La API devuelve `{ error: { code, message, details?, requestId } }`. Los mensaje
 
 ---
 
-## 14. Lo que el sistema nunca debe hacer
+## 14. Presentación y localización
+
+| ID | Regla | Cumplimiento |
+|---|---|---|
+| BR-195 | La interfaz del MVP se presenta en español (Perú); no se requiere un segundo idioma (D-30 aprobada). | Textos centralizados en claves de traducción; un solo archivo de idioma activo. |
+| BR-196 | Fechas `dd/mm/aaaa`, separador decimal `.` y moneda `S/` en la presentación; los valores almacenados no cambian de formato (D-15, D-30). | Formateadores locales en el frontend; la API transporta ISO 8601 y decimales sin formato. |
+| BR-197 | Los textos visibles no se escriben directamente en los componentes: se usan claves de traducción para poder añadir otro idioma sin reescribir pantallas (D-30). | Revisión de código; sin cadenas de UI embebidas. |
+| BR-198 | Los mensajes de error de la API son claros y en español, pero el cliente decide cómo presentarlos; no se traduce el `code` estable (D-30). | `code` inmutable; `message` en español. |
+
+---
+
+## 15. Lo que el sistema nunca debe hacer
 
 - Cambiar la ubicación actual desde un formulario de edición de ficha.
 - Confirmar un movimiento sin usuario autenticado y autorizado.

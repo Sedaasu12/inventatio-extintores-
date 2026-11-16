@@ -58,6 +58,7 @@
 | P-27 | Operación sin conexión | D-14 | Respondida y aplicada |
 | P-28 | Movimientos por lote | D-25 | Respondida y aplicada |
 | P-29 | Costos de mantenimiento | D-29 | Respondida y aplicada |
+| P-30 | Idioma y localización | D-30 | Respondida y aplicada |
 
 ---
 
@@ -1036,6 +1037,33 @@
 
 ---
 
+### P-30 — Idioma y localización
+
+**Pregunta:** ¿Solo español (Perú) o varios idiomas? ¿Formatos de fecha `dd/mm/aaaa`?
+
+**Respuesta del propietario (2026-11-14):** solo español (Perú); se acepta preparar claves de traducción para no reescribir pantallas si algún día se añade otro idioma.
+
+**Lectura:**
+
+- El personal operativo es local y trabaja en español; un segundo idioma no aporta valor en el MVP y duplicaría textos, validaciones y pruebas.
+- Centralizar los textos en claves cuesta poco al inicio y evita una reescritura completa si la organización se expande.
+- Los formatos deben ser los de uso local: fecha `dd/mm/aaaa`, separador decimal `.` y moneda `S/`.
+- La zona horaria ya está fijada en `America/Lima` (D-15); la localización no la cambia.
+- Los `code` de error deben permanecer estables y sin traducir para que el cliente pueda reaccionar a ellos.
+
+**Qué NO se concluye todavía:**
+
+- Si se necesitará un segundo idioma: no se modela; añadirlo implica un nuevo archivo de traducción y pruebas de textos.
+- Si se requiere formato por sede o por usuario: no se implementa; el formato es único para toda la aplicación.
+
+**Implicaciones:** D-30 se aprueba con opción A. Se añade una sección de presentación y localización (BR-195..198), se actualiza RNF-13, se prepara `shared/i18n/es-PE.ts` y `APP_LOCALE=es-PE`, y se añaden pruebas T-UI-01..04 y PT-25.
+
+**Decisiones afectadas:** D-30 (aprobada), D-15.
+
+**Documentos actualizados:** este registro (P-30, H-36), `decisiones-pendientes.md`, `reglas-de-negocio.md` (BR-195..198), `requerimientos.md` (RNF-13), `01-requerimientos.md` (RNF-14), `02-arquitectura.md` (§3, §11), `diseno-api.md` (§9, §11), `plan-de-pruebas.md` (§8.1), `04-flujos-y-pruebas.md` (PT-25), `plan-implementacion.md` (fase 8) y `analisis-funcional.md`.
+
+---
+
 ## 4. Contradicciones y hallazgos
 
 | ID | Hallazgo | Efecto |
@@ -1075,9 +1103,10 @@
 | H-33 | No estaba definido si la operación debía continuar sin internet. | D-14: PWA con lectura en caché y borradores confirmados al sincronizar; operaciones sensibles solo en línea; ventana de 7 días. |
 | H-34 | Se mueven varios extintores a la vez, pero no estaba definido si se necesitaba una cabecera de lote. | D-25: selección múltiple en la interfaz con un movimiento individual por activo; sin tablas de lote. |
 | H-35 | No estaba definido si el sistema debía registrar costos de mantenimiento. | D-29: costo y moneda opcionales; sin reporte financiero en el MVP. |
+| H-36 | No estaba definido el idioma ni los formatos locales del producto. | D-30: español (Perú) con claves de traducción preparadas; fechas `dd/mm/aaaa`, decimal `.` y moneda `S/`. |
 
 ---
 
 ## 5. Próxima pregunta
 
-Levantamiento cerrado el 2026-11-10 y ampliado con D-02, D-06, D-06b, D-08b, D-11, D-12, D-13, D-14, D-19, D-20, D-21, D-22, D-23, D-25, D-26, D-26b, D-27, D-28 y D-29. No quedan preguntas de ubicaciones, identidad, política de acceso, condición técnica, inspecciones, vencimiento del equipo, umbrales de alerta, aprobación de operaciones sensibles, adjuntos, formatos de reporte, canal de notificaciones, retención, volumen, despliegue, operación sin conexión, movimientos por lote ni costos pendientes. La siguiente decisión abierta es **D-30 (idioma y localización)**. No se inicia implementación funcional sin aprobación.
+Levantamiento cerrado el 2026-11-10 y ampliado con D-02, D-06, D-06b, D-08b, D-11, D-12, D-13, D-14, D-19, D-20, D-21, D-22, D-23, D-25, D-26, D-26b, D-27, D-28, D-29 y D-30. **No quedan preguntas abiertas:** ubicaciones, identidad, política de acceso, condición técnica, inspecciones, vencimiento del equipo, umbrales de alerta, aprobación de operaciones sensibles, adjuntos, formatos de reporte, canal de notificaciones, retención, volumen, despliegue, operación sin conexión, movimientos por lote, costos e idioma están decididos. El siguiente paso es cerrar el alcance de la fase 1 (esquema Prisma y migración inicial) y solicitar autorización. No se inicia implementación funcional sin aprobación.
