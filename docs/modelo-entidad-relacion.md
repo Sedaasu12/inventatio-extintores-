@@ -537,8 +537,8 @@ Sin `updated_at`: es inmutable. `asset_sequence` refleja el orden de inserción;
 | `certificate_no` | `VARCHAR(100)` | Sí | Documento/certificado. |
 | `certificate_date` | `DATE` | Sí | |
 | `next_due_date` | `DATE` | Sí | Indicada, no calculada; debe ser posterior a `performed_at`. |
-| `cost` | `DECIMAL(12,2)` | Sí | Opcional. |
-| `currency` | `CHAR(3)` | Sí | Default `PEN` si hay costo. |
+| `cost` | `DECIMAL(12,2)` | Sí | Opcional; ≥ 0. Si es nulo, `currency` también (D-29). |
+| `currency` | `CHAR(3)` | Sí | ISO 4217; default `PEN` cuando hay costo. Sin reporte financiero en el MVP (D-29). |
 | `notes` | `TEXT` | Sí | |
 | `document_ref` | `VARCHAR(100)` | Sí | |
 | `corrects_id` | `CHAR(36)` | Sí | FK `maintenance_services.id`. |
@@ -700,6 +700,8 @@ No se siembran valores de días por defecto. La instalación crea las filas con 
 | C-15 | Una orden de mantenimiento es interna o externa, no ambas | `CHECK ((provider_id IS NULL) <> (workshop_location_id IS NULL))` |
 | C-16 | Jerarquía de ubicaciones de máximo dos niveles | Validación de servicio: `SEDE` con `parent_id` nulo; `ALMACEN`, `TALLER` y `AREA` con padre de tipo `SEDE`; prohibido anidar hijos. |
 | C-17 | Nombre de ubicación único dentro de su sede | `UNIQUE(parent_id, name)` para hijas; validación de servicio para sedes (varios `NULL` no se comparan en MySQL). Sin distinguir mayúsculas por la colación. |
+| C-18 | Costo no negativo | `CHECK (cost IS NULL OR cost >= 0)` en `maintenance_services`. |
+| C-19 | Moneda coherente con el costo | `CHECK ((cost IS NULL AND currency IS NULL) OR (cost IS NOT NULL AND currency IS NOT NULL))`; validación ISO 4217 en servicio (D-29). |
 
 > MySQL no permite `CHECK` con subconsultas (por ejemplo, validar que la ubicación sea de tipo `ALMACEN`). Esa coherencia se valida en el servicio y se cubre con pruebas de integración; opcionalmente se puede añadir un trigger, que debe documentarse y probarse.
 
@@ -779,6 +781,7 @@ Con 10 000 activos y 100 000 movimientos, los listados deben paginarse y filtrar
 | Se agrega `entry_source` a `movements`. | Explica por qué un equipo aparece en una ubicación sin pasar por almacén (D-03). |
 | Se agrega `TALLER` a `LocationType` y `workshop_location_id` a `maintenance_orders`. | Permite mantenimiento en taller propio sin simular un proveedor externo (D-31). `provider_id` pasa a nullable con `CHECK` de exclusividad. |
 | `movement_batches` no se incluye. | Un movimiento por activo; la selección múltiple de la interfaz no crea lote (D-25 aprobada). La cabecera de lote con documento único queda para fase 2. |
+| `maintenance_services.cost`/`currency` se mantienen opcionales. | Se registran solo si se informan; sin reporte financiero en el MVP (D-29). |
 
 ---
 

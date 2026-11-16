@@ -29,6 +29,7 @@
 | RF-23 | Registrar baja con motivo, fecha y autorización. | Must |
 | RF-24 | Adjuntar fotos, actas o constancias a movimientos y servicios. | Could | Fuera del MVP: solo referencia textual (D-13); archivos en fase posterior. |
 | RF-25 | Operar sin conexión: consultar en caché y preparar borradores de movimientos rutinarios e inspecciones que se confirman al sincronizar. | Must | Borradores no confirmados; operaciones sensibles solo en línea; ventana de 7 días (D-14). |
+| RF-26 | Registrar costo y moneda del servicio de mantenimiento de forma opcional. | Should | `cost` ≥ 0 y `currency` ISO 4217 cuando se informan; sin reporte financiero en el MVP (D-29). |
 
 ## 2. Requerimientos no funcionales
 - RNF-01 Seguridad: autenticación, autorización por rol y validación en backend.

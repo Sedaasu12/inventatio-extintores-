@@ -221,14 +221,18 @@ Estructura D-02: `SEDE` es la raíz; `ALMACEN`, `TALLER` y `AREA` son hijos. Los
 | T-MAN-06 | Integración | Servicio sin `next_due_date` | Elimina la fecha objetivo de esa categoría; `SIN_FECHA_CONFIGURADA`. | BR-088 |
 | T-MAN-07 | Integración | Servicio retroactivo anterior | No reemplaza la fecha objetivo vigente. | BR-111 |
 | T-MAN-08 | Integración | Servicio posterior | Reemplaza la fecha objetivo. | BR-112 |
-| T-MAN-09 | Integración | Retorno con servicio aprobado | Orden cerrada; movimiento de retorno; estado según destino; condición `OPERATIVO`. | RF-MAN-05 |
-| T-MAN-10 | Integración | Retorno con resultado `RECHAZADO` | Condición `NO_OPERATIVO`; orden cerrada; historial. | RF-MAN-05 |
+| T-MAN-09 | Integración | Retorno con servicio aprobado | Orden cerrada; movimiento de retorno; estado según destino; la condición no cambia por el resultado (D-10). | RF-MAN-05 |
+| T-MAN-10 | Integración | Retorno con resultado `RECHAZADO` | Orden cerrada; historial; la condición no cambia automáticamente; el cambio exige D-27. | RF-MAN-05 / D-10 |
 | T-MAN-11 | Integración | Retorno con proveedor distinto | 409; no cierra. | BR-067 |
 | T-MAN-12 | Integración | Retorno antes del envío/servicio | 422. | BR-091 |
 | T-MAN-13 | Integración | Servicio interno sin orden | 201; actualiza fechas; auditoría. | RF-MAN-03 |
 | T-MAN-14 | Integración | Orden cerrada recibe servicio/retorno | 409. | RF-MAN-09 |
 | T-MAN-15 | Unitario | El resultado del servicio no altera la condición | Tras un servicio aprobado o rechazado, la condición permanece; el cambio explícito sí queda auditado | RF-MAN-05 / BR-089 |
 | T-MAN-16 | Unitario | Servicio a las 02:00 UTC (21:00 local) con próxima fecha al día siguiente local | `performed_on` es la fecha local correcta; `next_due_date` válida. | BR-113 |
+| T-MAN-17 | Integración | Servicio con costo 150.00 y moneda `PEN` | Se guarda el costo; se muestra en la ficha y el detalle; no hay totales ni reporte financiero | D-29 / BR-095 |
+| T-MAN-18 | Integración | Servicio con costo negativo o moneda de 2 letras | 422; no se crea el servicio | D-29 / BR-095 |
+| T-MAN-19 | Integración | Servicio sin costo pero con moneda, o con costo y sin moneda | 422; costo y moneda son coherentes o ambos nulos | D-29 / BR-096 |
+| T-MAN-20 | Integración | Consultar `/reports/maintenance` con costos registrados | Muestra el costo por servicio; no existe endpoint de totales ni exportación financiera | D-29 / BR-097 |
 
 ### 4.7 Inspecciones
 

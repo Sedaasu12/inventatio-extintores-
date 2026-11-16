@@ -210,6 +210,9 @@ stateDiagram-v2
 | BR-092 | Una orden cancelada no puede tener retorno; la cancelación es excepcional y auditada. | Estado `CANCELADA`; fase 2. |
 | BR-093 | `opened_at` coincide con la fecha del movimiento de envío y `closed_at` con la del retorno. | Servicio transaccional; prueba. |
 | BR-094 | El taller propio es una ubicación de tipo `TALLER`; el envío y el retorno a taller son movimientos entre ubicaciones internas (D-31 aprobada). | Enum `LocationType`; validación; reportes. |
+| BR-095 | El costo del servicio es opcional; si se informa, debe ser ≥ 0 y llevar moneda ISO 4217 (por defecto `PEN`) (D-29 aprobada). | `CHECK` en `maintenance_services`; validación de DTO. |
+| BR-096 | Si no se informa costo, la moneda queda nula; no se completa un importe supuesto ni se hereda de otro servicio (D-29). | Validación de servicio; sin valores por defecto de importe. |
+| BR-097 | El costo es un dato de consulta: el MVP no calcula totales, gastos por proveedor ni reportes financieros, y no se usa para alertas (D-29). | Sin endpoints de reporte de costos; sin cálculos agregados. |
 
 ---
 

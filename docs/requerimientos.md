@@ -106,7 +106,7 @@ La matriz detallada está en `docs/diseno-api.md`. Los permisos se validan siemp
 | RF-MAN-07 | Consultar órdenes abiertas y retornos pendientes. | Must | Listado filtrable por proveedor, estado y fecha prevista; no se confunde con alertas técnicas. |
 | RF-MAN-08 | Impedir una segunda orden activa para el mismo activo. | Must | Restricción en base de datos y validación de servicio; 409 al intentar duplicar. |
 | RF-MAN-09 | Conservar orden, servicios y movimientos aunque se corrija un error. | Must | Corrección mediante nuevo registro/ajuste; no borrado físico. |
-| RF-MAN-10 | Registrar costos y moneda cuando se conozcan. | Could | Campos opcionales; no bloquean el flujo; reporte de costos en segunda fase. |
+| RF-MAN-10 | Registrar costo y moneda del servicio de forma opcional. | Should | `cost` ≥ 0 y `currency` ISO 4217 cuando se informan; si no hay costo, moneda nula; sin reporte financiero en el MVP (D-29). |
 
 ### 2.6 Inspecciones
 
@@ -243,7 +243,7 @@ La matriz detallada está en `docs/diseno-api.md`. Los permisos se validan siemp
 | RF-10 | RF-EXT-05, RF-MOV-09 |
 | RF-11 | RF-MOV-11, RF-MOV-15 |
 | RF-12 | RF-INS-01..08 |
-| RF-13 | RF-MAN-02..06 |
+| RF-13 | RF-MAN-02..06, RF-MAN-10 |
 | RF-14 | RF-MAN-02, RF-INS-07 |
 | RF-15 | RF-ALE-01..10 |
 | RF-16 | RF-DASH-01..05 |

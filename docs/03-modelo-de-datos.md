@@ -41,6 +41,7 @@ Este es un modelo lógico de partida. Debe revisarse antes de generar la migraci
 - No modelar tablas de archivo histórico ni jobs de purga: la retención es indefinida en el MVP (D-21).
 - No modelar una tabla de borradores offline en el servidor: los borradores viven cifrados en el dispositivo y solo se persisten al confirmarse, con `client_uuid`, `capture_mode`, `device_id` y `synced_at` (D-14).
 - No modelar cabecera de lote ni tabla de ítems de lote: la selección múltiple de la interfaz genera un movimiento por activo (D-25).
+- Mantener `cost` y `currency` opcionales en el servicio y no modelar tablas de gasto, centros de costo ni conciliación contable: el MVP no genera reportes financieros (D-29).
 
 ## Nota de diseño importante
 La ubicación actual puede guardarse en `extinguishers.current_location_id` para consultas rápidas, pero esa columna es una proyección del último movimiento confirmado. Solo el servicio de movimientos puede modificarla y debe hacerlo dentro de la misma transacción que inserta el movimiento. Para destinos externos, usa un campo/relación explícito que permita identificar la contraparte y estado externo; no simules que el activo está en un almacén interno.

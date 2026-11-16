@@ -513,7 +513,7 @@ Cubrir el ciclo técnico: envío/retorno de mantenimiento, servicios, inspeccion
 ### Dependencias
 
 - Fase 5.
-- D-10 (condición, aprobada), D-13 (evidencia textual, aprobada: sin archivos), D-18 (documentos), D-28 (inspección/condición, aprobada: sin cambio automático).
+- D-10 (condición, aprobada), D-13 (evidencia textual, aprobada: sin archivos), D-18 (documentos), D-28 (inspección/condición, aprobada: sin cambio automático), D-29 (costos opcionales, aprobada).
 
 ### Alcance
 
@@ -525,7 +525,8 @@ Cubrir el ciclo técnico: envío/retorno de mantenimiento, servicios, inspeccion
 - Inspecciones.
 - Idempotencia en servicios e inspecciones.
 - Proyección `due_dates` con comparación por fecha de evento.
-- Mapeo de condición técnica según resultado.
+- Resultado del servicio como evidencia; sin mapeo automático a condición (D-10/D-28).
+- Costo y moneda opcionales en el servicio, sin reporte financiero (D-29).
 - Endpoints de consulta.
 
 ### Archivos esperados

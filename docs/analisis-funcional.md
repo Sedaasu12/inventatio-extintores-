@@ -56,7 +56,7 @@ El repositorio es un **punto de partida documental**, no un proyecto iniciado. L
 
 - **No hay trabajo previo que destruir.** Los documentos existentes se conservan como línea base; los nuevos documentos los detallan y, en algunos puntos, los refinan.
 - **Hay que crear el proyecto desde cero.** La primera fase debe incluir control de versiones, versiones fijadas, lint, typecheck, pruebas y build antes de escribir reglas de negocio.
-- **Las decisiones de negocio ya resueltas permiten fijar la migración.** El alcance single-tenant (D-01), el vencimiento del equipo (D-12), los umbrales de alerta (D-11), la autorización de movimientos (D-07/D-08b), la evidencia textual (D-13), los formatos de reporte (D-19), el canal de alertas (D-20), la retención (D-21), el volumen (D-22), el despliegue con respaldo (D-23), la operación sin conexión (D-14) y los movimientos individuales con selección múltiple (D-25) están aprobados; quedan decisiones abiertas que no cambian el núcleo del modelo (costos e idioma).
+- **Las decisiones de negocio ya resueltas permiten fijar la migración.** El alcance single-tenant (D-01), el vencimiento del equipo (D-12), los umbrales de alerta (D-11), la autorización de movimientos (D-07/D-08b), la evidencia textual (D-13), los formatos de reporte (D-19), el canal de alertas (D-20), la retención (D-21), el volumen (D-22), el despliegue con respaldo (D-23), la operación sin conexión (D-14), los movimientos individuales con selección múltiple (D-25) y los costos opcionales sin reporte financiero (D-29) están aprobados; queda abierta solo la localización (D-30).
 
 ---
 
@@ -252,7 +252,7 @@ Cada flujo indica disparador, actor, precondiciones, pasos, validaciones, result
 
 **Pasos:**
 
-1. Registrar el/los servicios realizados: tipo, fecha, resultado, certificado/documento, próxima fecha indicada y observaciones.
+1. Registrar el/los servicios realizados: tipo, fecha, resultado, certificado/documento, próxima fecha indicada, costo y moneda si se conocen, y observaciones.
 2. Elegir “Registrar retorno”; indicar ubicación interna destino (almacén o área), recibido por, fecha, motivo, documento y notas.
 3. El backend valida que la orden esté abierta, que exista al menos un servicio y que la fecha de retorno no sea anterior al envío/servicio.
 4. En una transacción: inserta `RETORNO_MANTENIMIENTO`, actualiza la colocación interna y el estado (`EN_ALMACEN` o `ASIGNADO`), cierra la orden y recalcula las fechas objetivo de mantenimiento/recarga/prueba. **No** cambia la condición técnica: el resultado del servicio es evidencia (D-10).
@@ -261,6 +261,8 @@ Cada flujo indica disparador, actor, precondiciones, pasos, validaciones, result
 **Condición técnica tras el servicio:** el resultado (`APROBADO`, `APROBADO_CON_OBSERVACIONES`, `RECHAZADO`) queda como evidencia. Si se requiere cambiar la condición, se usa la acción explícita `POST /extinguishers/:id/condition`, con motivo y auditoría (D-10, BR-089).
 
 **Excepciones:** retorno sin servicio (422), orden inexistente/cerrada (409), proveedor distinto (409), fecha inválida (422).
+
+**Costo (D-29):** el costo y la moneda son opcionales y se guardan solo si se informan; no generan totales, reportes de gasto ni alertas. El costo no bloquea el retorno ni el cierre de la orden.
 
 ### 5.7 Inspección
 
@@ -396,6 +398,8 @@ El detalle completo está en:
 | Ingreso, salida, traslado, retorno | Sí | | |
 | Mantenimiento externo y retorno | Sí | | |
 | Inspecciones y servicios | Sí | | |
+| Costo y moneda del servicio (opcional) | Sí (sin reporte financiero, D-29) | | |
+| Reportes de gasto por proveedor/periodo | | Sí | |
 | Fechas separadas y alertas | Sí | | |
 | Historial y auditoría | Sí | | |
 | Dashboard y reportes básicos | Sí | | |
@@ -463,6 +467,7 @@ Se registran como supuestos explícitos; no son reglas aprobadas. El detalle y l
 | S-22 | El historial y la auditoría se conservan indefinidamente en el MVP; no hay purga, archivo ni anonimización (D-21). |
 | S-23 | App y API en nube con HTTPS; MySQL on-premise por red privada o túnel cifrado; respaldo diario cifrado con RPO 24 h / RTO 4 h (D-23). |
 | S-24 | PWA con lectura en caché y borradores de movimientos rutinarios e inspecciones que se confirman al sincronizar; operaciones sensibles solo en línea; ventana de 7 días (D-14). |
+| S-25 | El costo y la moneda del servicio son opcionales; el MVP no genera reportes financieros (D-29). |
 
 ### 9.1 Realidad operativa declarada (levantamiento 2026-11-10; precisión D-02 el 2026-11-11)
 
@@ -491,9 +496,9 @@ Hechos aportados por el propietario. **No son reglas aprobadas**; el detalle y l
 
 ## 10. Decisiones que requieren respuesta antes de implementar
 
-> **Estado al 2026-11-14:** el levantamiento está cerrado y las decisiones aprobadas figuran en `docs/decisiones-pendientes.md` (§2.2 y §2.4), incluidas D-08b, D-11, D-12, D-13, D-14, D-19, D-20, D-21, D-22, D-23 y D-25. Lo que sigue son las decisiones abiertas que bloquean fases concretas.
+> **Estado al 2026-11-14:** el levantamiento está cerrado y las decisiones aprobadas figuran en `docs/decisiones-pendientes.md` (§2.2 y §2.4), incluidas D-08b, D-11, D-12, D-13, D-14, D-19, D-20, D-21, D-22, D-23, D-25 y D-29. Lo que sigue son las decisiones abiertas que bloquean fases concretas.
 
-1. **D-29/D-30:** costos e idioma.
+1. **D-30:** idioma y localización.
 
 El detalle, la recomendación y el supuesto de cada una está en `docs/decisiones-pendientes.md`.
 
@@ -516,7 +521,7 @@ El detalle, la recomendación y el supuesto de cada una está en `docs/decisione
 
 ## 12. Próximo paso
 
-1. Completar las decisiones abiertas de `decisiones-pendientes.md` (siguiente: D-29 y D-30).
+1. Completar las decisiones abiertas de `decisiones-pendientes.md` (siguiente: D-30).
 2. Cerrar el alcance de la fase 1 (esquema y migración inicial) con las decisiones ya aprobadas.
 3. Autorizar la fase 1 antes de escribir módulos funcionales.
 

@@ -65,6 +65,7 @@
 | PT-21 | Entrar por HTTP sin TLS o restaurar el respaldo diario | El acceso se fuerza a HTTPS; la restauración cumple RPO 24 h / RTO 4 h (D-23). |
 | PT-22 | Preparar un movimiento sin red y sincronizar | El borrador no cambia la ubicación hasta confirmarse; si el origen cambió, se rechaza como conflicto (D-14). |
 | PT-23 | Seleccionar varios extintores y confirmar un traslado | Se crea un movimiento por activo; si uno tiene origen inválido, los demás se confirman y el resultado se muestra por equipo (D-25). |
+| PT-24 | Registrar un servicio con costo opcional | Se guarda importe y moneda; no hay totales ni reporte financiero; sin costo, la moneda queda nula (D-29). |
 
 ## 7. Cierre de cada entrega
 - Migración ejecutada desde una base vacía.

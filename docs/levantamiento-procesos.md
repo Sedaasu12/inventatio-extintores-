@@ -57,6 +57,7 @@
 | P-26 | Despliegue y respaldo | D-23 | Respondida y aplicada |
 | P-27 | Operación sin conexión | D-14 | Respondida y aplicada |
 | P-28 | Movimientos por lote | D-25 | Respondida y aplicada |
+| P-29 | Costos de mantenimiento | D-29 | Respondida y aplicada |
 
 ---
 
@@ -1009,6 +1010,32 @@
 
 ---
 
+### P-29 — Costos de mantenimiento
+
+**Pregunta:** ¿Se requiere costo, moneda, proveedor y reporte de gastos?
+
+**Respuesta del propietario (2026-11-14):** se registran costo y moneda de forma opcional; no se necesita reporte financiero en el MVP.
+
+**Lectura:**
+
+- El costo ayuda a consultar cuánto costó un servicio, pero no forma parte de la trazabilidad física ni de las alertas.
+- Guardarlo como campo opcional evita dos extremos: perder el dato y convertirlo en un módulo contable.
+- Sin reporte financiero no se añaden permisos, totales ni exportaciones que obliguen a conciliar con contabilidad.
+- La moneda debe ser coherente con el importe: si no hay costo, no se inventa moneda.
+
+**Qué NO se concluye todavía:**
+
+- Si la organización exigirá reportes de gasto por proveedor, sede o periodo: queda en el backlog de segunda fase.
+- Si se necesita tipo de cambio o multimoneda: no se modela en el MVP; se registra el código ISO de la moneda informada.
+
+**Implicaciones:** D-29 se aprueba con opción A. Se mantienen `cost` y `currency` opcionales con `CHECK` de coherencia, se añaden BR-095..097, RF-MAN-10 y pruebas T-MAN-17..20.
+
+**Decisiones afectadas:** D-29 (aprobada), D-19.
+
+**Documentos actualizados:** este registro (P-29, H-35), `decisiones-pendientes.md`, `reglas-de-negocio.md` (BR-095..097), `modelo-entidad-relacion.md` (§4.9, §5.1, §8), `03-modelo-de-datos.md`, `diseno-api.md` (§4.7, §5.4), `requerimientos.md` (RF-MAN-10), `04-flujos-y-pruebas.md` (PT-24), `plan-de-pruebas.md` (T-MAN-17..20), `plan-implementacion.md` (fase 6), `analisis-funcional.md` y `01-requerimientos.md`.
+
+---
+
 ## 4. Contradicciones y hallazgos
 
 | ID | Hallazgo | Efecto |
@@ -1047,9 +1074,10 @@
 | H-32 | No estaba definido dónde desplegar ni qué pérdida de datos y tiempo de recuperación se aceptan. | D-23: híbrido (app en nube + MySQL on-premise), HTTPS, red privada/túnel y RPO 24 h / RTO 4 h. |
 | H-33 | No estaba definido si la operación debía continuar sin internet. | D-14: PWA con lectura en caché y borradores confirmados al sincronizar; operaciones sensibles solo en línea; ventana de 7 días. |
 | H-34 | Se mueven varios extintores a la vez, pero no estaba definido si se necesitaba una cabecera de lote. | D-25: selección múltiple en la interfaz con un movimiento individual por activo; sin tablas de lote. |
+| H-35 | No estaba definido si el sistema debía registrar costos de mantenimiento. | D-29: costo y moneda opcionales; sin reporte financiero en el MVP. |
 
 ---
 
 ## 5. Próxima pregunta
 
-Levantamiento cerrado el 2026-11-10 y ampliado con D-02, D-06, D-06b, D-08b, D-11, D-12, D-13, D-14, D-19, D-20, D-21, D-22, D-23, D-25, D-26, D-26b, D-27 y D-28. No quedan preguntas de ubicaciones, identidad, política de acceso, condición técnica, inspecciones, vencimiento del equipo, umbrales de alerta, aprobación de operaciones sensibles, adjuntos, formatos de reporte, canal de notificaciones, retención, volumen, despliegue, operación sin conexión ni movimientos por lote pendientes. La siguiente decisión abierta por impacto es **D-29 (costos)**, seguida de **D-30 (idioma)**. No se inicia implementación funcional sin aprobación.
+Levantamiento cerrado el 2026-11-10 y ampliado con D-02, D-06, D-06b, D-08b, D-11, D-12, D-13, D-14, D-19, D-20, D-21, D-22, D-23, D-25, D-26, D-26b, D-27, D-28 y D-29. No quedan preguntas de ubicaciones, identidad, política de acceso, condición técnica, inspecciones, vencimiento del equipo, umbrales de alerta, aprobación de operaciones sensibles, adjuntos, formatos de reporte, canal de notificaciones, retención, volumen, despliegue, operación sin conexión, movimientos por lote ni costos pendientes. La siguiente decisión abierta es **D-30 (idioma y localización)**. No se inicia implementación funcional sin aprobación.

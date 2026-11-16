@@ -495,6 +495,8 @@ GET /api/v1/alerts?eventType=INSPECCION&status=POR_VENCER&page=1&pageSize=20
 
 Todos los reportes usan filtros de servidor y paginación; los totales se calculan en SQL, no en el cliente. La consulta devuelve JSON y la exportación CSV usa los mismos filtros; no se generan ni almacenan archivos persistentes (D-19).
 
+> **Sin reporte financiero (D-29):** `/reports/maintenance` puede mostrar el costo de cada servicio, pero el MVP no expone totales de gasto, comparativas por proveedor ni exportación financiera. El costo es un dato opcional de consulta.
+
 ### 4.8 Auditoría y salud
 
 | Método | Ruta | Permiso | Descripción |
@@ -613,7 +615,7 @@ Al cambiar `usefulLifeYears`, el servidor recalcula la fecha objetivo `EQUIPO` d
 - `checklist` JSON con tamaño máximo (ej. 20 KB) y estructura validada por esquema.
 - `result` enum estricto.
 - `providerId` obligatorio si el servicio es externo; `workshopLocationId` y `performedByUserId` si es interno (D-31).
-- `cost` ≥ 0; `currency` ISO 4217 de 3 letras.
+- `cost` opcional y ≥ 0; `currency` ISO 4217 de 3 letras, obligatoria si hay costo y nula si no lo hay (D-29).
 
 ---
 

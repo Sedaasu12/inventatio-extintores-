@@ -49,6 +49,7 @@ Estado al 2026-11-14. El registro formal de aprobaciones está en §2.2 a §2.4;
 | 20 | D-23 | Despliegue y respaldo | Híbrido: app en nube + MySQL propio; RPO 24 h / RTO 4 h. | Aprobada | Fase 12 |
 | 21 | D-14 | Operación sin internet | PWA con caché de lectura y borradores confirmados al sincronizar; ventana de 7 días. | Aprobada | Fase 11 |
 | 22 | D-25 | Movimientos por lote | Selección múltiple en UI; movimientos individuales; sin cabecera de lote. | Aprobada | Fase 5/10 |
+| 23 | D-29 | Costos de mantenimiento | Costo y moneda opcionales; sin reporte financiero en el MVP. | Aprobada | Fase 6 |
 
 ---
 
@@ -135,6 +136,7 @@ El propietario revisó las decisiones una por una y **confirmó** las once, sin 
 | D-23 | C — híbrido: app en nube + MySQL propio; RPO 24 h / RTO 4 h (2026-11-14) |
 | D-14 | B — PWA con lectura en caché y borradores confirmados al sincronizar; 7 días sin conexión (2026-11-14) |
 | D-25 | A + C — selección múltiple en UI; movimientos individuales; sin cabecera de lote (2026-11-14) |
+| D-29 | A — costo y moneda opcionales; sin reporte financiero en el MVP (2026-11-14) |
 
 ---
 
@@ -920,9 +922,15 @@ El propietario revisó las decisiones una por una y **confirmó** las once, sin 
 
 **Recomendación:** A.
 
-**Si no se responde:** A.
+**Decisión aprobada (2026-11-14):** opción **A** — costo y moneda opcionales, sin reporte financiero en el MVP.
 
-**Bloquea:** no bloquea MVP. **Estado:** abierta.
+- `maintenance_services.cost` (`DECIMAL(12,2)`, nulo permitido) y `maintenance_services.currency` (`CHAR(3)`, ISO 4217) se registran solo si el usuario los informa.
+- Si `cost` es nulo, `currency` también debe ser nulo; si hay costo, la moneda por defecto es `PEN` y debe ser un código ISO 4217 válido.
+- El costo es un dato de consulta en la ficha y el detalle del servicio; **no** genera totales, reportes de gasto, comparativas por proveedor ni exportación financiera.
+- No se añaden permisos nuevos: el costo se registra con `maintenance.manage` y se consulta con `maintenance.read`.
+- Los reportes de costo quedan en el backlog de segunda fase; si se implementan, requerirán su propia decisión y permisos.
+
+**Bloquea:** fase 6 (campos del servicio). **Estado:** aprobada.
 
 ---
 
@@ -985,7 +993,7 @@ El propietario revisó las decisiones una por una y **confirmó** las once, sin 
 | S-14 | 10 000 activos, 100 000 movimientos y <100 usuarios; confirmado por el propietario (D-22). | D-22 |
 | S-15 | Interfaz en español. | D-30 |
 | S-16 | Condición técnica como enum en MVP. | D-26 |
-| S-17 | Costos opcionales, sin reporte financiero. | D-29 |
+| S-17 | Costos opcionales, sin reporte financiero (D-29). | D-29 |
 | S-18 | Sin notificaciones por correo, WhatsApp ni SMS en el MVP; solo alertas en la aplicación (D-20). | D-20 |
 | S-19 | Retención indefinida por defecto; sin borrado ni anonimización programada en el MVP (D-21). | D-21 |
 | S-20 | Un solo `ADMIN` puede ajustar; Seguridad puede baja/condición. | D-07/D-27 |
@@ -995,7 +1003,7 @@ El propietario revisó las decisiones una por una y **confirmó** las once, sin 
 | S-24 | Despliegue híbrido: app y API en nube con HTTPS; MySQL on-premise por red privada o túnel cifrado; respaldo diario cifrado con RPO 24 h / RTO 4 h. | D-23 |
 | S-25 | PWA con lectura en caché y borradores de movimientos rutinarios e inspecciones que se confirman al sincronizar; ventana de 7 días; operaciones sensibles solo en línea. | D-14 |
 
-**Tras las aprobaciones del 2026-11-10 al 2026-11-14**, S-01, S-02, S-04, S-06 a S-14, S-16, S-18 a S-25 pasan a decisiones aprobadas (ver §2.2 y §2.4). S-11 se ajusta: **no** existe mapeo automático de resultado a condición. Siguen como supuesto S-15 y S-17.
+**Tras las aprobaciones del 2026-11-10 al 2026-11-14**, S-01, S-02, S-04, S-06 a S-14, S-16 a S-25 pasan a decisiones aprobadas (ver §2.2 y §2.4). S-11 se ajusta: **no** existe mapeo automático de resultado a condición. Solo queda como supuesto S-15.
 
 ---
 
@@ -1019,8 +1027,7 @@ Estas decisiones se usaron para escribir los documentos, pero **no están aproba
 
 Para no bloquear el diseño, se propone esta secuencia. Solo figuran las decisiones **abiertas** al 2026-11-14; las aprobadas están en §2.2 y §2.4, y ya se reflejaron en los documentos. Cada respuesta se registra aquí y se refleja en el modelo/API antes de avanzar.
 
-1. **D-29:** ¿se registran costos de mantenimiento? (fase 6)
-2. **D-30:** ¿idioma y localización? (transversal)
+1. **D-30:** ¿idioma y localización? (transversal)
 
 ---
 
