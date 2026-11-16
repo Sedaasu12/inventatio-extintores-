@@ -158,12 +158,12 @@ Materializar el ERD aprobado en Prisma/MySQL, con restricciones, índices y dato
 ### Dependencias
 
 - Fase 0.
-- D-01 (single/multi-tenant), D-02 (ubicaciones, aprobada), D-15 (zona horaria), D-26 (enum de condición, aprobada).
+- D-01 (single/multi-tenant), D-02 (ubicaciones, aprobada), D-14 (dispositivos y captura offline, aprobada), D-15 (zona horaria), D-22 (índices por volumen), D-25 (sin tablas de lote), D-26 (enum de condición, aprobada), D-29 (costos opcionales), D-31 (taller interno).
 
 ### Alcance
 
-- `schema.prisma` con todas las entidades del MVP: usuarios, roles, permisos, refresh tokens, idempotencia, ubicaciones, tipos, proveedores, extintores, movimientos, órdenes, servicios, inspecciones, fechas objetivo, umbrales, auditoría, contadores.
-- Cambios aprobados a incluir: `LocationType` del MVP reducido a `SEDE`, `ALMACEN`, `AREA` y `TALLER`; dos niveles con nombre único por sede (D-02); `movements.entry_source`, `maintenance_orders.provider_id` nullable + `workshop_location_id` con `CHECK` de exclusividad (D-31).
+- `schema.prisma` con todas las entidades del MVP: usuarios, roles, permisos, refresh tokens, idempotencia, dispositivos, ubicaciones, tipos, proveedores, extintores, movimientos, órdenes, servicios, inspecciones, fechas objetivo, umbrales, auditoría, contadores.
+- Cambios aprobados a incluir: `LocationType` del MVP reducido a `SEDE`, `ALMACEN`, `AREA` y `TALLER`; dos niveles con nombre único por sede (D-02); `movements.entry_source`, `maintenance_orders.provider_id` nullable + `workshop_location_id` con `CHECK` de exclusividad (D-31); `maintenance_services.cost`/`currency` opcionales con `CHECK` de coherencia (D-29); `devices` y campos `client_uuid`, `capture_mode`, `device_id`, `synced_at` (D-14); sin tablas de lote (D-25).
 - Enums y relaciones.
 - Migración inicial.
 - SQL manual para `CHECK`, columna generada `active_key` y índices especiales.
@@ -186,7 +186,7 @@ docs/modelo-entidad-relacion.md
 
 - `prisma validate` sin errores.
 - `prisma migrate deploy` desde base vacía crea todas las tablas, enums, FKs e índices.
-- Restricciones C-01 a C-14 verificadas con pruebas de integración.
+- Restricciones C-01 a C-19 verificadas con pruebas de integración.
 - Seed ejecutable dos veces sin duplicar (idempotente) o con reset controlado.
 - ERD y migración coinciden.
 - No se siembran periodos ni fechas técnicas inventadas.
