@@ -306,6 +306,8 @@ Idempotency-Key: 4e8d0c2a-9f2b-4c1a-8f3e-1b2c3d4e5f60
 
 `POST /extinguishers/:id/movements` **no acepta** `INGRESO` (solo alta), `ENVIO_MANTENIMIENTO`, `RETORNO_MANTENIMIENTO`, `BAJA` ni `AJUSTE`; cada uno tiene su flujo dedicado para validar reglas específicas.
 
+> **Selección múltiple sin lote (D-25):** no existe endpoint de lote. La interfaz envía una petición por activo, cada una con su `Idempotency-Key` y su `rowVersion`; el cliente muestra el resultado por equipo y no presenta la operación como un todo indivisible. Un rechazo no revierte las confirmaciones anteriores.
+
 #### Ejemplo de salida
 
 ```json

@@ -439,7 +439,7 @@ Implementar el corazón de la trazabilidad: movimientos atómicos, validación d
 ### Dependencias
 
 - Fase 4.
-- D-08 (evidencia, aprobada), D-08b (sin segunda aprobación, aprobada), D-09 (tránsito), D-17 (baja), D-26b (efecto de la condición).
+- D-08 (evidencia, aprobada), D-08b (sin segunda aprobación, aprobada), D-09 (tránsito), D-17 (baja), D-25 (sin lote, aprobada), D-26b (efecto de la condición).
 
 ### Alcance
 
@@ -451,6 +451,7 @@ Implementar el corazón de la trazabilidad: movimientos atómicos, validación d
 - `row_version` y manejo de 409.
 - Auditoría transaccional.
 - Endpoint de baja y ajuste; ambos se ejecutan directamente con permiso, motivo, `authorizedBy` y `documentRef`, sin flujo de aprobación (D-08b).
+- Sin modelo ni endpoint de lote: la selección múltiple de la interfaz se resuelve con una petición por activo y transacciones independientes (D-25).
 
 ### Archivos esperados
 
@@ -803,6 +804,7 @@ Completar los flujos operativos y de administración del MVP.
 ### Alcance
 
 - Wizard de movimientos: salida, traslado, retorno, baja, ajuste.
+- Selección múltiple de activos para movimientos y resultado por equipo, con una petición por activo (D-25).
 - Envío/retorno de mantenimiento y servicios.
 - Inspecciones.
 - Alertas y configuración de umbrales.
@@ -1058,7 +1060,7 @@ Cada puerta requiere evidencia de pruebas y revisión de los documentos actualiz
 - Exportación PDF/Excel.
 - Notificaciones por correo.
 - Importación masiva y conciliación.
-- Lotes de movimiento.
+- Cabecera de lote con documento único (la selección múltiple ya está en el MVP con movimientos individuales, D-25).
 - Catálogo administrable de condiciones.
 - Corrección de inspecciones/servicios desde UI.
 - Alertas de retornos pendientes.

@@ -158,6 +158,9 @@
 | BR-070 | `BAJA` limpia la colocación actual y fija `retired_at`; no borra la ficha. |
 | BR-071 | `AJUSTE` es exclusivo de `ADMIN` y requiere motivo, autorización y documento; no requiere aprobación de otro usuario en la aplicación (D-08b). | Permiso `movements.adjust`; 403 sin permiso; 422 sin motivo/documento; auditoría. |
 | BR-072 | Un `AJUSTE` que reactiva un activo dado de baja debe indicar el movimiento de baja corregido y justificación; es excepcional. |
+| BR-072A | La selección múltiple en la interfaz no crea un lote: genera una operación individual por activo, cada una con su validación de origen, transacción, secuencia y auditoría (D-25 aprobada). | Sin tablas `movement_batches` ni `batch_id`; una llamada por activo. |
+| BR-072B | En una confirmación múltiple, cada movimiento se confirma o rechaza por separado; un rechazo no revierte los movimientos ya confirmados y la interfaz informa el resultado por equipo (D-25). | Resultado por ítem; sin transacción de lote. |
+| BR-072C | La selección múltiple no relaja ninguna regla: permisos, origen, estado, condición, evidencia y fechas se validan activo por activo (D-25). | Mismas validaciones que la operación individual. |
 
 ### 4.4 Máquina de estados
 

@@ -64,6 +64,7 @@
 | PT-20 | Consultar historial antiguo o auditoría | Los registros siguen completos; no existe purga ni archivo (D-21). |
 | PT-21 | Entrar por HTTP sin TLS o restaurar el respaldo diario | El acceso se fuerza a HTTPS; la restauración cumple RPO 24 h / RTO 4 h (D-23). |
 | PT-22 | Preparar un movimiento sin red y sincronizar | El borrador no cambia la ubicación hasta confirmarse; si el origen cambió, se rechaza como conflicto (D-14). |
+| PT-23 | Seleccionar varios extintores y confirmar un traslado | Se crea un movimiento por activo; si uno tiene origen inválido, los demás se confirman y el resultado se muestra por equipo (D-25). |
 
 ## 7. Cierre de cada entrega
 - Migración ejecutada desde una base vacía.

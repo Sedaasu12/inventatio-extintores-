@@ -719,6 +719,7 @@ No se siembran valores de días por defecto. La instalación crea las filas con 
 | I-10 | Una fecha objetivo apunta a una fuente existente y coherente con su categoría. |
 | I-11 | `ASIGNADO` ⇒ `technical_condition <> 'NO_OPERATIVO'` (D-26b). Un equipo no operativo nunca está instalado en un área. |
 | I-12 | La fecha objetivo `EQUIPO` es la más temprana entre `manufacturer_expiry_date` y `manufacture_date + useful_life_years` cuando ambas existen; nunca se inventa una fecha (D-12). |
+| I-13 | No existe cabecera de lote: una selección múltiple en la interfaz produce un movimiento independiente por activo, cada uno con su propia transacción, secuencia y auditoría (D-25). |
 
 ---
 
@@ -777,7 +778,7 @@ Con 10 000 activos y 100 000 movimientos, los listados deben paginarse y filtrar
 | Se agrega `actor_label` en auditoría. | Conserva identidad aunque el usuario se desactive. |
 | Se agrega `entry_source` a `movements`. | Explica por qué un equipo aparece en una ubicación sin pasar por almacén (D-03). |
 | Se agrega `TALLER` a `LocationType` y `workshop_location_id` a `maintenance_orders`. | Permite mantenimiento en taller propio sin simular un proveedor externo (D-31). `provider_id` pasa a nullable con `CHECK` de exclusividad. |
-| `movement_batches` no se incluye. | Un movimiento por activo en MVP; lotes en fase 2. |
+| `movement_batches` no se incluye. | Un movimiento por activo; la selección múltiple de la interfaz no crea lote (D-25 aprobada). La cabecera de lote con documento único queda para fase 2. |
 
 ---
 

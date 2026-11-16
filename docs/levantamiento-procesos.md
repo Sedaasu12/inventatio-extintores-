@@ -56,6 +56,7 @@
 | P-25 | Volumen esperado | D-22 | Respondida y aplicada |
 | P-26 | Despliegue y respaldo | D-23 | Respondida y aplicada |
 | P-27 | Operación sin conexión | D-14 | Respondida y aplicada |
+| P-28 | Movimientos por lote | D-25 | Respondida y aplicada |
 
 ---
 
@@ -982,6 +983,32 @@
 
 ---
 
+### P-28 — Movimientos por lote
+
+**Pregunta:** ¿Se trasladan varios extintores en una misma orden? ¿Se necesita una cabecera de lote?
+
+**Respuesta del propietario (2026-11-14):** sí se mueven varios equipos a la vez; se acuerda selección múltiple en la interfaz con movimientos individuales, sin cabecera de lote.
+
+**Lectura:**
+
+- La operación real mueve lotes físicos, pero la trazabilidad exigida es por activo: cada equipo tiene su código, su ubicación y su historial.
+- Una cabecera de lote obligaría a decidir qué pasa si un activo falla (revertir todo, dejar el lote parcial, corregir ítem por ítem) y añadiría estados que el MVP no necesita.
+- La selección múltiple resuelve la comodidad operativa sin tocar el modelo: la interfaz confirma una vez y el servidor registra un movimiento por activo.
+- Un documento único de lote puede ser un requisito documental posterior; por eso la opción B queda en el backlog, no descartada.
+
+**Qué NO se concluye todavía:**
+
+- Si la organización exige imprimir una orden única con varios equipos: se decidirá al analizar la opción B en fase 2.
+- Si la selección múltiple debe limitar el número de activos por operación: no se fija un límite sin evidencia de uso.
+
+**Implicaciones:** D-25 se aprueba con opción A + C. No se crean tablas `movement_batches` ni `batch_id`; se añaden reglas BR-072A..072C, RF-MOV-19 y pruebas T-MOV-34..36.
+
+**Decisiones afectadas:** D-25 (aprobada), D-08b, D-14.
+
+**Documentos actualizados:** este registro (P-28, H-34), `decisiones-pendientes.md`, `reglas-de-negocio.md` (BR-072A..072C), `modelo-entidad-relacion.md` (§5.2, §8), `03-modelo-de-datos.md`, `diseno-api.md` (§4.4), `requerimientos.md` (RF-MOV-19), `04-flujos-y-pruebas.md` (PT-23), `plan-de-pruebas.md` (T-MOV-34..36), `plan-implementacion.md` (fases 5 y 10) y `analisis-funcional.md`.
+
+---
+
 ## 4. Contradicciones y hallazgos
 
 | ID | Hallazgo | Efecto |
@@ -1019,9 +1046,10 @@
 | H-31 | No había cifras confirmadas de activos, usuarios, movimientos ni sedes. | D-22: se confirma 10 000 activos, 100 000 movimientos y <100 usuarios; revisar si se supera 10×. |
 | H-32 | No estaba definido dónde desplegar ni qué pérdida de datos y tiempo de recuperación se aceptan. | D-23: híbrido (app en nube + MySQL on-premise), HTTPS, red privada/túnel y RPO 24 h / RTO 4 h. |
 | H-33 | No estaba definido si la operación debía continuar sin internet. | D-14: PWA con lectura en caché y borradores confirmados al sincronizar; operaciones sensibles solo en línea; ventana de 7 días. |
+| H-34 | Se mueven varios extintores a la vez, pero no estaba definido si se necesitaba una cabecera de lote. | D-25: selección múltiple en la interfaz con un movimiento individual por activo; sin tablas de lote. |
 
 ---
 
 ## 5. Próxima pregunta
 
-Levantamiento cerrado el 2026-11-10 y ampliado con D-02, D-06, D-06b, D-08b, D-11, D-12, D-13, D-14, D-19, D-20, D-21, D-22, D-23, D-26, D-26b, D-27 y D-28. No quedan preguntas de ubicaciones, identidad, política de acceso, condición técnica, inspecciones, vencimiento del equipo, umbrales de alerta, aprobación de operaciones sensibles, adjuntos, formatos de reporte, canal de notificaciones, retención, volumen, despliegue ni operación sin conexión pendientes. La siguiente decisión abierta por impacto es **D-25 (lotes)**, seguida de **D-29 (costos)** y **D-30 (idioma)**. No se inicia implementación funcional sin aprobación.
+Levantamiento cerrado el 2026-11-10 y ampliado con D-02, D-06, D-06b, D-08b, D-11, D-12, D-13, D-14, D-19, D-20, D-21, D-22, D-23, D-25, D-26, D-26b, D-27 y D-28. No quedan preguntas de ubicaciones, identidad, política de acceso, condición técnica, inspecciones, vencimiento del equipo, umbrales de alerta, aprobación de operaciones sensibles, adjuntos, formatos de reporte, canal de notificaciones, retención, volumen, despliegue, operación sin conexión ni movimientos por lote pendientes. La siguiente decisión abierta por impacto es **D-29 (costos)**, seguida de **D-30 (idioma)**. No se inicia implementación funcional sin aprobación.

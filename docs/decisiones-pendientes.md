@@ -48,6 +48,7 @@ Estado al 2026-11-14. El registro formal de aprobaciones está en §2.2 a §2.4;
 | 19 | D-22 | Volumen esperado | 10 000 activos, 100 000 movimientos y <100 usuarios; revisar si se supera 10×. | Aprobada | Transversal |
 | 20 | D-23 | Despliegue y respaldo | Híbrido: app en nube + MySQL propio; RPO 24 h / RTO 4 h. | Aprobada | Fase 12 |
 | 21 | D-14 | Operación sin internet | PWA con caché de lectura y borradores confirmados al sincronizar; ventana de 7 días. | Aprobada | Fase 11 |
+| 22 | D-25 | Movimientos por lote | Selección múltiple en UI; movimientos individuales; sin cabecera de lote. | Aprobada | Fase 5/10 |
 
 ---
 
@@ -133,6 +134,7 @@ El propietario revisó las decisiones una por una y **confirmó** las once, sin 
 | D-22 | A — 10 000 activos, 100 000 movimientos y <100 usuarios; revisar si se supera 10× (2026-11-14) |
 | D-23 | C — híbrido: app en nube + MySQL propio; RPO 24 h / RTO 4 h (2026-11-14) |
 | D-14 | B — PWA con lectura en caché y borradores confirmados al sincronizar; 7 días sin conexión (2026-11-14) |
+| D-25 | A + C — selección múltiple en UI; movimientos individuales; sin cabecera de lote (2026-11-14) |
 
 ---
 
@@ -782,9 +784,16 @@ El propietario revisó las decisiones una por una y **confirmó** las once, sin 
 
 **Recomendación:** A + C: la UI permite seleccionar varios y confirmar, pero genera un movimiento individual por activo. B en fase 2 si se requiere una orden documental única.
 
-**Si no se responde:** A.
+**Decisión aprobada (2026-11-14):** opción **A + C** — selección múltiple en la interfaz, movimientos individuales en el servidor.
 
-**Bloquea:** no bloquea MVP. **Estado:** abierta.
+- No existe cabecera de lote ni tabla de ítems de lote: cada activo conserva su propio movimiento, su `asset_sequence`, su validación de origen y su auditoría.
+- La interfaz permite seleccionar varios extintores compatibles y confirmar una sola vez; internamente envía una operación por activo.
+- Cada movimiento se confirma o rechaza **por separado**: un origen inválido en un activo no revierte los movimientos ya confirmados de los demás, y la interfaz muestra el resultado por equipo.
+- La selección múltiple no omite ninguna regla: se validan permisos, origen, estado, condición y evidencia por cada activo.
+- Un documento único de lote (opción B) queda para una fase posterior si la organización exige una orden documental común.
+- Sin conexión, la selección múltiple genera un borrador por activo, cada uno con su `clientUuid` (D-14).
+
+**Bloquea:** fase 5 (alcance de la interfaz) y fase 10 (pantallas). **Estado:** aprobada.
 
 ---
 
@@ -964,7 +973,7 @@ El propietario revisó las decisiones una por una y **confirmó** las once, sin 
 | S-02 | Zona horaria `America/Lima`. | D-15 |
 | S-03 | PWA con lectura en caché y borradores confirmados al sincronizar; operaciones sensibles solo en línea (D-14). | D-14 |
 | S-04 | Auth local (correo + contraseña) con `AuthProvider` desacoplado; JWT + refresh. | D-06 |
-| S-05 | Un movimiento por activo; sin cabecera de lote. | D-25 |
+| S-05 | Un movimiento por activo; la selección múltiple en la interfaz no crea cabecera de lote (D-25). | D-25 |
 | S-06 | Alta en almacén o área interna. | D-03 |
 | S-07 | Código generado `EXT-` + 6 dígitos; sin importación de códigos (D-04). | D-04 |
 | S-08 | QR con código plano. | D-05 |
@@ -986,7 +995,7 @@ El propietario revisó las decisiones una por una y **confirmó** las once, sin 
 | S-24 | Despliegue híbrido: app y API en nube con HTTPS; MySQL on-premise por red privada o túnel cifrado; respaldo diario cifrado con RPO 24 h / RTO 4 h. | D-23 |
 | S-25 | PWA con lectura en caché y borradores de movimientos rutinarios e inspecciones que se confirman al sincronizar; ventana de 7 días; operaciones sensibles solo en línea. | D-14 |
 
-**Tras las aprobaciones del 2026-11-10 al 2026-11-14**, S-01, S-02, S-04, S-06 a S-14, S-16, S-18 a S-25 pasan a decisiones aprobadas (ver §2.2 y §2.4). S-11 se ajusta: **no** existe mapeo automático de resultado a condición. Siguen como supuesto S-05, S-15 y S-17.
+**Tras las aprobaciones del 2026-11-10 al 2026-11-14**, S-01, S-02, S-04, S-06 a S-14, S-16, S-18 a S-25 pasan a decisiones aprobadas (ver §2.2 y §2.4). S-11 se ajusta: **no** existe mapeo automático de resultado a condición. Siguen como supuesto S-15 y S-17.
 
 ---
 
@@ -1003,7 +1012,6 @@ Estas decisiones se usaron para escribir los documentos, pero **no están aproba
 7. Usar `row_version` + bloqueo de fila para concurrencia.
 8. Usar idempotencia en POST críticos.
 9. No implementar `alerts` persistidas en el MVP.
-10. No implementar lotes de movimiento en el MVP.
 
 ---
 
@@ -1011,9 +1019,8 @@ Estas decisiones se usaron para escribir los documentos, pero **no están aproba
 
 Para no bloquear el diseño, se propone esta secuencia. Solo figuran las decisiones **abiertas** al 2026-11-14; las aprobadas están en §2.2 y §2.4, y ya se reflejaron en los documentos. Cada respuesta se registra aquí y se refleja en el modelo/API antes de avanzar.
 
-1. **D-25:** ¿se necesitan movimientos por lote? (fase 5)
-2. **D-29:** ¿se registran costos de mantenimiento? (fase 6)
-3. **D-30:** ¿idioma y localización? (transversal)
+1. **D-29:** ¿se registran costos de mantenimiento? (fase 6)
+2. **D-30:** ¿idioma y localización? (transversal)
 
 ---
 

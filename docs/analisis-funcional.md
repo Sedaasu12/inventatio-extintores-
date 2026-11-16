@@ -56,7 +56,7 @@ El repositorio es un **punto de partida documental**, no un proyecto iniciado. L
 
 - **No hay trabajo previo que destruir.** Los documentos existentes se conservan como línea base; los nuevos documentos los detallan y, en algunos puntos, los refinan.
 - **Hay que crear el proyecto desde cero.** La primera fase debe incluir control de versiones, versiones fijadas, lint, typecheck, pruebas y build antes de escribir reglas de negocio.
-- **Las decisiones de negocio ya resueltas permiten fijar la migración.** El alcance single-tenant (D-01), el vencimiento del equipo (D-12), los umbrales de alerta (D-11), la autorización de movimientos (D-07/D-08b), la evidencia textual (D-13), los formatos de reporte (D-19), el canal de alertas (D-20), la retención (D-21), el volumen (D-22), el despliegue con respaldo (D-23) y la operación sin conexión (D-14) están aprobados; quedan decisiones abiertas que no cambian el núcleo del modelo (lotes, costos e idioma).
+- **Las decisiones de negocio ya resueltas permiten fijar la migración.** El alcance single-tenant (D-01), el vencimiento del equipo (D-12), los umbrales de alerta (D-11), la autorización de movimientos (D-07/D-08b), la evidencia textual (D-13), los formatos de reporte (D-19), el canal de alertas (D-20), la retención (D-21), el volumen (D-22), el despliegue con respaldo (D-23), la operación sin conexión (D-14) y los movimientos individuales con selección múltiple (D-25) están aprobados; quedan decisiones abiertas que no cambian el núcleo del modelo (costos e idioma).
 
 ---
 
@@ -107,7 +107,7 @@ Los nombres definitivos y la separación exacta de permisos deben confirmarse co
 - Exportación PDF/Excel y reportes avanzados.
 - Notificaciones por correo.
 - Importación masiva de inventario existente.
-- Lotes de movimiento para trasladar varios equipos en una sola orden.
+- Cabecera de lote con documento único para trasladar varios equipos en una sola orden; la selección múltiple del MVP genera movimientos individuales (D-25).
 - Alertas de retornos de mantenimiento pendientes.
 - Catálogos administrables de condiciones técnicas y tipos de inspección.
 
@@ -210,6 +210,8 @@ Cada flujo indica disparador, actor, precondiciones, pasos, validaciones, result
 **Pasos:** escanear/buscar; elegir “Traslado”; indicar origen (precargado y no editable), destino, motivo, responsables y receptor; confirmar. El backend valida que el origen sea la colocación actual y que el destino sea una ubicación interna activa. Actualiza estado según el tipo de destino: almacén → `EN_ALMACEN`; área → `ASIGNADO`.
 
 **Regla especial:** si el destino es un almacén y el origen es un área, el flujo recomendado es `RETORNO_ALMACEN`, no `TRASLADO`, para que los reportes distingan una devolución de un traslado operativo. La API puede rechazar la combinación o normalizarla; se documenta como regla.
+
+**Selección múltiple (D-25):** para mover varios equipos con el mismo destino y motivo, la interfaz permite seleccionarlos y confirmar una sola vez. El servidor registra un movimiento independiente por activo, con su propia validación de origen y auditoría; si uno falla, los demás no se revierten y el resultado se muestra por equipo.
 
 ### 5.4 Retorno al almacén
 
@@ -402,7 +404,8 @@ El detalle completo está en:
 | Exportación PDF/Excel | | Sí | |
 | Correo | | Sí | |
 | Importación masiva | | Sí | |
-| Lotes de movimiento | | Sí | |
+| Selección múltiple de movimientos | Sí (movimientos individuales, D-25) | | |
+| Cabecera de lote / documento único | | Sí | |
 | PWA / offline | Sí (lectura y borradores, D-14) | | |
 | App nativa | | | Sí |
 | Integraciones IoT/ERP | | | Sí |
@@ -440,7 +443,7 @@ Se registran como supuestos explícitos; no son reglas aprobadas. El detalle y l
 | S-02 | Zona horaria de operación `America/Lima`; eventos en UTC y fechas calendario sin hora. |
 | S-03 | Operación en línea con lectura en caché y borradores que se confirman al sincronizar (D-14). |
 | S-04 | Autenticación local con correo/contraseña a través de un `AuthProvider`; sin SSO obligatorio en el MVP, pero preparado para OIDC (D-06). |
-| S-05 | Un movimiento por activo; los lotes se evalúan en segunda fase. |
+| S-05 | Un movimiento por activo; la selección múltiple en la interfaz no crea lote (D-25). |
 | S-06 | Un extintor puede registrarse inicialmente en almacén o en un área interna, con `entry_source` y motivo (aprobado D-03). |
 | S-07 | El código se genera en servidor con prefijo `EXT-` y secuencia de 6 dígitos; no se importan códigos (D-04). |
 | S-08 | El QR contiene solo el código estable, no una URL con datos ni datos personales. |
@@ -488,9 +491,9 @@ Hechos aportados por el propietario. **No son reglas aprobadas**; el detalle y l
 
 ## 10. Decisiones que requieren respuesta antes de implementar
 
-> **Estado al 2026-11-14:** el levantamiento está cerrado y las decisiones aprobadas figuran en `docs/decisiones-pendientes.md` (§2.2 y §2.4), incluidas D-08b, D-11, D-12, D-13, D-14, D-19, D-20, D-21, D-22 y D-23. Lo que sigue son las decisiones abiertas que bloquean fases concretas.
+> **Estado al 2026-11-14:** el levantamiento está cerrado y las decisiones aprobadas figuran en `docs/decisiones-pendientes.md` (§2.2 y §2.4), incluidas D-08b, D-11, D-12, D-13, D-14, D-19, D-20, D-21, D-22, D-23 y D-25. Lo que sigue son las decisiones abiertas que bloquean fases concretas.
 
-1. **D-25/D-29/D-30:** lotes, costos e idioma.
+1. **D-29/D-30:** costos e idioma.
 
 El detalle, la recomendación y el supuesto de cada una está en `docs/decisiones-pendientes.md`.
 
@@ -513,7 +516,7 @@ El detalle, la recomendación y el supuesto de cada una está en `docs/decisione
 
 ## 12. Próximo paso
 
-1. Completar las decisiones abiertas de `decisiones-pendientes.md` (siguiente: D-25, D-29 y D-30).
+1. Completar las decisiones abiertas de `decisiones-pendientes.md` (siguiente: D-29 y D-30).
 2. Cerrar el alcance de la fase 1 (esquema y migración inicial) con las decisiones ya aprobadas.
 3. Autorizar la fase 1 antes de escribir módulos funcionales.
 

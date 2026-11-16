@@ -91,6 +91,7 @@ La matriz detallada está en `docs/diseno-api.md`. Los permisos se validan siemp
 | RF-MOV-16 | Adjuntar referencia documental al movimiento. | Should | Campo `document_ref` textual obligatorio para mantenimiento externo, baja y ajuste; sin archivos, fotos ni firmas en el MVP (D-13). |
 | RF-MOV-17 | Ejecutar operaciones sensibles sin segunda aprobación en la aplicación. | Must | `BAJA` y `AJUSTE` se confirman con permiso, motivo y documento; no existen estados pendientes ni aprobación de otro usuario en el MVP (D-08b). |
 | RF-MOV-18 | Mantener la evidencia documental como texto en el MVP. | Must | No se aceptan archivos ni firmas; `document_ref` máximo 100 caracteres; los adjuntos quedan para fase posterior (D-13). |
+| RF-MOV-19 | Registrar varios movimientos desde una selección múltiple. | Must | La interfaz selecciona varios activos y confirma una vez; el servidor crea un movimiento individual por activo, sin cabecera de lote; el resultado se informa por equipo (D-25). |
 
 ### 2.5 Mantenimiento, recarga, reparación y prueba
 
@@ -237,7 +238,7 @@ La matriz detallada está en `docs/diseno-api.md`. Los permisos se validan siemp
 | RF-05 | RF-UBI-01..04 |
 | RF-06 | RF-MOV-01 |
 | RF-07 | RF-MOV-02 |
-| RF-08 | RF-MOV-03, RF-MOV-04 |
+| RF-08 | RF-MOV-03, RF-MOV-04, RF-MOV-19 |
 | RF-09 | RF-MOV-05, RF-MOV-06, RF-MAN-01..09 |
 | RF-10 | RF-EXT-05, RF-MOV-09 |
 | RF-11 | RF-MOV-11, RF-MOV-15 |

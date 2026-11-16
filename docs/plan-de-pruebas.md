@@ -205,6 +205,9 @@ Estructura D-02: `SEDE` es la raíz; `ALMACEN`, `TALLER` y `AREA` son hijos. Los
 | T-MOV-31 | Integración | `AJUSTE` por `ADMIN` sin `documentRef` | 422; no se crea el movimiento. | D-08b / BR-071 |
 | T-MOV-32 | Integración | Enviar un archivo o campo `attachments` en un movimiento | 422 por campo no permitido; no se almacena ningún archivo (D-13). | D-13 / BR-051C |
 | T-MOV-33 | Integración | `documentRef` de más de 100 caracteres | 422; la referencia es textual y limitada (D-13). | D-13 / BR-051C |
+| T-MOV-34 | Integración | Confirmar una selección múltiple de 5 activos con destinos válidos | Se crean 5 movimientos independientes, cada uno con su `asset_sequence` y auditoría; no se crea cabecera de lote | D-25 / BR-072A |
+| T-MOV-35 | Integración | Selección múltiple donde 1 activo tiene origen distinto | Los otros 4 se confirman y ese devuelve `ORIGIN_MISMATCH`; no hay rollback del conjunto | D-25 / BR-072B |
+| T-MOV-36 | Integración | Enviar `batchId` o una estructura de lote a la API | 422 por campo no permitido; el endpoint solo acepta un activo por petición | D-25 / BR-072A |
 
 ### 4.6 Mantenimiento
 
