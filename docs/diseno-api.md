@@ -72,7 +72,7 @@
 }
 ```
 
-No se devuelven stack traces, SQL, nombres de tablas ni datos de otros activos.
+No se devuelven stack traces, SQL, nombres de tablas ni datos de otros activos. Los errores de validación de DTO responden `422` con `code = VALIDATION_ERROR` y `details` con la lista de campos.
 
 ---
 
@@ -88,6 +88,8 @@ No se devuelven stack traces, SQL, nombres de tablas ni datos de otros activos.
 6. Un refresh revocado o reutilizado invalida la familia de tokens y devuelve 401.
 
 > **Proveedor de identidad (D-06 opción C):** el login valida la identidad a través de un `AuthProvider`. El MVP incluye solo el proveedor `LOCAL`; el contrato de sesión (tokens, permisos, auditoría) no depende de él. Si se adopta OIDC, se añaden rutas de redirección y callback, y el resto de la API no cambia.
+
+> **Implementación (fase 2):** el refresh token es opaco y se guarda solo su hash SHA-256; el access token incluye `sub` y `sid` (familia de refresh) y los permisos se recargan de la base en cada solicitud. Así, desactivar un usuario o revocar una sesión surte efecto de inmediato, sin esperar a que expire el access token. La cookie usa `Path=/api/v1/auth` y `SameSite=Strict`; `refresh` y `logout` validan `Origin` contra `CORS_ORIGINS` cuando el navegador lo envía.
 
 ### 2.2 Endpoints de autenticación
 
@@ -666,6 +668,8 @@ Al cambiar `usefulLifeYears`, el servidor recalcula la fecha objetivo `EQUIPO` d
 | Exportaciones | 5/min por usuario. |
 
 Configurables por entorno. Respuesta `429` con `Retry-After`.
+
+> **Implementación (fase 2):** el límite de login es un contador en memoria por IP y por correo con ventana deslizante (`RATE_LIMIT_LOGIN`, `RATE_LIMIT_LOGIN_WINDOW_SECONDS`). Es válido para una sola instancia; con varias debe moverse a un almacén compartido. Un login exitoso limpia solo el contador del correo.
 
 ---
 

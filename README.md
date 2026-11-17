@@ -102,12 +102,26 @@ cd ../frontend
 npm start
 ```
 
-Endpoints de la fase 0:
+Endpoints disponibles:
 
 | Ruta | Descripción |
 |---|---|
-| `GET /api/v1/health` | Estado del servicio |
+| `GET /api/v1/health` | Estado del servicio (público) |
+| `POST /api/v1/auth/login` | Inicio de sesión (correo y contraseña) |
+| `POST /api/v1/auth/refresh` | Rotación del refresh token |
+| `POST /api/v1/auth/logout` | Cierre de sesión |
+| `GET /api/v1/auth/me` | Perfil, roles y permisos efectivos |
+| `POST /api/v1/auth/change-password` | Cambio de contraseña propio |
+| `GET/POST /api/v1/users` | Consulta y alta de usuarios |
+| `GET /api/v1/roles`, `GET /api/v1/permissions` | Catálogos de autorización |
+| `PUT /api/v1/roles/:id/permissions` | Matriz de permisos del rol |
+| `GET /api/v1/audit-logs` | Auditoría (requiere `audit.read`) |
 | `GET /api/docs` | Swagger generado en tiempo de ejecución |
+
+El access token se envía como `Authorization: Bearer <token>`. El refresh token
+viaja en una cookie `HttpOnly` con `SameSite=Strict`; el frontend no debe
+guardarlo en `localStorage`. El administrador sembrado debe cambiar su contraseña
+en el primer inicio de sesión.
 
 ## Verificación
 

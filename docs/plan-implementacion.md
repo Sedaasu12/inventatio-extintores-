@@ -323,6 +323,47 @@ npm run test:e2e -- auth
 npm run lint && npm run typecheck && npm run build
 ```
 
+### Estado de ejecución (2026-11-16)
+
+Implementado:
+
+- `backend/src/modules/auth/`: `AuthProvider` + `LocalAuthProvider`, login, refresh rotativo, logout, `/me`, cambio de contraseña, política de contraseñas, rate limit y emisión de tokens.
+- `backend/src/modules/users/`: CRUD de usuarios (sin borrado físico), roles, catálogo de permisos y reemplazo de la matriz de permisos.
+- `backend/src/modules/audit/`: registro append-only y consulta paginada en `GET /audit-logs`.
+- `backend/src/common/`: guards (`JwtAuthGuard`, `PasswordChangeGuard`, `PermissionsGuard`), decoradores, contrato de error, `requestId` y filtro global.
+- `backend/src/app.module.ts` y `backend/src/main.ts`: `JwtModule` global, guards globales, filtro global, middleware de `requestId`, `cookie-parser`, CORS con credenciales y `ValidationPipe` con 422.
+- `backend/test/auth.e2e-spec.ts`, `rbac.e2e-spec.ts`, `e2e-fixtures.ts`, `e2e-app.ts`, `e2e-env.ts`, `jest-e2e.json` y `src/modules/auth/password-policy.spec.ts`.
+
+Resultados reales de la verificación:
+
+| Comando | Resultado |
+|---|---|
+| `npm run lint` | Sin errores. |
+| `npm run typecheck` | Sin errores. |
+| `npm test` | 16 pruebas, 16 correctas (entorno + política de contraseñas). |
+| `npm run test:e2e` | 26 pruebas, 26 correctas (auth, RBAC y auditoría). |
+| `npm run test:integration` | 33 pruebas, 33 correctas (sin regresiones). |
+| `npm run build` | Compila. |
+
+Cobertura de pruebas:
+
+- T-AUT-01, 02, 03, 04, 05, 06, 08, 09, 10, 11, 12, 13, 17 y 18.
+- T-AUT-15 y T-AUT-16 como pruebas unitarias de la política de contraseñas.
+- T-SEC-01, 02, 06, 07, 09, 11, 12 y 13.
+- Validación de DTO con 422 y formato `{ error: { code, message, details?, requestId } }`.
+
+Desviaciones y notas:
+
+- **Refresh token opaco, no JWT.** Se guarda solo su hash SHA-256 en `refresh_tokens`; la rotación revoca el anterior y la reutilización revoca la familia completa.
+- **Access token ligado a la sesión.** El JWT incluye `sub` y `sid` (familia de refresh). En cada solicitud se recargan usuario, estado y permisos desde la base; un usuario desactivado o una sesión revocada pierden acceso de inmediato.
+- **Rate limit de login en memoria.** Es un contador por IP y por correo con ventana deslizante. El MVP corre en una sola instancia; con varias instancias debe moverse a un almacén compartido. El login exitoso limpia solo el contador del correo, no el de la IP.
+- **Auditoría de fallo best-effort.** Si no se puede escribir el registro de un login fallido, la respuesta sigue siendo 401 y el problema se registra en el log del servidor.
+- **Origen en refresh/logout.** Además de `SameSite=Strict`, se valida la cabecera `Origin` contra `CORS_ORIGINS` cuando el navegador la envía.
+- **T-AUT-07 y T-AUT-14 se difieren.** Requieren endpoints de movimientos y de cambio de condición, que pertenecen a fases posteriores. En esta fase se cubre el equivalente 403 sobre `/users` y `/roles/:id/permissions`, verificando que no hay efectos en la base.
+- **T-SEC-08 no se prueba con supertest.** CORS lo aplica el navegador; la configuración se valida en `main.ts` con `CORS_ORIGINS` y credenciales.
+- **Base de pruebas dedicada.** Los e2e usan `site_test` mediante `test/integration/global-setup.ts` y `test/e2e-env.ts`; nunca tocan la base de desarrollo.
+- **Sin recuperación de contraseña por correo ni MFA.** D-06b lo excluye del MVP; el reset lo hace un administrador y obliga el cambio en el siguiente inicio de sesión.
+
 ---
 
 ## 6. Fase 3 — Ubicaciones y catálogos

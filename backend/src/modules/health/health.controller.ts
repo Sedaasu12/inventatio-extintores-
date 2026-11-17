@@ -1,5 +1,6 @@
 import { Controller, Get, Inject } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Public } from '../../common/auth/public.decorator';
 import { APP_ENV } from '../../config/config.module';
 import type { AppEnv } from '../../config/env';
 
@@ -16,6 +17,7 @@ interface HealthResponse {
 export class HealthController {
   constructor(@Inject(APP_ENV) private readonly env: AppEnv) {}
 
+  @Public()
   @Get()
   @ApiOperation({ summary: 'Estado del servicio' })
   @ApiOkResponse({
