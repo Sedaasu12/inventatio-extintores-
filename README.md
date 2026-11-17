@@ -116,6 +116,14 @@ Endpoints disponibles:
 | `GET /api/v1/roles`, `GET /api/v1/permissions` | Catálogos de autorización |
 | `PUT /api/v1/roles/:id/permissions` | Matriz de permisos del rol |
 | `GET /api/v1/audit-logs` | Auditoría (requiere `audit.read`) |
+| `GET/POST /api/v1/locations` | Ubicaciones; `tree=true` devuelve la jerarquía |
+| `GET/PATCH /api/v1/locations/:id` | Detalle y edición de nombre, dirección o padre |
+| `POST /api/v1/locations/:id/deactivate` | Desactivación lógica con validación de dependencias |
+| `GET /api/v1/locations/:id/extinguishers` | Inventario de la ubicación o sede |
+| `GET/POST /api/v1/extinguisher-types` | Catálogo de tipos de extintor |
+| `PATCH /api/v1/extinguisher-types/:id` | Edita/desactiva; recalcula fechas `EQUIPO` |
+| `GET/POST /api/v1/external-parties` | Catálogo de proveedores y talleres |
+| `GET/PATCH /api/v1/external-parties/:id` | Detalle, edición y desactivación lógica |
 | `GET /api/docs` | Swagger generado en tiempo de ejecución |
 
 El access token se envía como `Authorization: Bearer <token>`. El refresh token

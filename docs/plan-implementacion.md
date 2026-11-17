@@ -427,6 +427,48 @@ npm run test:e2e -- locations
 npm run lint && npm run typecheck && npm run build
 ```
 
+### Estado de ejecución (2026-11-16)
+
+Implementado:
+
+- `backend/src/modules/locations/`: CRUD de ubicaciones, jerarquía de dos niveles, árbol, validación de padre activo, bloqueo de ciclos, generación de código y desactivación con validación de dependencias.
+- `backend/src/modules/catalogs/extinguisher-types/`: CRUD de tipos, validación de vida útil y recálculo transaccional de fechas `EQUIPO`.
+- `backend/src/modules/catalogs/external-parties/`: CRUD de contrapartes externas con desactivación lógica.
+- `backend/src/common/codes/code-counter.service.ts`: contador `UBI-` con `SELECT ... FOR UPDATE` dentro de la transacción.
+- `backend/src/common/errors/error-codes.ts`: `LOCATION_CYCLE`, `LOCATION_DEPTH`, `LOCATION_PARENT_TYPE`, `LOCATION_NAME_DUPLICATE` y `USEFUL_LIFE_INVALID`.
+- `backend/src/app.module.ts`: módulos de ubicaciones y catálogos conectados.
+- `backend/test/locations.e2e-spec.ts`, `backend/test/catalogs.e2e-spec.ts`, `backend/src/common/codes/code-counter.service.spec.ts` y `backend/src/modules/catalogs/extinguisher-types/equipment-due-dates.service.spec.ts`.
+
+Resultados reales de la verificación:
+
+| Comando | Resultado |
+|---|---|
+| `npm run lint` | Sin errores. |
+| `npm run typecheck` | Sin errores. |
+| `npm test` | 25 pruebas, 25 correctas (16 previas + 3 del contador + 6 de fechas). |
+| `npm run test:e2e` | 53 pruebas, 53 correctas (26 previas + 17 de ubicaciones + 10 de catálogos). |
+| `npm run test:integration` | 33 pruebas, 33 correctas (sin regresiones). |
+| `npm run build` | Compila. |
+| `npm run prisma:validate` | Esquema válido. |
+
+Cobertura de pruebas:
+
+- T-UBI-01, 02, 03, 04, 06, 08, 09, 10, 11 y 12.
+- Reglas adicionales: desactivación de taller con orden abierta, cambio de padre sin historial, rechazo de padre inactivo o inexistente, paginación, árbol, inventario por sede, 404 y 403.
+- Recalculo de `EQUIPO` con fecha calculada, fecha documentada más temprana y limpieza al quitar la vida útil.
+- Pruebas unitarias del formato de código y de la suma de años con ajuste de 29 de febrero.
+
+Desviaciones y notas:
+
+- **T-UBI-05, T-UBI-07 y T-UBI-13 se difieren.** Requieren movimientos o asignación de extintores, que pertenecen a la fase 4.
+- **Código enviado por el cliente.** Gracias a `forbidNonWhitelisted`, cualquier intento de enviar `code` en el alta o la edición responde `422 VALIDATION_ERROR`; el código solo lo genera el servidor.
+- **Desactivación.** Responde `409 CONFLICT` si hay extintores actuales, hijos activos u órdenes de mantenimiento abiertas en un taller. Es idempotente: una ubicación ya inactiva responde `204`.
+- **Jerarquía.** La API solo permite dos niveles; `LOCATION_CYCLE` queda como defensa para datos antiguos o cambios futuros y no es alcanzable con el contrato actual.
+- **Vida útil.** El DTO valida que sea entero; el servicio valida el rango 1–65535 y devuelve `USEFUL_LIFE_INVALID`. Un valor no entero responde `VALIDATION_ERROR`.
+- **Fechas `EQUIPO`.** Se recalculan en la misma transacción del cambio de tipo. Si el 29 de febrero cae en un año no bisiesto, se usa el 28 de febrero para no desplazar el vencimiento al mes siguiente.
+- **Sin borrado físico.** No hay `DELETE` de ubicaciones, tipos ni contrapartes; se desactivan con `active = false` y las referencias históricas se conservan.
+- **Contador sin reintento ante creación concurrente.** La semilla crea los contadores; si faltara la fila, la primera transacción la crea. El bloqueo `FOR UPDATE` evita códigos duplicados en el uso normal.
+
 ---
 
 ## 7. Fase 4 — Extintores, código, QR y alta inicial

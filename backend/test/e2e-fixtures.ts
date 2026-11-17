@@ -16,12 +16,16 @@ export const PERMISSIONS = [
   'audit.read',
   'movements.create',
   'extinguishers.read',
+  'locations.read',
+  'locations.manage',
+  'catalogs.read',
+  'catalogs.manage',
 ] as const;
 
 const ROLE_MATRIX: Record<string, readonly string[]> = {
   ADMIN: PERMISSIONS,
-  CONSULTA: ['extinguishers.read'],
-  ALMACEN: ['extinguishers.read', 'movements.create'],
+  CONSULTA: ['extinguishers.read', 'locations.read', 'catalogs.read'],
+  ALMACEN: ['extinguishers.read', 'movements.create', 'locations.read'],
 };
 
 export interface AuthFixtures {

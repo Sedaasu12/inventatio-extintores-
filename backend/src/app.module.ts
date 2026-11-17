@@ -11,7 +11,10 @@ import { APP_ENV, AppConfigModule } from './config/config.module';
 import type { AppEnv } from './config/env';
 import { AuditModule } from './modules/audit/audit.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { ExternalPartiesModule } from './modules/catalogs/external-parties/external-parties.module';
+import { ExtinguisherTypesModule } from './modules/catalogs/extinguisher-types/extinguisher-types.module';
 import { HealthModule } from './modules/health/health.module';
+import { LocationsModule } from './modules/locations/locations.module';
 import { UsersModule } from './modules/users/users.module';
 import { PrismaModule } from './prisma/prisma.module';
 
@@ -34,6 +37,9 @@ import { PrismaModule } from './prisma/prisma.module';
     AuditModule,
     AuthModule,
     UsersModule,
+    LocationsModule,
+    ExtinguisherTypesModule,
+    ExternalPartiesModule,
     HealthModule,
   ],
   providers: [

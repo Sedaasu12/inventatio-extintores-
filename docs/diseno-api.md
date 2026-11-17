@@ -223,6 +223,8 @@ Los roles son una agrupación de permisos; el backend verifica permisos, no nomb
 | POST | `/external-parties` | `catalogs.manage` | Crea contraparte. |
 | PATCH | `/external-parties/:id` | `catalogs.manage` | Edita/desactiva. |
 
+> **Implementación (fase 3):** el listado paginado devuelve `{ data, meta }`; `GET /locations?tree=true` devuelve `{ data: SedeNode[] }` con `children` anidados y sin paginación. Los filtros (`active`, `type`, `parentId`, `search`) se aplican en el servidor. `POST /locations/:id/deactivate` responde `409 CONFLICT` si la ubicación tiene extintores actuales, hijos activos u órdenes de mantenimiento abiertas en un taller; si ya está inactiva responde `204` sin efectos. No existen endpoints `DELETE`: tipos y contrapartes se desactivan con `PATCH ... { "active": false }`. Los identificadores inexistentes responden `404`. El código de ubicación (`UBI-000001`) se genera dentro de la transacción con bloqueo del contador y no se acepta del cliente. `PATCH /locations/:id` solo cambia el padre si la ubicación no tiene activos ni historial de movimientos u órdenes. `GET /extinguisher-types/:id` no se expone en el MVP; el detalle llega en el listado filtrado. T-UBI-05, T-UBI-07 y T-UBI-13 se difieren a la fase 4 porque requieren movimientos o asignación de extintores.
+
 ### 4.3 Extintores, QR y etiquetas
 
 | Método | Ruta | Permiso | Descripción |
@@ -570,7 +572,7 @@ Reglas de actualización: `PATCH` acepta `name`, `address` y, solo si la ubicaci
 | `description` | string | No | Máx. 500. |
 | `active` | boolean | No | Desactivación lógica; no se borra un tipo con equipos. |
 
-Al cambiar `usefulLifeYears`, el servidor recalcula la fecha objetivo `EQUIPO` de los equipos del tipo dentro de la misma transacción y registra auditoría (D-12 / BR-107E).
+Al cambiar `usefulLifeYears`, el servidor recalcula la fecha objetivo `EQUIPO` de los equipos del tipo dentro de la misma transacción y registra auditoría (D-12 / BR-107E). El valor debe ser un entero; el rango 1–65535 se valida en el servicio y responde `USEFUL_LIFE_INVALID`. `null` borra la vida útil y elimina las fechas `EQUIPO` calculadas, pero conserva la fecha documentada por el fabricante.
 
 ### 5.2 DTO de alta
 
