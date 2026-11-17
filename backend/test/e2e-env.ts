@@ -13,3 +13,7 @@ process.env.COOKIE_SECURE = 'false';
 process.env.CORS_ORIGINS = 'http://localhost:4200';
 process.env.RATE_LIMIT_LOGIN = '5';
 process.env.RATE_LIMIT_LOGIN_WINDOW_SECONDS = '60';
+// Límite bajo por usuario para poder probar 429 sin agotar el de IP.
+process.env.RATE_LIMIT_QR_USER = '2';
+process.env.RATE_LIMIT_QR_IP = '300';
+process.env.RATE_LIMIT_QR_WINDOW_SECONDS = '60';

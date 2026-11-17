@@ -14,6 +14,9 @@ describe('loadEnv', () => {
     expect(env.corsOrigins).toEqual(['http://localhost:4200']);
     expect(env.loginRateLimit).toBe(5);
     expect(env.loginRateWindowSeconds).toBe(60);
+    expect(env.qrRateLimitUser).toBe(60);
+    expect(env.qrRateLimitIp).toBe(300);
+    expect(env.qrRateLimitWindowSeconds).toBe(60);
   });
 
   it('reads explicit values', () => {
@@ -29,6 +32,9 @@ describe('loadEnv', () => {
       CORS_ORIGINS: 'http://localhost:4200, https://site.example.test',
       RATE_LIMIT_LOGIN: '8',
       RATE_LIMIT_LOGIN_WINDOW_SECONDS: '120',
+      RATE_LIMIT_QR_USER: '15',
+      RATE_LIMIT_QR_IP: '90',
+      RATE_LIMIT_QR_WINDOW_SECONDS: '30',
     });
 
     expect(env).toEqual({
@@ -43,6 +49,9 @@ describe('loadEnv', () => {
       corsOrigins: ['http://localhost:4200', 'https://site.example.test'],
       loginRateLimit: 8,
       loginRateWindowSeconds: 120,
+      qrRateLimitUser: 15,
+      qrRateLimitIp: 90,
+      qrRateLimitWindowSeconds: 30,
     });
   });
 

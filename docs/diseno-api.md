@@ -252,7 +252,6 @@ Los roles son una agrupación de permisos; el backend verifica permisos, no nomb
 POST /api/v1/extinguishers
 Idempotency-Key: 4e8d0c2a-9f2b-4c1a-8f3e-1b2c3d4e5f60
 {
-  "assetCode": null,
   "serialNumber": "SN-2025-001",
   "typeId": "6c1f...",
   "brand": "ACME",
@@ -264,6 +263,10 @@ Idempotency-Key: 4e8d0c2a-9f2b-4c1a-8f3e-1b2c3d4e5f60
   "commissionedAt": "2025-02-10",
   "manufacturerExpiryDate": "2035-01-15",
   "initialLocationId": "2d9a...",
+  "entrySource": "COMPRA_CENTRAL",
+  "initialReason": "Compra central para el almacén",
+  "receivedBy": "Carlos Ruiz",
+  "documentRef": "FACTURA-2025-001",
   "technicalCondition": "OPERATIVO",
   "notes": "Equipo nuevo."
 }
@@ -294,6 +297,8 @@ Idempotency-Key: 4e8d0c2a-9f2b-4c1a-8f3e-1b2c3d4e5f60
 ```
 
 > `assetCode` no se acepta como entrada: lo genera el servidor. Tampoco se importan códigos en el MVP (D-04 aprobada); la carga inicial de equipos existentes (D-24) genera código nuevo para cada uno.
+
+> **Implementación (fase 4A):** están disponibles `GET /extinguishers` (paginado y filtrado), `POST /extinguishers`, `GET /extinguishers/:id`, `GET /extinguishers/by-code/:assetCode`, `PATCH /extinguishers/:id`, `POST /extinguishers/:id/condition`, `GET /extinguishers/:id/qr` y `GET /extinguishers/:id/label`. Movimientos, historial, línea de tiempo, baja y ajustes quedan para la fase 5. El alta exige `Idempotency-Key`; un reintento idéntico responde `200` con `Idempotent-Replay: true`, y una clave reutilizada con otro payload responde `409 IDEMPOTENCY_CONFLICT`. La ubicación inicial debe ser un `ALMACEN` o `AREA` activo; `SEDE`, `TALLER` o una ubicación inactiva responden `422 DESTINATION_INVALID`. La condición inicial es obligatoria y `AREA` + `NO_OPERATIVO` responde `422 CONDITION_NOT_ASSIGNABLE`. El servidor fija `movedAt` del `INGRESO` con la hora UTC de confirmación. `PATCH` rechaza con `422` cualquier intento de enviar `assetCode`, `currentLocationId`, `logisticsStatus`, `technicalCondition` o `placementType`, y exige `rowVersion`. Los filtros `alertEventType` y `alertStatus` quedan diferidos hasta la fase de alertas. El QR contiene solo el `asset_code`; la etiqueta HTML incluye el código textual y el QR, sin datos personales ni ubicación.
 
 ### 4.4 Movimientos
 
@@ -588,11 +593,15 @@ Al cambiar `usefulLifeYears`, el servidor recalcula la fecha objetivo `EQUIPO` d
 | `acquiredAt` | date | No | ≥ fabricación. |
 | `commissionedAt` | date | No | ≥ adquisición. |
 | `manufacturerExpiryDate` | date | No | ≥ fabricación; documentada por el fabricante. La categoría `EQUIPO` usa la más temprana entre esta y la calculada con `usefulLifeYears` (D-12). |
-| `initialLocationId` | UUID | Sí | Activa, interna. Si no es `ALMACEN`, exige `entrySource` y motivo. |
-| `entrySource` | enum | Sí | `COMPRA_CENTRAL`, `COMPRA_LOCAL`, `CARGA_INICIAL`, `RETORNO_MANTENIMIENTO`, `TRASLADO` (D-03). |
+| `initialLocationId` | UUID | Sí | Activa y de tipo `ALMACEN` o `AREA`. `SEDE`, `TALLER` o una ubicación inactiva responden `422 DESTINATION_INVALID`. |
+| `entrySource` | enum | Sí | `COMPRA_CENTRAL`, `COMPRA_LOCAL`, `CARGA_INICIAL`, `RETORNO_MANTENIMIENTO` o `TRASLADO` (D-03 / BR-037A). Todo `INGRESO` lo registra, incluso el alta en almacén. |
 | `initialReason` | string | Sí | 5..500; motivo del ingreso y de la ubicación inicial. |
+| `receivedBy` | string | Sí | 2..150; persona que recibe el activo (BR-051A). Es un snapshot de nombre, no un usuario. |
+| `documentRef` | string | Sí | 1..100; referencia textual a guía, factura u orden (BR-051A / BR-051B). |
 | `technicalCondition` | enum | Sí | `OPERATIVO`, `OBSERVADO`, `NO_OPERATIVO` o `PENDIENTE_INSPECCION`; sin valor por defecto (D-26). Si la ubicación inicial es un `AREA`, no puede ser `NO_OPERATIVO` (D-26b). |
 | `notes` | string | No | Máx. 2000. |
+
+> El alta no acepta `movedAt`: el servidor registra la hora UTC de confirmación en el `INGRESO` inicial. Tampoco acepta `assetCode`, `logisticsStatus`, `placementType`, `currentLocationId` ni `technicalCondition` fuera del enum.
 
 ### 5.3 DTO de movimiento
 
@@ -642,6 +651,8 @@ Al cambiar `usefulLifeYears`, el servidor recalcula la fecha objetivo `EQUIPO` d
 - Si la operación falla antes de confirmar, la transacción revierte el registro y la clave puede reutilizarse.
 - La limpieza de registros se ejecuta después de 24 h; no se reutilizan claves de operaciones completadas dentro de esa ventana.
 
+> **Implementación (fase 4A):** el alta usa `request_hash` SHA-256 de un payload canónico. Si la clave existe dentro de la ventana de 24 h con el mismo hash, se devuelve el recurso original con `200` y `Idempotent-Replay: true`; si el hash difiere, `409 IDEMPOTENCY_CONFLICT`; si el registro está en `PROCESSING`, `409 CONCURRENCY_CONFLICT`. El registro de idempotencia, la ficha, el `INGRESO`, la fecha `EQUIPO` y la auditoría se confirman en una única transacción `Serializable`; si cualquier paso falla, no queda ninguno de ellos y la clave puede reutilizarse.
+
 ### 6.1A Idempotencia de borradores offline
 
 - Cada borrador usa `clientUuid` como clave idempotente, independiente del header `Idempotency-Key`.
@@ -672,6 +683,8 @@ Al cambiar `usefulLifeYears`, el servidor recalcula la fecha objetivo `EQUIPO` d
 Configurables por entorno. Respuesta `429` con `Retry-After`.
 
 > **Implementación (fase 2):** el límite de login es un contador en memoria por IP y por correo con ventana deslizante (`RATE_LIMIT_LOGIN`, `RATE_LIMIT_LOGIN_WINDOW_SECONDS`). Es válido para una sola instancia; con varias debe moverse a un almacén compartido. Un login exitoso limpia solo el contador del correo.
+
+> **Implementación (fase 4A):** `GET /extinguishers/by-code/:assetCode` aplica dos ventanas deslizantes en memoria, por usuario y por IP (`RATE_LIMIT_QR_USER`, `RATE_LIMIT_QR_IP`, `RATE_LIMIT_QR_WINDOW_SECONDS`). Al superar cualquiera responde `429 RATE_LIMITED` con `Retry-After`. El contador por usuario se reinicia al cambiar el identificador de usuario; el de IP es compartido por todos los usuarios de la instancia. Para varias instancias debe migrarse a un almacén compartido.
 
 ---
 

@@ -12,6 +12,9 @@ export interface AppEnv {
   corsOrigins: string[];
   loginRateLimit: number;
   loginRateWindowSeconds: number;
+  qrRateLimitUser: number;
+  qrRateLimitIp: number;
+  qrRateLimitWindowSeconds: number;
 }
 
 const DEFAULT_PORT = 3000;
@@ -23,6 +26,9 @@ const DEFAULT_REFRESH_TOKEN_TTL_SECONDS = 7 * 24 * 60 * 60;
 const DEFAULT_CORS_ORIGINS = ['http://localhost:4200'];
 const DEFAULT_LOGIN_RATE_LIMIT = 5;
 const DEFAULT_LOGIN_RATE_WINDOW_SECONDS = 60;
+const DEFAULT_QR_RATE_LIMIT_USER = 60;
+const DEFAULT_QR_RATE_LIMIT_IP = 300;
+const DEFAULT_QR_RATE_WINDOW_SECONDS = 60;
 const MIN_PRODUCTION_SECRET_LENGTH = 32;
 
 function fail(message: string): never {
@@ -209,6 +215,21 @@ export function loadEnv(source: NodeJS.ProcessEnv = process.env): AppEnv {
       source.RATE_LIMIT_LOGIN_WINDOW_SECONDS,
       DEFAULT_LOGIN_RATE_WINDOW_SECONDS,
       'RATE_LIMIT_LOGIN_WINDOW_SECONDS',
+    ),
+    qrRateLimitUser: parsePositiveInteger(
+      source.RATE_LIMIT_QR_USER,
+      DEFAULT_QR_RATE_LIMIT_USER,
+      'RATE_LIMIT_QR_USER',
+    ),
+    qrRateLimitIp: parsePositiveInteger(
+      source.RATE_LIMIT_QR_IP,
+      DEFAULT_QR_RATE_LIMIT_IP,
+      'RATE_LIMIT_QR_IP',
+    ),
+    qrRateLimitWindowSeconds: parsePositiveInteger(
+      source.RATE_LIMIT_QR_WINDOW_SECONDS,
+      DEFAULT_QR_RATE_WINDOW_SECONDS,
+      'RATE_LIMIT_QR_WINDOW_SECONDS',
     ),
   };
 }

@@ -1,4 +1,8 @@
-import { LOCATION_COUNTER, formatCounterCode } from './code-counter.service';
+import {
+  EXTINGUISHER_COUNTER,
+  LOCATION_COUNTER,
+  formatCounterCode,
+} from './code-counter.service';
 import type { CounterDefinition } from './code-counter.service';
 
 describe('formatCounterCode (D-04 / BR-027C)', () => {
@@ -16,6 +20,15 @@ describe('formatCounterCode (D-04 / BR-027C)', () => {
     expect(definition).toEqual({
       scope: 'LOCATION',
       prefix: 'UBI-',
+      padding: 6,
+    });
+  });
+
+  it('expone el contador de extintores aprobado', () => {
+    const definition: CounterDefinition = EXTINGUISHER_COUNTER;
+    expect(definition).toEqual({
+      scope: 'EXTINGUISHER',
+      prefix: 'EXT-',
       padding: 6,
     });
   });

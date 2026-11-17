@@ -22,7 +22,7 @@ async function bootstrap(): Promise<void> {
       'Idempotency-Key',
       'X-Request-Id',
     ],
-    exposedHeaders: ['X-Request-Id', 'Retry-After'],
+    exposedHeaders: ['X-Request-Id', 'Retry-After', 'Idempotent-Replay'],
   });
   app.useGlobalPipes(
     new ValidationPipe({

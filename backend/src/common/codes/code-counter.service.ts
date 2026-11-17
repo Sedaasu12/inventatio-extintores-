@@ -15,6 +15,12 @@ export const LOCATION_COUNTER: CounterDefinition = {
   padding: 6,
 };
 
+export const EXTINGUISHER_COUNTER: CounterDefinition = {
+  scope: 'EXTINGUISHER',
+  prefix: 'EXT-',
+  padding: 6,
+};
+
 export function formatCounterCode(
   prefix: string,
   value: number,

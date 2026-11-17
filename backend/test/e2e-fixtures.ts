@@ -14,8 +14,13 @@ export const PERMISSIONS = [
   'users.manage',
   'roles.manage',
   'audit.read',
+  'movements.read',
   'movements.create',
   'extinguishers.read',
+  'extinguishers.create',
+  'extinguishers.update',
+  'extinguishers.condition',
+  'extinguishers.retire',
   'locations.read',
   'locations.manage',
   'catalogs.read',
@@ -24,8 +29,30 @@ export const PERMISSIONS = [
 
 const ROLE_MATRIX: Record<string, readonly string[]> = {
   ADMIN: PERMISSIONS,
-  CONSULTA: ['extinguishers.read', 'locations.read', 'catalogs.read'],
-  ALMACEN: ['extinguishers.read', 'movements.create', 'locations.read'],
+  CONSULTA: [
+    'extinguishers.read',
+    'movements.read',
+    'locations.read',
+    'catalogs.read',
+  ],
+  ALMACEN: [
+    'extinguishers.read',
+    'extinguishers.create',
+    'extinguishers.update',
+    'movements.read',
+    'movements.create',
+    'locations.read',
+    'catalogs.read',
+  ],
+  SEGURIDAD: [
+    'extinguishers.read',
+    'extinguishers.update',
+    'extinguishers.condition',
+    'extinguishers.retire',
+    'movements.read',
+    'movements.create',
+    'locations.read',
+  ],
 };
 
 export interface AuthFixtures {
@@ -33,6 +60,7 @@ export interface AuthFixtures {
   admin: { id: string; email: string };
   consulta: { id: string; email: string };
   almacen: { id: string; email: string };
+  seguridad: { id: string; email: string };
   inactive: { id: string; email: string };
 }
 
@@ -95,6 +123,7 @@ export async function seedAuthFixtures(): Promise<AuthFixtures> {
   const adminRole = await createRole('ADMIN');
   const consultaRole = await createRole('CONSULTA');
   const almacenRole = await createRole('ALMACEN');
+  const seguridadRole = await createRole('SEGURIDAD');
 
   const passwordHash = await hash(TEST_PASSWORD, 12);
 
@@ -109,6 +138,11 @@ export async function seedAuthFixtures(): Promise<AuthFixtures> {
     passwordHash,
     almacenRole,
   );
+  const seguridad = await createUser(
+    'seguridad@test.local',
+    passwordHash,
+    seguridadRole,
+  );
   const inactive = await createUser(
     'inactivo@test.local',
     passwordHash,
@@ -121,6 +155,7 @@ export async function seedAuthFixtures(): Promise<AuthFixtures> {
     admin,
     consulta,
     almacen,
+    seguridad,
     inactive,
   };
 }

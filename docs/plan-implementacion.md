@@ -545,6 +545,49 @@ npm run test:e2e -- extinguishers
 npm run lint && npm run typecheck && npm run build
 ```
 
+### Estado de ejecución (2026-11-16)
+
+Implementado en la fase 4A:
+
+- `backend/src/modules/extinguishers/`: alta transaccional, listado, ficha, resolución por código, edición con `rowVersion`, cambio de condición, QR y etiqueta.
+- `backend/src/common/codes/code-counter.service.ts`: contador `EXT-` (`EXTINGUISHER`) y módulo global `CodeCounterModule`.
+- `backend/src/common/rate-limit/sliding-window-rate-limiter.ts`: ventana deslizante reutilizable; `QrRateLimiter` aplica límites por usuario y por IP.
+- `backend/src/modules/catalogs/extinguisher-types/equipment-due-dates.service.ts`: fecha `EQUIPO` reutilizada por el alta y por el `PATCH`.
+- `backend/src/config/env.ts` y `.env.example`: `RATE_LIMIT_QR_USER`, `RATE_LIMIT_QR_IP`, `RATE_LIMIT_QR_WINDOW_SECONDS`.
+- `backend/src/common/errors/error-codes.ts`: `ASSET_NOT_FOUND`, `ASSET_RETIRED`, `ASSET_CODE_DUPLICATE`, `DESTINATION_INVALID`, `CONDITION_NOT_ASSIGNABLE`, `CONCURRENCY_CONFLICT`, `IDEMPOTENCY_CONFLICT`, `DATE_IN_FUTURE`, `DATE_BEFORE_EVENT`.
+- `backend/test/extinguishers.e2e-spec.ts`, `backend/test/extinguishers-rollback.e2e-spec.ts`, `backend/src/modules/extinguishers/extinguisher-dates.spec.ts`, `extinguisher-qr.service.spec.ts` y `qr-rate-limiter.spec.ts`.
+- `backend/test/e2e-fixtures.ts`: rol y usuario `SEGURIDAD`, permisos de extintores y conteo de usuarios actualizado.
+
+Resultados reales de la verificación:
+
+| Comando | Resultado |
+|---|---|
+| `npm run lint` | Sin errores. |
+| `npm run typecheck` | Sin errores. |
+| `npm test` | 40 pruebas, 40 correctas. |
+| `npm run test:e2e` | 79 pruebas, 79 correctas (53 previas + 25 de extintores + 1 de rollback). |
+| `npm run test:integration` | 33 pruebas, 33 correctas (sin regresiones). |
+| `npm run build` | Compila. |
+| `npm run prisma:validate` | Esquema válido. |
+
+Cobertura de pruebas:
+
+- T-EXT-01 a T-EXT-08, T-EXT-10, T-EXT-12 a T-EXT-17.
+- T-QR-01 a T-QR-05 y T-QR-09.
+- T-CON-03 (dos altas simultáneas con códigos distintos).
+- T-MOV-16/T-MOV-17: fallo simulado después de insertar el movimiento y la fecha objetivo; rollback completo sin extintor, movimiento, fecha ni registro de idempotencia.
+- Reglas adicionales: reintento idempotente, conflicto de payload, clave obligatoria, fechas futuras o anteriores, destinos inválidos, tipo inactivo, ausencia de fecha `EQUIPO` inventada, QR PNG/SVG, etiqueta HTML y permisos por rol.
+
+Desviaciones y notas:
+
+- **Importación D-24 en fase 4B.** El alta ya es estable; la conciliación con dry-run merece su propio diseño y pruebas.
+- **Filtros de alertas y línea de tiempo diferidos.** `alertEventType`, `alertStatus` y `GET /extinguishers/:id/timeline` dependen del motor de alertas y de inspecciones/servicios; se implementarán en fases posteriores.
+- **T-EXT-18 a T-EXT-21** ya están cubiertas por las pruebas unitarias de fechas `EQUIPO` de la fase 3 y por el alta de esta fase.
+- **Idempotencia de 24 h.** La misma clave con el mismo payload devuelve el recurso con `200` e `Idempotent-Replay: true`; con payload distinto responde `409 IDEMPOTENCY_CONFLICT`. Un registro en `PROCESSING` responde `409 CONCURRENCY_CONFLICT`.
+- **Concurrencia.** La transacción usa aislamiento `Serializable` y reintenta hasta tres veces conflictos de escritura (`P2034`) o unicidad (`P2002`) antes de devolver un error controlado.
+- **Rate limit en memoria.** Es válido para una sola instancia; con varias debe moverse a un almacén compartido.
+- **Sin archivos ni PII en el QR.** La etiqueta HTML embebe el PNG y muestra solo el código; no incluye ubicación, fechas ni nombres.
+
 ---
 
 ## 8. Fase 5 — Motor de movimientos

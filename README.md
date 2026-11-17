@@ -124,6 +124,12 @@ Endpoints disponibles:
 | `PATCH /api/v1/extinguisher-types/:id` | Edita/desactiva; recalcula fechas `EQUIPO` |
 | `GET/POST /api/v1/external-parties` | Catálogo de proveedores y talleres |
 | `GET/PATCH /api/v1/external-parties/:id` | Detalle, edición y desactivación lógica |
+| `GET/POST /api/v1/extinguishers` | Listado filtrado y alta transaccional con `Idempotency-Key` |
+| `GET /api/v1/extinguishers/by-code/:assetCode` | Resolución de QR o código manual (con rate limit) |
+| `GET/PATCH /api/v1/extinguishers/:id` | Ficha completa y edición con `rowVersion` |
+| `POST /api/v1/extinguishers/:id/condition` | Cambio de condición técnica con motivo (SEGURIDAD/ADMIN) |
+| `GET /api/v1/extinguishers/:id/qr` | QR PNG/SVG del código del activo |
+| `GET /api/v1/extinguishers/:id/label` | Etiqueta HTML imprimible |
 | `GET /api/docs` | Swagger generado en tiempo de ejecución |
 
 El access token se envía como `Authorization: Bearer <token>`. El refresh token

@@ -5,6 +5,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { JwtAuthGuard } from './common/auth/jwt-auth.guard';
 import { PasswordChangeGuard } from './common/auth/password-change.guard';
 import { PermissionsGuard } from './common/auth/permissions.guard';
+import { CodeCounterModule } from './common/codes/code-counter.module';
 import { ApiExceptionFilter } from './common/errors/api-exception.filter';
 import { RequestIdMiddleware } from './common/middleware/request-id.middleware';
 import { APP_ENV, AppConfigModule } from './config/config.module';
@@ -13,6 +14,7 @@ import { AuditModule } from './modules/audit/audit.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { ExternalPartiesModule } from './modules/catalogs/external-parties/external-parties.module';
 import { ExtinguisherTypesModule } from './modules/catalogs/extinguisher-types/extinguisher-types.module';
+import { ExtinguishersModule } from './modules/extinguishers/extinguishers.module';
 import { HealthModule } from './modules/health/health.module';
 import { LocationsModule } from './modules/locations/locations.module';
 import { UsersModule } from './modules/users/users.module';
@@ -37,9 +39,11 @@ import { PrismaModule } from './prisma/prisma.module';
     AuditModule,
     AuthModule,
     UsersModule,
+    CodeCounterModule,
     LocationsModule,
     ExtinguisherTypesModule,
     ExternalPartiesModule,
+    ExtinguishersModule,
     HealthModule,
   ],
   providers: [

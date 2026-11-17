@@ -121,8 +121,8 @@ describe('RBAC y auditoría (e2e)', () => {
     expect(body.meta).toMatchObject({
       page: 1,
       pageSize: 2,
-      total: 4,
-      totalPages: 2,
+      total: 5,
+      totalPages: 3,
     });
   });
 
