@@ -13,6 +13,8 @@ jobs:
         image: mysql:8.4
         env:
           MYSQL_ROOT_PASSWORD: root
+          # Necesario para que el runner pueda crear `site_test` por TCP.
+          MYSQL_ROOT_HOST: "%"
           MYSQL_DATABASE: site
           MYSQL_USER: site
           MYSQL_PASSWORD: site

@@ -6,10 +6,9 @@
  */
 import { PrismaClient } from '@prisma/client';
 import { randomUUID } from 'node:crypto';
+import { resolveTestDatabaseUrl } from '../test-database';
 
-export const TEST_DATABASE_URL =
-  process.env.TEST_DATABASE_URL?.trim() ||
-  'mysql://site:site@localhost:3307/site_test';
+export const TEST_DATABASE_URL = resolveTestDatabaseUrl();
 
 process.env.DATABASE_URL = TEST_DATABASE_URL;
 

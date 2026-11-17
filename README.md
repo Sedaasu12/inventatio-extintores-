@@ -79,16 +79,23 @@ La semilla crea el usuario `admin@site.local`. Si no defines
 `SEED_ADMIN_PASSWORD`, se genera una contraseña temporal y se muestra una sola vez
 en la consola; el administrador debe cambiarla en el primer inicio de sesión.
 
-Las pruebas de integración usan una base separada `site_test`, creada y migrada
-automáticamente por `backend/test/integration/global-setup.ts`:
+Las pruebas de integración y e2e usan una base separada `site_test`, creada y
+migrada automáticamente por `backend/test/integration/global-setup.ts`:
 
 ```bash
 npm run test:integration
+npm run test:e2e
 ```
 
-El setup se niega a ejecutarse si `TEST_DATABASE_URL` apunta a `site`. Para usar
-otra base u otro administrador, define `TEST_DATABASE_URL` y
-`TEST_DATABASE_ADMIN_URL`.
+La URL de pruebas se resuelve así: si defines `TEST_DATABASE_URL`, se usa tal
+cual; si no, se deriva de `DATABASE_URL` cambiando el nombre de la base por
+`<nombre>_test` (por ejemplo, `site` → `site_test`) y conservando servidor y
+credenciales. Sin ninguna de las dos, se usa el valor local
+`mysql://site:site@localhost:3307/site_test`.
+
+El administrador para crear la base se deriva del mismo servidor con el usuario
+`root` (`TEST_DATABASE_ADMIN_URL` permite cambiarlo). El setup se niega a
+ejecutarse si la base de pruebas resuelta se llama `site`.
 
 ## Ejecución en desarrollo
 
