@@ -57,9 +57,10 @@ describe('import-token', () => {
       SECRET,
     );
     const [body, signature] = token.split('.');
-    const tampered = signature.endsWith('A')
-      ? `${signature.slice(0, -1)}B`
-      : `${signature.slice(0, -1)}A`;
+    // Se altera el primer carácter de la firma: a diferencia del último, sus
+    // seis bits son significativos y el HMAC decodificado siempre cambia.
+    const first = signature[0] === 'A' ? 'B' : 'A';
+    const tampered = `${first}${signature.slice(1)}`;
     expect(verifyDryRunToken(`${body}.${tampered}`, SECRET)).toBeNull();
     expect(verifyDryRunToken(token, `${SECRET}-otro`)).toBeNull();
     expect(verifyDryRunToken('sin-punto', SECRET)).toBeNull();
