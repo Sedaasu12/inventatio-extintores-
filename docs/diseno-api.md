@@ -375,6 +375,8 @@ Un comprobante ausente, vencido, alterado, de otro usuario o asociado a otro arc
 
 > **Selección múltiple sin lote (D-25):** no existe endpoint de lote. La interfaz envía una petición por activo, cada una con su `Idempotency-Key` y su `rowVersion`; el cliente muestra el resultado por equipo y no presenta la operación como un todo indivisible. Un rechazo no revierte las confirmaciones anteriores.
 
+> **Implementación (fase 5):** están disponibles `POST /extinguishers/:id/movements` (`SALIDA`, `TRASLADO`, `RETORNO_ALMACEN`), `POST /extinguishers/:id/retire`, `POST /extinguishers/:id/adjustments`, `GET /extinguishers/:id/movements`, `GET /movements` y `GET /movements/:id`. Los tres POST exigen `Idempotency-Key`; un reintento idéntico responde `200` con `Idempotent-Replay: true` y una clave reutilizada con otro payload responde `409 IDEMPOTENCY_CONFLICT`. El movimiento y la proyección del extintor se confirman en una transacción `Serializable` con bloqueo `SELECT ... FOR UPDATE` y secuencia `asset_sequence` calculada bajo el bloqueo; un `rowVersion` desactualizado responde `409 CONCURRENCY_CONFLICT`. El origen debe coincidir exactamente con la colocación actual (`409 ORIGIN_MISMATCH`); las combinaciones no permitidas responden `409 INVALID_TRANSITION` y los destinos inválidos o iguales al origen `422 DESTINATION_INVALID`. `movedAt` exige zona horaria, se guarda en UTC y no puede superar los 5 minutos de tolerancia ni ser anterior al alta o al último movimiento (`422 DATE_IN_FUTURE` / `422 DATE_BEFORE_EVENT`). `authorizedBy` y `documentRef` son opcionales en `SALIDA`, `TRASLADO` y `RETORNO_ALMACEN`; `BAJA` y `AJUSTE` los exigen junto con el motivo. `BAJA` bloquea con `409 MAINTENANCE_ORDER_ACTIVE` si existe una orden `ABIERTA` o `EN_PROVEEDOR`. `AJUSTE` es exclusivo de `ADMIN`, exige `correctsMovementId` cuando reactiva una baja y deriva el estado de la colocación destino; no modifica la condición técnica. `TALLER` queda reservado para el flujo de mantenimiento de la fase 6.
+
 #### Ejemplo de salida
 
 ```json
@@ -417,6 +419,41 @@ Idempotency-Key: 0b0d...
   }
 }
 ```
+
+#### Ejemplo de baja
+
+```json
+POST /api/v1/extinguishers/a1b2.../retire
+Idempotency-Key: 5c2f...
+{
+  "movedAt": "2026-11-12T09:00:00-05:00",
+  "authorizedBy": "María López",
+  "reason": "Equipo fuera de servicio definitivo",
+  "documentRef": "ACTA-BAJA-2026-001",
+  "rowVersion": 5
+}
+```
+
+Respuesta `201` con el movimiento `BAJA` (destino `NONE`) y el extintor en `DADO_DE_BAJA`, colocación `NONE` y `retiredAt` fijado. No se borra la ficha ni el historial.
+
+#### Ejemplo de ajuste
+
+```json
+POST /api/v1/extinguishers/a1b2.../adjustments
+Idempotency-Key: 9d1e...
+{
+  "placementType": "INTERNAL",
+  "locationId": "2d9a...",
+  "movedAt": "2026-11-12T09:30:00-05:00",
+  "authorizedBy": "María López",
+  "reason": "Corrección de ubicación registrada por error",
+  "documentRef": "ACTA-AJUSTE-2026-001",
+  "correctsMovementId": "mv-baja...",
+  "rowVersion": 6
+}
+```
+
+Para una colocación externa se envía `placementType: "EXTERNAL"` y `externalPartyId` en lugar de `locationId`. La reactivación de una baja exige `correctsMovementId` apuntando a su movimiento `BAJA`.
 
 #### Ejemplo de envío a mantenimiento
 

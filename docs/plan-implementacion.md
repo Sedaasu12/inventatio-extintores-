@@ -662,12 +662,14 @@ Implementar el corazón de la trazabilidad: movimientos atómicos, validación d
 
 ```text
 backend/src/modules/movements/
-backend/src/modules/movements/dto/
+backend/src/modules/movements/dto/movements.dto.ts
 backend/src/modules/movements/movement-policy.ts
-backend/src/modules/movements/movement.service.ts
+backend/src/modules/movements/movement-policy.spec.ts
+backend/src/modules/movements/movement-view.ts
+backend/src/modules/movements/movements.service.ts
+backend/src/modules/movements/movements.controller.ts
+backend/src/modules/movements/movements.module.ts
 backend/test/movements.e2e-spec.ts
-backend/test/movements-concurrency.e2e-spec.ts
-backend/test/movements-transaction.e2e-spec.ts
 ```
 
 ### Criterios de aceptación
@@ -701,11 +703,32 @@ backend/test/movements-transaction.e2e-spec.ts
 ### Verificación
 
 ```bash
-npm run test -- movements
+npm run test -- movement-policy
 npm run test:e2e -- movements
-npm run test:integration -- movements-concurrency
 npm run lint && npm run typecheck && npm run build
 ```
+
+### Estado de ejecución de la fase 5 (2026-11-17)
+
+Implementado:
+
+- `backend/src/modules/movements/movement-policy.ts`: matriz de transiciones, validación de origen y destino, evidencia por tipo, reglas de `movedAt` y proyección de estado. Sin dependencias de Prisma ni del request.
+- `backend/src/modules/movements/movements.service.ts`: servicio transaccional único con `SELECT ... FOR UPDATE`, secuencia `asset_sequence`, snapshots de origen/destino, `rowVersion`, idempotencia de 24 h y auditoría en la misma transacción.
+- `backend/src/modules/movements/movements.controller.ts` y `movements.module.ts`: `POST /extinguishers/:id/movements`, `POST /extinguishers/:id/retire`, `POST /extinguishers/:id/adjustments`, `GET /extinguishers/:id/movements`, `GET /movements` y `GET /movements/:id`.
+- `backend/src/modules/movements/movement-view.ts` y `dto/movements.dto.ts`: contrato de respuesta y validación de entrada.
+- `backend/src/common/errors/error-codes.ts`: `ORIGIN_MISMATCH`, `INVALID_TRANSITION` y `MAINTENANCE_ORDER_ACTIVE`.
+- `backend/test/movements.e2e-spec.ts`: 34 casos e2e (T-MOV-01 a T-MOV-42, incluidas concurrencia, idempotencia, rollback, baja, ajuste y reactivación).
+- `backend/test/e2e-fixtures.ts`: permiso `movements.adjust` para la matriz de pruebas.
+
+Supuestos documentados y aprobados para esta fase:
+
+- `SALIDA` solo hacia `AREA`; `TRASLADO` solo almacén↔almacén o área↔área; `RETORNO_ALMACEN` solo hacia `ALMACEN`; `TALLER` se reserva para mantenimiento.
+- `authorizedBy` y `documentRef` son opcionales en `SALIDA`, `TRASLADO` y `RETORNO_ALMACEN`; obligatorios en `BAJA` y `AJUSTE`.
+- `AJUSTE` no cambia la condición técnica ni el estado de forma independiente: la colocación destino deriva el estado. La reactivación exige `correctsMovementId` del movimiento `BAJA`.
+- `movedAt` es obligatorio, con zona horaria, se almacena en UTC y se valida contra el alta, el último movimiento y la tolerancia de 5 minutos.
+- Sin migración nueva: el modelo `Movement` y los permisos ya existían.
+
+Verificación ejecutada: `npm run test` 88/88, `npm run test:e2e` 123/123, `npm run test:integration` 33/33, lint, typecheck, build y `prisma validate` correctos; `./scripts/verify.ps1` completo sin errores.
 
 ---
 

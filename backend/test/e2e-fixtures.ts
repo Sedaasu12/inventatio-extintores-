@@ -16,6 +16,7 @@ export const PERMISSIONS = [
   'audit.read',
   'movements.read',
   'movements.create',
+  'movements.adjust',
   'extinguishers.read',
   'extinguishers.create',
   'extinguishers.update',

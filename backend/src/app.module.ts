@@ -17,6 +17,7 @@ import { ExtinguisherTypesModule } from './modules/catalogs/extinguisher-types/e
 import { ExtinguishersModule } from './modules/extinguishers/extinguishers.module';
 import { HealthModule } from './modules/health/health.module';
 import { LocationsModule } from './modules/locations/locations.module';
+import { MovementsModule } from './modules/movements/movements.module';
 import { UsersModule } from './modules/users/users.module';
 import { PrismaModule } from './prisma/prisma.module';
 
@@ -44,6 +45,7 @@ import { PrismaModule } from './prisma/prisma.module';
     ExtinguisherTypesModule,
     ExternalPartiesModule,
     ExtinguishersModule,
+    MovementsModule,
     HealthModule,
   ],
   providers: [

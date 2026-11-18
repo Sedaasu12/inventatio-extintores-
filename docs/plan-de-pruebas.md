@@ -188,6 +188,8 @@ Estructura D-02: `SEDE` es la raíz; `ALMACEN`, `TALLER` y `AREA` son hijos. Los
 
 ### 4.5 Movimientos
 
+> **Implementación (fase 5, 2026-11-17):** los casos T-MOV-01 a T-MOV-42 se ejecutan en `backend/test/movements.e2e-spec.ts`. T-MOV-16/17 se cubren con un fallo simulado de auditoría que revierte la transacción completa; T-MOV-25/26/27 usan la condición `NO_OPERATIVO`.
+
 | ID | Nivel | Acción | Resultado esperado | Requisito |
 |---|---|---|---|---|
 | T-MOV-01 | Integración | `SALIDA` desde almacén correcto | 201; estado `ASIGNADO`; origen/destino correctos; historial. | RF-MOV-02 |
@@ -226,6 +228,12 @@ Estructura D-02: `SEDE` es la raíz; `ALMACEN`, `TALLER` y `AREA` son hijos. Los
 | T-MOV-34 | Integración | Confirmar una selección múltiple de 5 activos con destinos válidos | Se crean 5 movimientos independientes, cada uno con su `asset_sequence` y auditoría; no se crea cabecera de lote | D-25 / BR-072A |
 | T-MOV-35 | Integración | Selección múltiple donde 1 activo tiene origen distinto | Los otros 4 se confirman y ese devuelve `ORIGIN_MISMATCH`; no hay rollback del conjunto | D-25 / BR-072B |
 | T-MOV-36 | Integración | Enviar `batchId` o una estructura de lote a la API | 422 por campo no permitido; el endpoint solo acepta un activo por petición | D-25 / BR-072A |
+| T-MOV-37 | Integración | `AJUSTE` reactiva una baja con `correctsMovementId` | 201; `EN_ALMACEN` o `ASIGNADO` según destino; `retiredAt` nulo; historial conservado | BR-072 |
+| T-MOV-38 | Integración | Reactivar sin `correctsMovementId` o con un movimiento distinto de la `BAJA` | 422; no se crea el ajuste | BR-072 |
+| T-MOV-39 | Integración | `AJUSTE` a una entidad externa | 201; colocación `EXTERNAL`; estado `EN_MANTENIMIENTO`; un movimiento ordinario posterior devuelve 409 | BR-052 / D-31 |
+| T-MOV-40 | Integración | `AJUSTE` a la misma colocación actual | 422 `DESTINATION_INVALID` | BR-043 |
+| T-MOV-41 | Integración | `TRASLADO` con destino `TALLER` | 422 `DESTINATION_INVALID`; el taller se usa en el flujo de mantenimiento | D-31 |
+| T-MOV-42 | Integración | Falta `Idempotency-Key`, `CONSULTA` intenta crear un movimiento o consulta el historial | 422; 403 al crear; 200 al leer | BR-047 / BR-058 / D-07 |
 
 ### 4.6 Mantenimiento
 

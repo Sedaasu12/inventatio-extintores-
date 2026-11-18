@@ -5,11 +5,11 @@ ubicación actual y conservar el historial de movimientos, inspecciones y servic
 
 ## Estado del proyecto
 
-**Fases 0 a 4B implementadas y verificadas:** modelo de datos, autenticación y
+**Fases 0 a 5 implementadas y verificadas:** modelo de datos, autenticación y
 auditoría, ubicaciones y catálogos, alta transaccional de extintores con QR y
-etiqueta, y carga inicial CSV/JSON con dry-run. El motor de movimientos,
-mantenimiento, inspecciones, alertas y el frontend de negocio corresponden a las
-fases siguientes.
+etiqueta, carga inicial CSV/JSON con dry-run, y motor de movimientos con baja e
+historial. Mantenimiento, inspecciones, alertas y el frontend de negocio
+corresponden a las fases siguientes.
 
 La evidencia completa, con los comandos y su salida real, está en
 `docs/evidencias/` y en `docs/plan-implementacion.md`.
@@ -141,6 +141,11 @@ Endpoints disponibles:
 | `GET /api/v1/extinguishers/:id/label` | Etiqueta HTML imprimible |
 | `POST /api/v1/extinguishers/imports/dry-run` | Previsualiza una carga inicial CSV/JSON sin escribir datos |
 | `POST /api/v1/extinguishers/imports` | Confirma la carga con el comprobante del dry-run |
+| `POST /api/v1/extinguishers/:id/movements` | `SALIDA`, `TRASLADO` o `RETORNO_ALMACEN` con `Idempotency-Key` |
+| `POST /api/v1/extinguishers/:id/retire` | Baja directa con evidencia obligatoria |
+| `POST /api/v1/extinguishers/:id/adjustments` | Ajuste excepcional de colocación (ADMIN) |
+| `GET /api/v1/extinguishers/:id/movements` | Historial paginado del activo |
+| `GET /api/v1/movements`, `GET /api/v1/movements/:id` | Historial global filtrado y detalle inmutable |
 | `GET /api/docs` | Swagger generado en tiempo de ejecución |
 
 El access token se envía como `Authorization: Bearer <token>`. El refresh token
@@ -184,6 +189,48 @@ La confirmación repite el mismo archivo y campos, añadiendo `dryRunToken`. Cad
 fila válida se importa en su propia transacción como `CARGA_INICIAL`; las filas
 inválidas se omiten y se reportan. Repetir la confirmación no duplica activos.
 El detalle de columnas y reglas está en `docs/diseno-api.md` §4.3.
+
+### Movimientos
+
+`POST /api/v1/extinguishers/:id/movements` acepta `SALIDA`, `TRASLADO` y
+`RETORNO_ALMACEN`. Cada petición exige `Idempotency-Key` y el `rowVersion`
+actual del extintor:
+
+```json
+{
+  "type": "SALIDA",
+  "originLocationId": "2d9a...",
+  "destinationLocationId": "7e4c...",
+  "movedAt": "2026-11-10T15:30:00-05:00",
+  "requestedBy": "Juan Pérez",
+  "deliveredBy": "Juan Pérez",
+  "receivedBy": "Carlos Ruiz",
+  "reason": "Instalación en sede Lima",
+  "documentRef": "ACTA-2026-001",
+  "rowVersion": 3
+}
+```
+
+Reglas aplicadas por el servidor:
+
+- El origen debe coincidir con la colocación actual (`409 ORIGIN_MISMATCH`).
+- `SALIDA` solo va de almacén a área; `TRASLADO` solo almacén↔almacén o
+  área↔área; `RETORNO_ALMACEN` solo de área a almacén. `TALLER` se reserva para
+  mantenimiento.
+- Un extintor `NO_OPERATIVO` no puede quedar en un área
+  (`422 CONDITION_NOT_ASSIGNABLE`).
+- `movedAt` exige zona horaria, no puede superar 5 minutos en el futuro ni ser
+  anterior al alta o al último movimiento.
+- `authorizedBy` y `documentRef` son opcionales en estos tres movimientos;
+  `BAJA` y `AJUSTE` los exigen, junto con el motivo.
+- `BAJA` se rechaza si hay una orden de mantenimiento activa. `AJUSTE` es
+  exclusivo de `ADMIN`, no cambia la condición técnica y exige
+  `correctsMovementId` para reactivar una baja.
+
+El movimiento y la actualización de estado/ubicación se confirman en una sola
+transacción con bloqueo de fila y secuencia por activo. Un `rowVersion`
+desactualizado responde `409 CONCURRENCY_CONFLICT`; un reintento idéntico
+devuelve `200` con `Idempotent-Replay: true`.
 
 ## Verificación
 
