@@ -153,6 +153,24 @@ Estructura D-02: `SEDE` es la raíz; `ALMACEN`, `TALLER` y `AREA` son hijos. Los
 | T-EXT-20 | Integración | Fecha documentada 2028 y calculada 2025 | La categoría `EQUIPO` usa 2025 (la más temprana). | D-12 / BR-107C |
 | T-EXT-21 | Integración | Cambiar `usefulLifeYears` de un tipo | Recalcula `EQUIPO` de sus equipos; auditoría; no toca otras categorías. | D-12 / BR-107E |
 
+### 4.3b Carga inicial (D-24)
+
+| ID | Nivel | Acción | Resultado esperado | Requisito |
+|---|---|---|---|---|
+| T-IMP-01 | E2E | Dry-run de un CSV válido | 200; `dryRunToken` y reporte por fila; no crea extintores, movimientos ni consume códigos. | D-24 / RF-EXT-11 |
+| T-IMP-02 | E2E | Confirmar el mismo archivo con el comprobante | 200; activo con código generado; `INGRESO` secuencia 1 con `CARGA_INICIAL`, `receivedBy` y `documentRef`; estado según destino. | D-24 / BR-051A / BR-036 |
+| T-IMP-03 | E2E | Confirmar sin `dryRunToken` | 422; no se escribe nada. | D-24 |
+| T-IMP-04 | E2E | Confirmar con un archivo distinto al del dry-run | 409 `IMPORT_DRY_RUN_INVALID`; sin escrituras. | D-24 |
+| T-IMP-05 | E2E | Archivo mixto con filas válidas e inválidas | Solo se importan las válidas; las inválidas quedan `SKIPPED` sin efectos parciales. | D-24 |
+| T-IMP-06 | E2E | Seriales duplicados en el archivo y ya registrados | Advertencias `SERIAL_DUPLICATE_IN_FILE` y `SERIAL_ALREADY_REGISTERED`; la carga no se bloquea (D-16). | D-16 / D-24 |
+| T-IMP-07 | E2E | Carga en JSON a un área | 200; código generado; estado `ASIGNADO`. | D-19 / D-24 |
+| T-IMP-08 | E2E | Dry-run con rol `CONSULTA` | 403; `ALMACEN` y `ADMIN` pueden previsualizar. | D-07 |
+| T-IMP-09 | E2E | Repetir la confirmación con el mismo comprobante | 200 con filas `REPLAYED`; no se duplican activos. | D-24 |
+| T-IMP-10 | E2E | Dry-run sin archivo adjunto | 422 `IMPORT_FILE_INVALID`. | D-24 |
+| T-IMP-11 | Unitario | CSV con comillas, comillas escapadas, `;` y BOM | Se parsea correctamente; cabeceras inválidas rechazan el archivo. | D-19 |
+| T-IMP-12 | Unitario | Comprobante de dry-run vencido, alterado o de otro secreto | Se rechaza; el mismo archivo y campos conservan la huella. | D-24 |
+| T-IMP-13 | Unitario | Conciliación de tipo, sede y ubicación | `TYPE_NOT_FOUND`, `SEDE_INVALID_TYPE`, `LOCATION_NOT_IN_SEDE`, `CONDITION_NOT_ASSIGNABLE` y fechas inválidas se reportan por fila. | D-24 / D-26b |
+
 ### 4.4 QR y escaneo
 
 | ID | Nivel | Acción | Resultado esperado | Requisito |

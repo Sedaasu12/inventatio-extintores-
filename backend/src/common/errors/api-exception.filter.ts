@@ -104,6 +104,26 @@ export class ApiExceptionFilter implements ExceptionFilter {
       };
     }
 
+    // Multer lanza errores fuera de la jerarquía de Nest (por ejemplo, al
+    // superar el tamaño máximo de archivo). No se exponen detalles internos.
+    if (exception instanceof Error && exception.name === 'MulterError') {
+      const multerCode = (exception as Error & { code?: string }).code;
+      const tooLarge = multerCode === 'LIMIT_FILE_SIZE';
+      return {
+        status: HttpStatus.UNPROCESSABLE_ENTITY,
+        body: {
+          error: {
+            code: ErrorCodes.IMPORT_FILE_INVALID,
+            message: tooLarge
+              ? 'El archivo supera el tamaño máximo permitido.'
+              : 'No se pudo leer el archivo adjunto.',
+            ...(tooLarge ? { details: { field: 'file' } } : {}),
+            requestId,
+          },
+        },
+      };
+    }
+
     if (exception instanceof Prisma.PrismaClientKnownRequestError) {
       if (exception.code === 'P2002') {
         return {

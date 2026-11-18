@@ -588,6 +588,50 @@ Desviaciones y notas:
 - **Rate limit en memoria.** Es válido para una sola instancia; con varias debe moverse a un almacén compartido.
 - **Sin archivos ni PII en el QR.** La etiqueta HTML embebe el PNG y muestra solo el código; no incluye ubicación, fechas ni nombres.
 
+### Estado de ejecución de la fase 4B (2026-11-17)
+
+Implementado en la fase 4B (carga inicial D-24):
+
+- `backend/src/modules/extinguishers/imports/import-file.ts`: parser CSV/JSON con límites (5 MB, 10 000 filas), BOM, delimitador `,`/`;`, comillas escapadas y saltos de línea entre comillas.
+- `backend/src/modules/extinguishers/imports/import-validation.ts`: validación por fila, conciliación de tipo/sede/ubicación, reglas de fecha y condición, advertencias de serial duplicado y resumen por sede y ubicación.
+- `backend/src/modules/extinguishers/imports/import-token.ts`: comprobante de dry-run firmado con HMAC derivado de `JWT_ACCESS_SECRET`, vigencia de 24 h y huella SHA-256 del archivo y de los campos comunes.
+- `backend/src/modules/extinguishers/imports/imports.service.ts` e `imports.controller.ts`: endpoints `POST /extinguishers/imports/dry-run` y `POST /extinguishers/imports` (`multipart/form-data`, permiso `extinguishers.create`).
+- `backend/src/modules/extinguishers/imports/dto/imports.dto.ts`: DTO de previsualización y confirmación.
+- `backend/src/modules/extinguishers/extinguishers.module.ts`: registro del controlador y servicio de importación.
+- `backend/src/common/errors/error-codes.ts`: `IMPORT_FILE_INVALID` e `IMPORT_DRY_RUN_INVALID`.
+- `backend/src/common/errors/api-exception.filter.ts`: traducción de errores de Multer (por ejemplo, archivo mayor al límite) a `422 IMPORT_FILE_INVALID`.
+- `backend/src/modules/extinguishers/imports/*.spec.ts` y `backend/test/extinguishers-import.e2e-spec.ts`.
+- `docs/diseno-api.md`: endpoints, campos, columnas, reglas de CSV/JSON y semántica de la confirmación.
+
+Resultados reales de la verificación:
+
+| Comando | Resultado |
+|---|---|
+| `npm run lint` | Sin errores. |
+| `npm run typecheck` | Sin errores. |
+| `npm test` | 67 pruebas, 67 correctas (40 previas + 27 de importación). |
+| `npm run test:e2e` | 89 pruebas, 89 correctas (79 previas + 10 de importación). |
+| `npm run test:integration` | 33 pruebas, 33 correctas (sin regresiones). |
+| `npm run build` | Compila. |
+| `npm run prisma:validate` | Esquema válido (sin cambios de esquema en 4B). |
+| `./scripts/verify.ps1` | Completa: backend y frontend (lint, typecheck, pruebas, build) sin fallos. |
+
+Cobertura de pruebas:
+
+- T-IMP-01 a T-IMP-13.
+- El dry-run no escribe extintores ni consume códigos.
+- La confirmación reutiliza el alta transaccional: ficha + `INGRESO` secuencia 1 + fecha `EQUIPO` + auditoría + idempotencia.
+- Filas inválidas se omiten sin efectos parciales; los fallos de escritura se reportan por fila como `FAILED`.
+- Repetir la confirmación devuelve `REPLAYED` y no duplica activos.
+- Seriales duplicados en el archivo o ya registrados generan advertencias, no bloqueos (D-16).
+- Comprobante ausente, vencido, alterado, de otro usuario o con archivo distinto responde `409 IMPORT_DRY_RUN_INVALID`.
+
+Desviaciones y notas:
+
+- **Sin tabla ni migración nuevas.** El comprobante es stateless (HMAC) y la protección contra duplicados se apoya en las claves de idempotencia por fila (`imp:<dryRunId>:<fila>`).
+- **Carga síncrona.** Para volúmenes grandes se documenta dividir el archivo en lotes operativos; el límite por archivo es de 10 000 filas.
+- **Advertencia de serial ya registrado dentro de la misma confirmación.** La detección se calcula antes de escribir; las filas repetidas dentro del mismo archivo se advierten entre sí.
+
 ---
 
 ## 8. Fase 5 — Motor de movimientos

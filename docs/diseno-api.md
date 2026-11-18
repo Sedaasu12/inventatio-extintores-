@@ -239,6 +239,8 @@ Los roles son una agrupación de permisos; el backend verifica permisos, no nomb
 | GET | `/extinguishers/:id/timeline` | `movements.read` | Movimientos + inspecciones + servicios (segunda fase si se complica). |
 | GET | `/extinguishers/:id/qr` | `extinguishers.read` | PNG/SVG del QR; query `format`, `size`. |
 | GET | `/extinguishers/:id/label` | `extinguishers.read` | HTML/PDF de etiqueta; PDF en segunda fase. |
+| POST | `/extinguishers/imports/dry-run` | `extinguishers.create` | Previsualiza una carga inicial (CSV/JSON) sin escribir datos. Devuelve comprobante y reporte por fila. |
+| POST | `/extinguishers/imports` | `extinguishers.create` | Confirma la carga con el comprobante del dry-run; importa cada fila válida en su propia transacción. |
 | POST | `/extinguishers/:id/retire` | `extinguishers.retire` | Baja; crea movimiento `BAJA` directamente, sin segunda aprobación; exige `authorizedBy`, motivo y `documentRef` (D-08b). Requiere `Idempotency-Key`. |
 | POST | `/extinguishers/:id/adjustments` | `movements.adjust` | Ajuste excepcional directo, sin segunda aprobación; exige `authorizedBy`, motivo y `documentRef` (D-08b). Requiere `Idempotency-Key`. |
 
@@ -299,6 +301,62 @@ Idempotency-Key: 4e8d0c2a-9f2b-4c1a-8f3e-1b2c3d4e5f60
 > `assetCode` no se acepta como entrada: lo genera el servidor. Tampoco se importan códigos en el MVP (D-04 aprobada); la carga inicial de equipos existentes (D-24) genera código nuevo para cada uno.
 
 > **Implementación (fase 4A):** están disponibles `GET /extinguishers` (paginado y filtrado), `POST /extinguishers`, `GET /extinguishers/:id`, `GET /extinguishers/by-code/:assetCode`, `PATCH /extinguishers/:id`, `POST /extinguishers/:id/condition`, `GET /extinguishers/:id/qr` y `GET /extinguishers/:id/label`. Movimientos, historial, línea de tiempo, baja y ajustes quedan para la fase 5. El alta exige `Idempotency-Key`; un reintento idéntico responde `200` con `Idempotent-Replay: true`, y una clave reutilizada con otro payload responde `409 IDEMPOTENCY_CONFLICT`. La ubicación inicial debe ser un `ALMACEN` o `AREA` activo; `SEDE`, `TALLER` o una ubicación inactiva responden `422 DESTINATION_INVALID`. La condición inicial es obligatoria y `AREA` + `NO_OPERATIVO` responde `422 CONDITION_NOT_ASSIGNABLE`. El servidor fija `movedAt` del `INGRESO` con la hora UTC de confirmación. `PATCH` rechaza con `422` cualquier intento de enviar `assetCode`, `currentLocationId`, `logisticsStatus`, `technicalCondition` o `placementType`, y exige `rowVersion`. Los filtros `alertEventType` y `alertStatus` quedan diferidos hasta la fase de alertas. El QR contiene solo el `asset_code`; la etiqueta HTML incluye el código textual y el QR, sin datos personales ni ubicación.
+
+#### Carga inicial (D-24)
+
+La carga inicial es una conciliación, no una importación limpia: el archivo es un punto de partida y la verificación física se hace en campo. El flujo obliga a previsualizar antes de escribir.
+
+1. `POST /api/v1/extinguishers/imports/dry-run` valida el archivo y devuelve un comprobante (`dryRunToken`) y un reporte por fila. No crea extintores, movimientos ni consume códigos.
+2. `POST /api/v1/extinguishers/imports` exige el comprobante y exactamente el mismo archivo y campos comunes. Importa solo las filas válidas.
+
+Ambas rutas son `multipart/form-data` y requieren `extinguishers.create`:
+
+| Campo | Obligatorio | Descripción |
+|---|---|---|
+| `file` | Sí | Archivo CSV o JSON, máximo 5 MB y 10 000 filas. |
+| `format` | Sí | `CSV` o `JSON`. |
+| `receivedBy` | Sí | Receptor de la carga; se copia al `INGRESO` de cada fila. |
+| `documentRef` | Sí | Referencia documental de la carga (acta, inventario, correo). |
+| `reason` | Sí | Motivo común de los `INGRESO`; mínimo 5 caracteres. |
+| `dryRunToken` | Solo al confirmar | Comprobante firmado del dry-run; vence a las 24 horas y está ligado al usuario, al archivo y a los campos comunes. |
+
+Columnas admitidas (los nombres son exactos; los códigos y enums se comparan sin distinguir mayúsculas):
+
+| Columna | Obligatoria | Regla |
+|---|---|---|
+| `serialNumber` | No | Máximo 100. Si falta, la fila se marca con advertencia `SERIAL_MISSING`. |
+| `typeCode` | Sí | Código de un tipo de extintor activo. |
+| `brand`, `model` | No | Máximo 100 cada uno. |
+| `capacityValue` | Sí | Número positivo con hasta dos decimales. |
+| `capacityUnit` | Sí | `KG`, `L` o `LB`. |
+| `manufactureDate`, `acquiredAt`, `commissionedAt`, `manufacturerExpiryDate` | No | `YYYY-MM-DD`; se aplican las mismas reglas del alta (fabricación no futura y orden cronológico). |
+| `sedeCode` | Sí | Código de una `SEDE` activa. |
+| `locationCode` | Sí | `ALMACEN` o `AREA` activo, hijo de `sedeCode`. `SEDE` y `TALLER` no son destinos de carga inicial. |
+| `technicalCondition` | Sí | Enum fijo (D-26). `AREA` + `NO_OPERATIVO` se rechaza con `CONDITION_NOT_ASSIGNABLE` (D-26b). |
+| `notes` | No | Máximo 2000. |
+
+CSV acepta delimitador `,` o `;`, comillas dobles, comillas escapadas (`""`) y saltos de línea entre comillas. Debe ser UTF-8. JSON acepta un arreglo de objetos o `{ "rows": [...] }`. Una cabecera o una propiedad desconocida se reporta como error; una cabecera CSV desconocida rechaza el archivo completo con `422 IMPORT_FILE_INVALID`.
+
+Ejemplo CSV:
+
+```csv
+serialNumber,typeCode,brand,model,capacityValue,capacityUnit,manufactureDate,acquiredAt,commissionedAt,manufacturerExpiryDate,sedeCode,locationCode,technicalCondition,notes
+SN-2020-001,PQS-6KG,ACME,PQS-6,6,KG,2020-01-01,2020-02-01,2020-02-10,2035-01-01,UBI-000001,UBI-000002,OPERATIVO,Carga inicial
+```
+
+El reporte del dry-run incluye `summary` (totales, válidos, inválidos, filas con advertencias, conteos por sede y ubicación) y `rows` con `status`, `errors`, `warnings`, datos normalizados y las entidades resueltas. La confirmación devuelve el mismo desglose con estados `IMPORTED`, `REPLAYED`, `SKIPPED` o `FAILED`.
+
+Reglas de la confirmación:
+
+- Cada fila válida usa la misma transacción del alta: extintor + `INGRESO` secuencia 1 + fecha `EQUIPO` + auditoría + registro de idempotencia.
+- `entrySource` siempre es `CARGA_INICIAL`; `receivedBy`, `documentRef` y `reason` provienen de los campos comunes.
+- El código se genera en el servidor (D-04); nunca se importa.
+- Una fila inválida se omite sin efectos parciales. Un fallo de escritura revierte solo esa fila y se reporta como `FAILED`.
+- La clave de idempotencia de cada fila es `imp:<dryRunId>:<fila>`. Repetir la confirmación con el mismo comprobante devuelve `REPLAYED` y no duplica activos.
+- El número de serie no es único (D-16). Los duplicados dentro del archivo y los seriales ya registrados generan advertencias, no bloqueos.
+- La operación completa se audita como `EXTINGUISHERS_IMPORTED` con el `dryRunId` y los conteos.
+
+Un comprobante ausente, vencido, alterado, de otro usuario o asociado a otro archivo responde `409 IMPORT_DRY_RUN_INVALID`. La carga es síncrona; para volúmenes grandes conviene dividir el archivo en lotes operativos.
 
 ### 4.4 Movimientos
 

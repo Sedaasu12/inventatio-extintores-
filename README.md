@@ -5,19 +5,21 @@ ubicación actual y conservar el historial de movimientos, inspecciones y servic
 
 ## Estado del proyecto
 
-**Fase 0 implementada y verificada:** esqueleto del repositorio, tooling, CI y
-base de datos comprobados. No hay modelos de datos, autenticación, CRUD, QR ni
-pantallas de negocio todavía.
+**Fases 0 a 4B implementadas y verificadas:** modelo de datos, autenticación y
+auditoría, ubicaciones y catálogos, alta transaccional de extintores con QR y
+etiqueta, y carga inicial CSV/JSON con dry-run. El motor de movimientos,
+mantenimiento, inspecciones, alertas y el frontend de negocio corresponden a las
+fases siguientes.
 
 La evidencia completa, con los comandos y su salida real, está en
-`docs/evidencias/fase-0.md`.
+`docs/evidencias/` y en `docs/plan-implementacion.md`.
 
 | Componente | Tecnología |
 |---|---|
 | Frontend | Angular 21 + TypeScript |
 | Backend | NestJS 11 + TypeScript |
 | Base de datos | MySQL 8 |
-| ORM | Prisma 6 (sin modelos en fase 0) |
+| ORM | Prisma 6 |
 
 ## Requisitos
 
@@ -137,12 +139,51 @@ Endpoints disponibles:
 | `POST /api/v1/extinguishers/:id/condition` | Cambio de condición técnica con motivo (SEGURIDAD/ADMIN) |
 | `GET /api/v1/extinguishers/:id/qr` | QR PNG/SVG del código del activo |
 | `GET /api/v1/extinguishers/:id/label` | Etiqueta HTML imprimible |
+| `POST /api/v1/extinguishers/imports/dry-run` | Previsualiza una carga inicial CSV/JSON sin escribir datos |
+| `POST /api/v1/extinguishers/imports` | Confirma la carga con el comprobante del dry-run |
 | `GET /api/docs` | Swagger generado en tiempo de ejecución |
 
 El access token se envía como `Authorization: Bearer <token>`. El refresh token
 viaja en una cookie `HttpOnly` con `SameSite=Strict`; el frontend no debe
 guardarlo en `localStorage`. El administrador sembrado debe cambiar su contraseña
 en el primer inicio de sesión.
+
+### Carga inicial
+
+La importación (D-24) exige previsualizar antes de escribir. Ambos endpoints son
+`multipart/form-data` y requieren el permiso `extinguishers.create`:
+
+| Campo | Obligatorio | Descripción |
+|---|---|---|
+| `file` | Sí | CSV o JSON, máximo 5 MB y 10 000 filas, UTF-8. |
+| `format` | Sí | `CSV` o `JSON`. |
+| `receivedBy` | Sí | Receptor de la carga; se copia al `INGRESO` de cada fila. |
+| `documentRef` | Sí | Referencia documental (acta, inventario, correo). |
+| `reason` | Sí | Motivo común de los `INGRESO`. |
+| `dryRunToken` | Solo al confirmar | Comprobante del dry-run; vence a las 24 h y está ligado al usuario y al archivo. |
+
+Columnas: `serialNumber`, `typeCode`, `brand`, `model`, `capacityValue`,
+`capacityUnit`, `manufactureDate`, `acquiredAt`, `commissionedAt`,
+`manufacturerExpiryDate`, `sedeCode`, `locationCode`, `technicalCondition`,
+`notes`. Son obligatorias `typeCode`, `capacityValue`, `capacityUnit`,
+`sedeCode`, `locationCode` y `technicalCondition`.
+
+Ejemplo con `curl`:
+
+```bash
+curl -X POST http://localhost:3000/api/v1/extinguishers/imports/dry-run \
+  -H "Authorization: Bearer $TOKEN" \
+  -F "file=@inventario.csv" \
+  -F "format=CSV" \
+  -F "receivedBy=Carlos Ruiz" \
+  -F "documentRef=ACTA-CARGA-2026-001" \
+  -F "reason=Carga inicial conciliada con verificación física"
+```
+
+La confirmación repite el mismo archivo y campos, añadiendo `dryRunToken`. Cada
+fila válida se importa en su propia transacción como `CARGA_INICIAL`; las filas
+inválidas se omiten y se reportan. Repetir la confirmación no duplica activos.
+El detalle de columnas y reglas está en `docs/diseno-api.md` §4.3.
 
 ## Verificación
 
@@ -162,9 +203,9 @@ salida. La evidencia de la fase 0 está en `docs/evidencias/fase-0.md`.
 ## Estructura
 
 ```text
-backend/          NestJS: configuración validada y módulo health
+backend/          NestJS: API REST, autenticación, catálogos, extintores e importación
 frontend/         Angular: esqueleto con routing
-docs/             Visión, requerimientos, reglas, modelo y evidencias
+docs/             Visión, requerimientos, reglas, modelo, API y evidencias
 scripts/          Verificación y reset de base de datos
 .github/          CI con lint, typecheck, pruebas y build
 ```
