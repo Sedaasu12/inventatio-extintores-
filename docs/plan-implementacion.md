@@ -631,6 +631,7 @@ Desviaciones y notas:
 - **Sin tabla ni migración nuevas.** El comprobante es stateless (HMAC) y la protección contra duplicados se apoya en las claves de idempotencia por fila (`imp:<dryRunId>:<fila>`).
 - **Carga síncrona.** Para volúmenes grandes se documenta dividir el archivo en lotes operativos; el límite por archivo es de 10 000 filas.
 - **Advertencia de serial ya registrado dentro de la misma confirmación.** La detección se calcula antes de escribir; las filas repetidas dentro del mismo archivo se advierten entre sí.
+- **Corrección de CI.** La prueba de firma alterada cambiaba el último carácter base64url, cuyos bits de relleno pueden decodificar al mismo HMAC; ahora altera el primer carácter, con bits significativos, y la detección es determinista en Linux y Windows.
 
 ---
 
