@@ -366,7 +366,8 @@ Un comprobante ausente, vencido, alterado, de otro usuario o asociado a otro arc
 | GET | `/movements/:id` | `movements.read` | Detalle inmutable. |
 | POST | `/extinguishers/:id/movements` | `movements.create` | `SALIDA`, `TRASLADO`, `RETORNO_ALMACEN`. Requiere `Idempotency-Key`. |
 | POST | `/extinguishers/:id/maintenance/send` | `maintenance.manage` | Crea orden + `ENVIO_MANTENIMIENTO`. Requiere `Idempotency-Key`. |
-| POST | `/maintenance-orders/:id/services` | `maintenance.manage` | Registra servicio. Requiere `Idempotency-Key`. |
+| POST | `/maintenance-orders/:id/services` | `maintenance.manage` | Registra servicio dentro de una orden. Requiere `Idempotency-Key`. |
+| POST | `/extinguishers/:id/services` | `maintenance.manage` | Servicio interno sin orden (no cambia colocación ni estado). Requiere `Idempotency-Key`. |
 | POST | `/maintenance-orders/:id/return` | `maintenance.manage` | `RETORNO_MANTENIMIENTO` + cierre de orden. Requiere `Idempotency-Key`. |
 | GET | `/maintenance-orders` | `maintenance.read` | Órdenes; filtros por estado/proveedor/retorno previsto. |
 | GET | `/maintenance-orders/:id` | `maintenance.read` | Orden, servicios y movimientos. |
@@ -507,6 +508,16 @@ Idempotency-Key: 7b8c...
   "rowVersion": 5
 }
 ```
+
+> **Implementación (fase 6A):** están disponibles `POST /extinguishers/:id/maintenance/send`, `POST /maintenance-orders/:id/services`, `POST /extinguishers/:id/services` (servicio interno sin orden, añadido para cubrir T-MAN-13), `POST /maintenance-orders/:id/return`, `GET /maintenance-orders` y `GET /maintenance-orders/:id`. Todas las escrituras exigen `Idempotency-Key` y comparten el contrato de idempotencia de §6.1.
+>
+> - **Apertura:** la orden se crea directamente en `EN_PROVEEDOR` tanto para proveedor externo como para taller interno; `ABIERTA` queda reservada para un flujo posterior (supuesto de fase 6A). Se exige exactamente uno de `providerId` o `workshopLocationId`. El proveedor externo debe estar activo y ser `PROVEEDOR_MANTENIMIENTO` o `TALLER`; el taller interno debe ser una ubicación activa de tipo `TALLER`. El envío externo exige `documentRef`. Solo puede existir una orden activa por extintor (`409 MAINTENANCE_ORDER_ACTIVE`).
+> - **Retorno:** exige al menos un servicio en la orden (`422 MAINTENANCE_SERVICE_REQUIRED`), que el extintor siga en el proveedor/taller de la orden (`409 ORIGIN_MISMATCH`) y un destino activo `ALMACEN` o `AREA` (`422 DESTINATION_INVALID`). El retorno desde proveedor externo exige `documentRef`. Cierra la orden en `CERRADA` con `closedAt` igual al `movedAt` del `RETORNO_MANTENIMIENTO`.
+> - **Servicios:** en una orden externa `providerId` es obligatorio y debe coincidir con el de la orden; en una orden interna `performedByUserId` es obligatorio y `providerId` está prohibido. El servicio sin orden solo se admite si el extintor no tiene orden activa, exige `performedByUserId` y prohíbe `providerId`.
+> - **Fechas:** `performedAt` es un instante ISO 8601 con zona horaria, se guarda en UTC y no puede superar los 5 minutos de tolerancia ni ser anterior al alta del extintor; dentro de una orden tampoco puede ser anterior a `openedAt`. `performedOn` se deriva en `America/Lima`. `nextDueDate` debe ser posterior a `performedOn` (`422 PRESCRIPTION_INVALID`).
+> - **Proyección de vencimientos:** cada servicio reemplaza únicamente su categoría (`MANTENIMIENTO`, `RECARGA` o `PRUEBA_HIDROSTATICA`) y solo si su `performedAt` es posterior al evento que originó la fecha vigente; un servicio retroactivo no pisa una fecha más reciente. Sin `nextDueDate`, la categoría queda sin fecha. `REPARACION` actualiza la categoría `MANTENIMIENTO` (supuesto de fase 6A). El resultado del servicio (`APROBADO`/`RECHAZADO`/`CON_OBSERVACIONES`) es evidencia y no cambia la condición técnica ni la colocación (D-10, D-28).
+> - **Costo y moneda:** ambos nulos o ambos informados; `cost ≥ 0` y `currency` ISO 4217 de tres letras. No se asume moneda por defecto. Los servicios y las inspecciones no incrementan `rowVersion`.
+> - **Diferido:** correcciones de servicios, cancelación de órdenes y `checklist` quedan para una fase posterior.
 
 ### 4.5 Inspecciones
 
@@ -725,6 +736,14 @@ Al cambiar `usefulLifeYears`, el servidor recalcula la fecha objetivo `EQUIPO` d
 - `providerId` obligatorio si el servicio es externo; `workshopLocationId` y `performedByUserId` si es interno (D-31).
 - `cost` opcional y ≥ 0; `currency` ISO 4217 de 3 letras, obligatoria si hay costo y nula si no lo hay (D-29).
 
+> **Servicio de mantenimiento implementado (fase 6A):** `serviceType` (`MANTENIMIENTO`, `RECARGA`, `REPARACION`, `PRUEBA_HIDROSTATICA`), `performedAt` (instante con zona), `result` (`APROBADO`, `RECHAZADO`, `CON_OBSERVACIONES`), `certificateNo` (≤ 100), `certificateDate` (`AAAA-MM-DD`), `nextDueDate` (`AAAA-MM-DD`, posterior a `performedOn`), `cost`/`currency`, `notes` (≤ 2000) y `documentRef` (≤ 100) son opcionales salvo las reglas de actor indicadas en §4.4. No se acepta `checklist` en esta fase.
+
+### 5.4a DTO de envío y retorno de mantenimiento
+
+- `SendToMaintenanceDto`: exactamente uno de `providerId` o `workshopLocationId`; `movedAt` obligatorio con zona; `deliveredBy` y `reason` obligatorios; `expectedReturnDate` opcional (`AAAA-MM-DD`); `authorizedBy`, `documentRef` y `notes` opcionales; `rowVersion` obligatorio.
+- `ReturnFromMaintenanceDto`: `destinationLocationId`, `movedAt`, `receivedBy`, `reason` y `rowVersion` obligatorios; `deliveredBy`, `authorizedBy`, `documentRef` y `notes` opcionales (`documentRef` obligatorio si la orden es externa).
+- `ListMaintenanceOrdersQueryDto`: paginación (`page`, `pageSize` ≤ 100), `status`, `providerId`, `workshopLocationId`, `extinguisherId`, `assetCode`, rango `expectedReturnFrom`/`expectedReturnTo` y orden por `openedAt`, `expectedReturnDate` o `createdAt`.
+
 ---
 
 ## 6. Idempotencia y concurrencia
@@ -736,6 +755,7 @@ Al cambiar `usefulLifeYears`, el servidor recalcula la fecha objetivo `EQUIPO` d
   - `POST /extinguishers/:id/movements`
   - `POST /extinguishers/:id/maintenance/send`
   - `POST /maintenance-orders/:id/services`
+  - `POST /extinguishers/:id/services`
   - `POST /maintenance-orders/:id/return`
   - `POST /extinguishers/:id/inspections`
   - `POST /extinguishers/:id/retire`
@@ -747,6 +767,8 @@ Al cambiar `usefulLifeYears`, el servidor recalcula la fecha objetivo `EQUIPO` d
 - La limpieza de registros se ejecuta después de 24 h; no se reutilizan claves de operaciones completadas dentro de esa ventana.
 
 > **Implementación (fase 4A):** el alta usa `request_hash` SHA-256 de un payload canónico. Si la clave existe dentro de la ventana de 24 h con el mismo hash, se devuelve el recurso original con `200` y `Idempotent-Replay: true`; si el hash difiere, `409 IDEMPOTENCY_CONFLICT`; si el registro está en `PROCESSING`, `409 CONCURRENCY_CONFLICT`. El registro de idempotencia, la ficha, el `INGRESO`, la fecha `EQUIPO` y la auditoría se confirman en una única transacción `Serializable`; si cualquier paso falla, no queda ninguno de ellos y la clave puede reutilizarse.
+
+> **Implementación (fase 6A):** el módulo `common/idempotency` reutiliza el mismo contrato para el envío, el retorno y los servicios de mantenimiento. La clave es única por usuario y operación; el `request_hash` incluye el ámbito (`orderId` o `extinguisherId`) y el payload canónico. El recurso, la proyección de vencimientos y la auditoría se confirman en la misma transacción `Serializable` que el bloqueo del extintor y de la orden.
 
 ### 6.1A Idempotencia de borradores offline
 

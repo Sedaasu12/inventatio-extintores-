@@ -5,10 +5,11 @@ ubicación actual y conservar el historial de movimientos, inspecciones y servic
 
 ## Estado del proyecto
 
-**Fases 0 a 5 implementadas y verificadas:** modelo de datos, autenticación y
-auditoría, ubicaciones y catálogos, alta transaccional de extintores con QR y
-etiqueta, carga inicial CSV/JSON con dry-run, y motor de movimientos con baja e
-historial. Mantenimiento, inspecciones, alertas y el frontend de negocio
+**Fases 0 a 5 y bloque 6A implementados y verificados:** modelo de datos,
+autenticación y auditoría, ubicaciones y catálogos, alta transaccional de
+extintores con QR y etiqueta, carga inicial CSV/JSON con dry-run, motor de
+movimientos con baja e historial, y ciclo de mantenimiento con servicios y
+proyección de vencimientos. Inspecciones, alertas y el frontend de negocio
 corresponden a las fases siguientes.
 
 La evidencia completa, con los comandos y su salida real, está en
@@ -232,6 +233,37 @@ transacción con bloqueo de fila y secuencia por activo. Un `rowVersion`
 desactualizado responde `409 CONCURRENCY_CONFLICT`; un reintento idéntico
 devuelve `200` con `Idempotent-Replay: true`.
 
+### Mantenimiento (fase 6A)
+
+| Endpoint | Uso |
+|---|---|
+| `POST /api/v1/extinguishers/:id/maintenance/send` | Crea la orden y el `ENVIO_MANTENIMIENTO`. |
+| `POST /api/v1/maintenance-orders/:id/services` | Registra un servicio dentro de la orden. |
+| `POST /api/v1/extinguishers/:id/services` | Servicio interno sin orden; no cambia colocación ni estado. |
+| `POST /api/v1/maintenance-orders/:id/return` | `RETORNO_MANTENIMIENTO` y cierre de la orden. |
+| `GET /api/v1/maintenance-orders` | Lista con filtros por estado, proveedor, taller, activo y retorno previsto. |
+| `GET /api/v1/maintenance-orders/:id` | Orden con sus servicios. |
+
+Reglas aplicadas por el servidor:
+
+- La orden nace en `EN_PROVEEDOR` para proveedor externo o taller interno; solo
+  puede existir una orden activa por extintor (`409 MAINTENANCE_ORDER_ACTIVE`).
+- El envío externo exige `documentRef`; el taller interno debe ser una ubicación
+  activa de tipo `TALLER`.
+- El retorno exige al menos un servicio (`422 MAINTENANCE_SERVICE_REQUIRED`),
+  que el extintor siga en el proveedor/taller de la orden y un destino activo
+  `ALMACEN` o `AREA`.
+- En una orden externa el `providerId` del servicio debe coincidir con el de la
+  orden; en una orden interna `performedByUserId` es obligatorio.
+- `performedAt` exige zona horaria, no puede superar 5 minutos en el futuro ni
+  ser anterior al alta o a la apertura de la orden. `nextDueDate` debe ser
+  posterior a la fecha local del hecho.
+- Cada servicio actualiza solo su categoría de vencimiento y no reemplaza una
+  fecha más reciente. El resultado del servicio es evidencia y no cambia la
+  condición técnica ni la ubicación.
+- Costo y moneda son opcionales y coherentes entre sí; no se asume moneda por
+  defecto.
+
 ## Verificación
 
 Desde la raíz:
@@ -250,7 +282,7 @@ salida. La evidencia de la fase 0 está en `docs/evidencias/fase-0.md`.
 ## Estructura
 
 ```text
-backend/          NestJS: API REST, autenticación, catálogos, extintores e importación
+backend/          NestJS: API REST, autenticación, catálogos, extintores, importación, movimientos y mantenimiento
 frontend/         Angular: esqueleto con routing
 docs/             Visión, requerimientos, reglas, modelo, API y evidencias
 scripts/          Verificación y reset de base de datos
@@ -270,7 +302,7 @@ scripts/          Verificación y reset de base de datos
 ## Seguridad y alcance
 
 - El QR solo identifica el activo; escanearlo no concede acceso.
-- Las acciones sensibles requieren autenticación y permisos (fases posteriores).
+- Las acciones sensibles requieren autenticación y permisos basados en roles.
 - No se almacenan secretos en el repositorio ni en el frontend.
 - La aplicación ayuda a controlar registros y avisos; no sustituye inspecciones,
   certificados ni criterios del personal competente.

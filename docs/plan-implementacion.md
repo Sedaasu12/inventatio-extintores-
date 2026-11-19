@@ -807,6 +807,19 @@ npm run test:e2e -- maintenance inspections
 npm run lint && npm run typecheck && npm run build
 ```
 
+### Estado de ejecución (fase 6A, 2026-11-19)
+
+Completado el bloque de mantenimiento y proyección de vencimientos; las inspecciones (6B) quedan pendientes.
+
+- **Infraestructura común:** `common/time/calendar.ts` y `common/time/instant.ts` (instantes ISO 8601 con zona, tolerancia de 5 minutos y fechas de calendario), `common/idempotency/` (hash canónico y registro transaccional reutilizable) y `movements/movement-core.ts` (bloqueo `FOR UPDATE`, snapshot de origen, secuencia y `rowVersion` compartidos con movimientos).
+- **Vencimientos:** `due-dates/due-date-projection.ts` reemplaza solo la categoría del evento y solo si la fecha de evento es posterior a la que originó la proyección vigente. `REPARACION` alimenta `MANTENIMIENTO`.
+- **Mantenimiento:** `MaintenanceModule` expone `POST /extinguishers/:id/maintenance/send`, `GET /maintenance-orders`, `GET /maintenance-orders/:id`, `POST /maintenance-orders/:id/services`, `POST /extinguishers/:id/services` (servicio interno sin orden) y `POST /maintenance-orders/:id/return`, todos con DTO validado, idempotencia, auditoría y transacción `Serializable`.
+- **Supuestos registrados:** la orden nace en `EN_PROVEEDOR` tanto para proveedor externo como para taller interno (`ABIERTA` se reserva para un flujo posterior); el retorno solo admite `ALMACEN`/`AREA` activos; el proveedor del servicio debe coincidir con el de la orden; el servicio sin orden exige `performedByUserId`, prohíbe `providerId` y no cambia colocación ni estado; `performedAt` no puede ser anterior al alta ni a la apertura de la orden; `nextDueDate` debe ser posterior a la fecha local del hecho; costo y moneda son ambos nulos o ambos informados, sin moneda por defecto; servicios e inspecciones no incrementan `rowVersion`; `checklist`, correcciones y cancelación de órdenes quedan diferidos.
+- **Incidente corregido:** `parseInstant` confundía la fracción de segundo con los segundos y rechazaba instantes válidos cuando el segundo era `59` con milisegundos (por ejemplo `14:35:59.120Z`). Se corrigió el parseo y se añadió `instant.spec.ts` como regresión. Las pruebas e2e anclan sus fechas al mayor valor entre `movedAt` del alta y `createdAt` para no depender de la latencia de la inserción.
+- **Limitación conocida:** un `AJUSTE` de fase 5 hacia `TALLER` o `EXTERNAL_PARTY` deja el extintor en `EN_MANTENIMIENTO` sin orden asociada; solo se corrige con otro `AJUSTE`. Se documentará en la ficha y se evaluará al cerrar la fase 6.
+- **Verificación:** `./scripts/verify.ps1` en verde (backend: 122 unitarias, 141 e2e, 33 de integración, lint, typecheck, build y `prisma validate`; frontend: lint, typecheck, 2 pruebas y build).
+- **Pendiente 6B:** módulo de inspecciones, `lastInspection` y `openMaintenanceOrder` en la ficha, y T-INS-01..06/08/09 + T-CON-04.
+
 ---
 
 ## 10. Fase 7 — Alertas, dashboard y reportes

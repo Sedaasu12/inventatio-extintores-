@@ -26,6 +26,7 @@ interface ExtinguisherBody {
   currentExternalParty: { id: string } | null;
   retiredAt: string | null;
   rowVersion: number;
+  createdAt: string;
 }
 
 interface AltaBody {
@@ -135,10 +136,16 @@ describe('Movimientos (e2e)', () => {
     return response.body as AltaBody;
   };
 
-  const at = (created: AltaBody, seconds: number): string =>
-    new Date(
-      new Date(created.movement.movedAt).getTime() + seconds * 1000,
-    ).toISOString();
+  const at = (created: AltaBody, seconds: number): string => {
+    // `createdAt` lo asigna la base al insertar y puede quedar por delante del
+    // `movedAt` del alta, capturado al inicio de la petición. Partimos del
+    // mayor de ambos para que los hechos posteriores nunca queden antes del alta.
+    const base = Math.max(
+      new Date(created.movement.movedAt).getTime(),
+      new Date(created.extinguisher.createdAt).getTime(),
+    );
+    return new Date(base + seconds * 1000).toISOString();
+  };
 
   const movementPayload = (
     created: AltaBody,

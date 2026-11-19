@@ -7,6 +7,7 @@ import { PasswordChangeGuard } from './common/auth/password-change.guard';
 import { PermissionsGuard } from './common/auth/permissions.guard';
 import { CodeCounterModule } from './common/codes/code-counter.module';
 import { ApiExceptionFilter } from './common/errors/api-exception.filter';
+import { IdempotencyModule } from './common/idempotency/idempotency.module';
 import { RequestIdMiddleware } from './common/middleware/request-id.middleware';
 import { APP_ENV, AppConfigModule } from './config/config.module';
 import type { AppEnv } from './config/env';
@@ -17,6 +18,7 @@ import { ExtinguisherTypesModule } from './modules/catalogs/extinguisher-types/e
 import { ExtinguishersModule } from './modules/extinguishers/extinguishers.module';
 import { HealthModule } from './modules/health/health.module';
 import { LocationsModule } from './modules/locations/locations.module';
+import { MaintenanceModule } from './modules/maintenance/maintenance.module';
 import { MovementsModule } from './modules/movements/movements.module';
 import { UsersModule } from './modules/users/users.module';
 import { PrismaModule } from './prisma/prisma.module';
@@ -41,11 +43,13 @@ import { PrismaModule } from './prisma/prisma.module';
     AuthModule,
     UsersModule,
     CodeCounterModule,
+    IdempotencyModule,
     LocationsModule,
     ExtinguisherTypesModule,
     ExternalPartiesModule,
     ExtinguishersModule,
     MovementsModule,
+    MaintenanceModule,
     HealthModule,
   ],
   providers: [

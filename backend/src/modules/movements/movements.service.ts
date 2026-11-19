@@ -1,23 +1,14 @@
 import { Injectable } from '@nestjs/common';
-import {
-  LocationType,
-  LogisticsStatus,
-  MovementType,
-  PlacementType,
-  Prisma,
-  TechnicalCondition,
-} from '@prisma/client';
-import { createHash, randomUUID } from 'node:crypto';
+import { Prisma } from '@prisma/client';
+import { randomUUID } from 'node:crypto';
 import type { AuthenticatedUser } from '../../common/auth/authenticated-user';
 import { ApiError } from '../../common/errors/api-error';
 import { ErrorCodes } from '../../common/errors/error-codes';
+import { IdempotencyService } from '../../common/idempotency/idempotency.service';
+import { hashPayload } from '../../common/idempotency/request-hash';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
 import type { RequestContext } from '../auth/auth.service';
-import {
-  EXTINGUISHER_DETAIL_SELECT,
-  toExtinguisherDetail,
-} from '../extinguishers/extinguisher-view';
 import {
   AdjustMovementDto,
   CreateMovementDto,
@@ -25,7 +16,21 @@ import {
   RetireExtinguisherDto,
 } from './dto/movements.dto';
 import {
-  AssetMovementState,
+  MovementOperationResult,
+  Tx,
+  assetNotFound,
+  assertRowVersion,
+  buildMovementBody,
+  locationLabel,
+  lockAsset,
+  nextSequence,
+  normalizeOptionalText,
+  requireText,
+  resolveActiveLocation,
+  snapshotOrigin,
+  toPolicyState,
+} from './movement-core';
+import {
   PlacementTarget,
   parseMovedAt,
   validateAdjustment,
@@ -34,85 +39,6 @@ import {
   validateRetirement,
 } from './movement-policy';
 import { MOVEMENT_SELECT, toMovementView } from './movement-view';
-
-const IDEMPOTENCY_TTL_MS = 24 * 60 * 60 * 1000;
-const MAX_TRANSACTION_ATTEMPTS = 3;
-const ACTIVE_MAINTENANCE_STATUSES = ['ABIERTA', 'EN_PROVEEDOR'] as const;
-
-type Tx = Prisma.TransactionClient;
-
-interface LockedAsset {
-  id: string;
-  assetCode: string;
-  logisticsStatus: LogisticsStatus;
-  technicalCondition: TechnicalCondition;
-  placementType: PlacementType;
-  currentLocationId: string | null;
-  currentExternalPartyId: string | null;
-  currentSince: Date | null;
-  retiredAt: Date | null;
-  rowVersion: number;
-  createdAt: Date;
-  currentLocation: {
-    id: string;
-    code: string;
-    name: string;
-    type: LocationType;
-  } | null;
-  currentExternalParty: {
-    id: string;
-    code: string;
-    name: string;
-  } | null;
-  lastMovement: {
-    id: string;
-    assetSequence: number;
-    movedAt: Date;
-    movementType: MovementType;
-  } | null;
-  hasActiveMaintenanceOrder: boolean;
-}
-
-interface EndpointSnapshot {
-  kind: 'LOCATION' | 'EXTERNAL_PARTY' | 'NONE';
-  locationId: string | null;
-  externalPartyId: string | null;
-  label: string;
-}
-
-export interface MovementOperationResult {
-  replayed: boolean;
-  body: {
-    movement: ReturnType<typeof toMovementView>;
-    extinguisher: ReturnType<typeof toExtinguisherDetail>;
-  };
-}
-
-function assetNotFound(): ApiError {
-  return new ApiError(
-    404,
-    ErrorCodes.ASSET_NOT_FOUND,
-    'El extintor no existe.',
-  );
-}
-
-function normalizeOptionalText(
-  value: string | null | undefined,
-): string | null {
-  if (value === undefined || value === null) {
-    return null;
-  }
-  const trimmed = value.trim();
-  return trimmed === '' ? null : trimmed;
-}
-
-function locationLabel(location: { code: string; name: string }): string {
-  return `${location.code} - ${location.name}`;
-}
-
-function hashPayload(value: unknown): string {
-  return createHash('sha256').update(JSON.stringify(value)).digest('hex');
-}
 
 function hashMovement(extinguisherId: string, dto: CreateMovementDto): string {
   return hashPayload({
@@ -169,18 +95,12 @@ function hashAdjustment(
   });
 }
 
-function isRetryableTransactionError(error: unknown): boolean {
-  return (
-    error instanceof Prisma.PrismaClientKnownRequestError &&
-    (error.code === 'P2034' || error.code === 'P2002')
-  );
-}
-
 @Injectable()
 export class MovementsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly audit: AuditService,
+    private readonly idempotency: IdempotencyService,
   ) {}
 
   async createMovement(
@@ -190,19 +110,22 @@ export class MovementsService {
     idempotencyKey: string,
     context: RequestContext,
   ): Promise<MovementOperationResult> {
-    const outcome = await this.runIdempotent(
-      actor,
-      idempotencyKey,
-      hashMovement(extinguisherId, dto),
-      `/api/v1/extinguishers/${extinguisherId}/movements`,
+    const outcome = await this.idempotency.run(
+      {
+        actorId: actor.id,
+        key: idempotencyKey,
+        requestHash: hashMovement(extinguisherId, dto),
+        path: `/api/v1/extinguishers/${extinguisherId}/movements`,
+        resourceType: 'MOVEMENT',
+      },
       async (tx) => {
-        const asset = await this.loadLockedAsset(tx, extinguisherId);
-        this.assertRowVersion(asset, dto.rowVersion);
+        const asset = await lockAsset(tx, extinguisherId);
+        assertRowVersion(asset, dto.rowVersion);
 
         const movedAt = parseMovedAt(dto.movedAt);
-        validateMovedAt(movedAt, this.toPolicyState(asset));
+        validateMovedAt(movedAt, toPolicyState(asset));
 
-        const destination = await this.resolveDestination(
+        const destination = await resolveActiveLocation(
           tx,
           dto.destinationLocationId,
         );
@@ -211,11 +134,11 @@ export class MovementsService {
           originLocationId: dto.originLocationId,
           destinationLocationId: destination.id,
           destinationLocationType: destination.type,
-          asset: this.toPolicyState(asset),
+          asset: toPolicyState(asset),
         });
         const evidence = this.resolveOperationalEvidence(dto);
-        const origin = this.snapshotOrigin(asset);
-        const assetSequence = this.nextSequence(asset);
+        const origin = snapshotOrigin(asset);
+        const assetSequence = nextSequence(asset);
         const movementId = randomUUID();
 
         await tx.movement.create({
@@ -286,7 +209,7 @@ export class MovementsService {
 
     return {
       replayed: outcome.replayed,
-      body: await this.buildMovementBody(outcome.resourceId),
+      body: await buildMovementBody(this.prisma, outcome.resourceId),
     };
   }
 
@@ -297,21 +220,24 @@ export class MovementsService {
     idempotencyKey: string,
     context: RequestContext,
   ): Promise<MovementOperationResult> {
-    const outcome = await this.runIdempotent(
-      actor,
-      idempotencyKey,
-      hashRetirement(extinguisherId, dto),
-      `/api/v1/extinguishers/${extinguisherId}/retire`,
+    const outcome = await this.idempotency.run(
+      {
+        actorId: actor.id,
+        key: idempotencyKey,
+        requestHash: hashRetirement(extinguisherId, dto),
+        path: `/api/v1/extinguishers/${extinguisherId}/retire`,
+        resourceType: 'MOVEMENT',
+      },
       async (tx) => {
-        const asset = await this.loadLockedAsset(tx, extinguisherId);
-        this.assertRowVersion(asset, dto.rowVersion);
+        const asset = await lockAsset(tx, extinguisherId);
+        assertRowVersion(asset, dto.rowVersion);
 
         const movedAt = parseMovedAt(dto.movedAt);
-        validateMovedAt(movedAt, this.toPolicyState(asset));
-        validateRetirement(this.toPolicyState(asset));
+        validateMovedAt(movedAt, toPolicyState(asset));
+        validateRetirement(toPolicyState(asset));
 
-        const origin = this.snapshotOrigin(asset);
-        const assetSequence = this.nextSequence(asset);
+        const origin = snapshotOrigin(asset);
+        const assetSequence = nextSequence(asset);
         const movementId = randomUUID();
 
         await tx.movement.create({
@@ -384,7 +310,7 @@ export class MovementsService {
 
     return {
       replayed: outcome.replayed,
-      body: await this.buildMovementBody(outcome.resourceId),
+      body: await buildMovementBody(this.prisma, outcome.resourceId),
     };
   }
 
@@ -399,17 +325,20 @@ export class MovementsService {
       throw ApiError.forbidden('Solo ADMIN puede registrar ajustes.');
     }
 
-    const outcome = await this.runIdempotent(
-      actor,
-      idempotencyKey,
-      hashAdjustment(extinguisherId, dto),
-      `/api/v1/extinguishers/${extinguisherId}/adjustments`,
+    const outcome = await this.idempotency.run(
+      {
+        actorId: actor.id,
+        key: idempotencyKey,
+        requestHash: hashAdjustment(extinguisherId, dto),
+        path: `/api/v1/extinguishers/${extinguisherId}/adjustments`,
+        resourceType: 'MOVEMENT',
+      },
       async (tx) => {
-        const asset = await this.loadLockedAsset(tx, extinguisherId);
-        this.assertRowVersion(asset, dto.rowVersion);
+        const asset = await lockAsset(tx, extinguisherId);
+        assertRowVersion(asset, dto.rowVersion);
 
         const movedAt = parseMovedAt(dto.movedAt);
-        validateMovedAt(movedAt, this.toPolicyState(asset));
+        validateMovedAt(movedAt, toPolicyState(asset));
 
         const { target, label } = await this.resolveAdjustmentTarget(tx, dto);
         const correctsMovement = await this.resolveCorrectsMovement(
@@ -418,13 +347,13 @@ export class MovementsService {
           dto.correctsMovementId,
         );
         const result = validateAdjustment({
-          asset: this.toPolicyState(asset),
+          asset: toPolicyState(asset),
           target,
           correctsMovement,
         });
 
-        const origin = this.snapshotOrigin(asset);
-        const assetSequence = this.nextSequence(asset);
+        const origin = snapshotOrigin(asset);
+        const assetSequence = nextSequence(asset);
         const movementId = randomUUID();
 
         await tx.movement.create({
@@ -508,7 +437,7 @@ export class MovementsService {
 
     return {
       replayed: outcome.replayed,
-      body: await this.buildMovementBody(outcome.resourceId),
+      body: await buildMovementBody(this.prisma, outcome.resourceId),
     };
   }
 
@@ -628,146 +557,6 @@ export class MovementsService {
     return { [value]: 'asc' };
   }
 
-  private async loadLockedAsset(
-    tx: Tx,
-    extinguisherId: string,
-  ): Promise<LockedAsset> {
-    const locked = await tx.$queryRaw<Array<{ id: string }>>`
-      SELECT id FROM extinguishers WHERE id = ${extinguisherId} FOR UPDATE
-    `;
-    if (locked.length === 0) {
-      throw assetNotFound();
-    }
-
-    const asset = await tx.extinguisher.findUnique({
-      where: { id: extinguisherId },
-      select: {
-        id: true,
-        assetCode: true,
-        logisticsStatus: true,
-        technicalCondition: true,
-        placementType: true,
-        currentLocationId: true,
-        currentExternalPartyId: true,
-        currentSince: true,
-        retiredAt: true,
-        rowVersion: true,
-        createdAt: true,
-        currentLocation: {
-          select: { id: true, code: true, name: true, type: true },
-        },
-        currentExternalParty: {
-          select: { id: true, code: true, name: true },
-        },
-      },
-    });
-    if (asset === null) {
-      throw assetNotFound();
-    }
-
-    const [lastMovement, activeOrder] = await Promise.all([
-      tx.movement.findFirst({
-        where: { extinguisherId },
-        orderBy: { assetSequence: 'desc' },
-        select: {
-          id: true,
-          assetSequence: true,
-          movedAt: true,
-          movementType: true,
-        },
-      }),
-      tx.maintenanceOrder.findFirst({
-        where: {
-          extinguisherId,
-          status: { in: [...ACTIVE_MAINTENANCE_STATUSES] },
-        },
-        select: { id: true },
-      }),
-    ]);
-
-    return {
-      ...asset,
-      lastMovement,
-      hasActiveMaintenanceOrder: activeOrder !== null,
-    };
-  }
-
-  private toPolicyState(asset: LockedAsset): AssetMovementState {
-    return {
-      id: asset.id,
-      logisticsStatus: asset.logisticsStatus,
-      technicalCondition: asset.technicalCondition,
-      placementType: asset.placementType,
-      currentLocationId: asset.currentLocationId,
-      currentLocationType: asset.currentLocation?.type ?? null,
-      currentExternalPartyId: asset.currentExternalPartyId,
-      createdAt: asset.createdAt,
-      lastMovementAt: asset.lastMovement?.movedAt ?? null,
-      hasActiveMaintenanceOrder: asset.hasActiveMaintenanceOrder,
-    };
-  }
-
-  private assertRowVersion(asset: LockedAsset, expected: number): void {
-    if (asset.rowVersion !== expected) {
-      throw new ApiError(
-        409,
-        ErrorCodes.CONCURRENCY_CONFLICT,
-        'El extintor fue modificado por otra operación. Recarga e intenta de nuevo.',
-        { field: 'rowVersion', expected: asset.rowVersion, received: expected },
-      );
-    }
-  }
-
-  private nextSequence(asset: LockedAsset): number {
-    return (asset.lastMovement?.assetSequence ?? 0) + 1;
-  }
-
-  private snapshotOrigin(asset: LockedAsset): EndpointSnapshot {
-    if (asset.placementType === 'INTERNAL' && asset.currentLocation !== null) {
-      return {
-        kind: 'LOCATION',
-        locationId: asset.currentLocation.id,
-        externalPartyId: null,
-        label: locationLabel(asset.currentLocation),
-      };
-    }
-    if (
-      asset.placementType === 'EXTERNAL' &&
-      asset.currentExternalParty !== null
-    ) {
-      return {
-        kind: 'EXTERNAL_PARTY',
-        locationId: null,
-        externalPartyId: asset.currentExternalParty.id,
-        label: locationLabel(asset.currentExternalParty),
-      };
-    }
-    return {
-      kind: 'NONE',
-      locationId: null,
-      externalPartyId: null,
-      label: 'Sin colocación',
-    };
-  }
-
-  private async resolveDestination(
-    tx: Tx,
-    locationId: string,
-  ): Promise<{ id: string; code: string; name: string; type: LocationType }> {
-    const location = await tx.location.findUnique({
-      where: { id: locationId },
-      select: { id: true, code: true, name: true, type: true, active: true },
-    });
-    if (location === null || !location.active) {
-      throw ApiError.unprocessable(
-        ErrorCodes.DESTINATION_INVALID,
-        'La ubicación de destino no existe o está inactiva.',
-        { field: 'destinationLocationId' },
-      );
-    }
-    return location;
-  }
-
   private async resolveAdjustmentTarget(
     tx: Tx,
     dto: AdjustMovementDto,
@@ -878,161 +667,13 @@ export class MovementsService {
     const requestedBy =
       dto.type === 'RETORNO_ALMACEN'
         ? normalizeOptionalText(dto.requestedBy)
-        : this.requireText(dto.requestedBy, 'requestedBy');
+        : requireText(dto.requestedBy, 'requestedBy');
 
     return {
       requestedBy,
       authorizedBy: normalizeOptionalText(dto.authorizedBy),
-      deliveredBy: this.requireText(dto.deliveredBy, 'deliveredBy'),
-      receivedBy: this.requireText(dto.receivedBy, 'receivedBy'),
+      deliveredBy: requireText(dto.deliveredBy, 'deliveredBy'),
+      receivedBy: requireText(dto.receivedBy, 'receivedBy'),
     };
-  }
-
-  private requireText(value: string | undefined, field: string): string {
-    const normalized = value?.trim() ?? '';
-    if (normalized.length === 0) {
-      throw ApiError.unprocessable(
-        ErrorCodes.VALIDATION_ERROR,
-        `El campo ${field} es obligatorio para este movimiento.`,
-        { field },
-      );
-    }
-    return normalized;
-  }
-
-  private async buildMovementBody(
-    movementId: string,
-  ): Promise<MovementOperationResult['body']> {
-    const movement = await this.prisma.movement.findUniqueOrThrow({
-      where: { id: movementId },
-      select: MOVEMENT_SELECT,
-    });
-    const extinguisher = await this.prisma.extinguisher.findUniqueOrThrow({
-      where: { id: movement.extinguisherId },
-      select: EXTINGUISHER_DETAIL_SELECT,
-    });
-
-    return {
-      movement: toMovementView(movement),
-      extinguisher: toExtinguisherDetail(extinguisher),
-    };
-  }
-
-  private async runIdempotent(
-    actor: AuthenticatedUser,
-    idempotencyKey: string,
-    requestHash: string,
-    path: string,
-    create: (tx: Tx) => Promise<{ resourceId: string; responseStatus: number }>,
-  ): Promise<{ replayed: boolean; resourceId: string }> {
-    const key = idempotencyKey.trim();
-    if (key.length === 0 || key.length > 64) {
-      throw ApiError.unprocessable(
-        ErrorCodes.VALIDATION_ERROR,
-        'El encabezado Idempotency-Key es obligatorio y admite hasta 64 caracteres.',
-        { field: 'Idempotency-Key' },
-      );
-    }
-
-    const now = new Date();
-    const expiresAt = new Date(now.getTime() + IDEMPOTENCY_TTL_MS);
-
-    for (let attempt = 1; attempt <= MAX_TRANSACTION_ATTEMPTS; attempt += 1) {
-      try {
-        return await this.prisma.$transaction(
-          async (tx) => {
-            const record = await tx.idempotencyRecord.findUnique({
-              where: {
-                userId_idempotencyKey: {
-                  userId: actor.id,
-                  idempotencyKey: key,
-                },
-              },
-            });
-
-            if (record !== null && record.expiresAt.getTime() > now.getTime()) {
-              if (record.requestHash !== requestHash) {
-                throw new ApiError(
-                  409,
-                  ErrorCodes.IDEMPOTENCY_CONFLICT,
-                  'La clave de idempotencia ya se usó con datos distintos.',
-                );
-              }
-              if (record.status === 'PROCESSING') {
-                throw new ApiError(
-                  409,
-                  ErrorCodes.CONCURRENCY_CONFLICT,
-                  'La operación con esta clave está en curso. Espera antes de reintentar.',
-                );
-              }
-              if (
-                record.resourceType === 'MOVEMENT' &&
-                record.resourceId !== null
-              ) {
-                return { replayed: true, resourceId: record.resourceId };
-              }
-              throw new ApiError(
-                409,
-                ErrorCodes.IDEMPOTENCY_CONFLICT,
-                'La clave de idempotencia no corresponde a un movimiento.',
-              );
-            }
-
-            if (record !== null) {
-              await tx.idempotencyRecord.delete({
-                where: { id: record.id },
-              });
-            }
-
-            await tx.idempotencyRecord.create({
-              data: {
-                id: randomUUID(),
-                userId: actor.id,
-                idempotencyKey: key,
-                method: 'POST',
-                path,
-                requestHash,
-                status: 'PROCESSING',
-                expiresAt,
-              },
-            });
-
-            const result = await create(tx);
-
-            await tx.idempotencyRecord.update({
-              where: {
-                userId_idempotencyKey: {
-                  userId: actor.id,
-                  idempotencyKey: key,
-                },
-              },
-              data: {
-                status: 'COMPLETED',
-                responseStatus: result.responseStatus,
-                resourceType: 'MOVEMENT',
-                resourceId: result.resourceId,
-              },
-            });
-
-            return { replayed: false, resourceId: result.resourceId };
-          },
-          { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
-        );
-      } catch (error) {
-        if (
-          isRetryableTransactionError(error) &&
-          attempt < MAX_TRANSACTION_ATTEMPTS
-        ) {
-          continue;
-        }
-        throw error;
-      }
-    }
-
-    throw new ApiError(
-      409,
-      ErrorCodes.CONCURRENCY_CONFLICT,
-      'No se pudo completar la operación por concurrencia. Intenta nuevamente.',
-    );
   }
 }

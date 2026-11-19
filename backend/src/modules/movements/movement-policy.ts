@@ -6,6 +6,13 @@ import {
 } from '@prisma/client';
 import { ApiError } from '../../common/errors/api-error';
 import { ErrorCodes } from '../../common/errors/error-codes';
+import {
+  CLOCK_TOLERANCE_MS,
+  INSTANT_PATTERN,
+  assertNotBefore,
+  assertNotFuture,
+  parseInstant,
+} from '../../common/time/instant';
 
 /**
  * Política pura del motor de movimientos (fase 5).
@@ -24,12 +31,10 @@ export const OPERATIONAL_MOVEMENT_TYPES = [
 export type OperationalMovementType =
   (typeof OPERATIONAL_MOVEMENT_TYPES)[number];
 
-/** Tolerancia de reloj para fechas futuras (BR-056). */
-export const CLOCK_TOLERANCE_MS = 5 * 60 * 1000;
+export { CLOCK_TOLERANCE_MS };
 
 /** Instante ISO 8601 con zona horaria obligatoria. */
-export const MOVED_AT_PATTERN =
-  /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2}(?:\.\d{1,3})?)?(?:Z|[+-]\d{2}:\d{2})$/;
+export const MOVED_AT_PATTERN = INSTANT_PATTERN;
 
 export interface AssetMovementState {
   id: string;
@@ -80,53 +85,12 @@ export interface AdjustmentResult {
   reactivates: boolean;
 }
 
-function isValidCalendarInstant(value: string): boolean {
-  const match = MOVED_AT_PATTERN.exec(value);
-  if (match === null) {
-    return false;
-  }
-
-  const [datePart, timePart] = value.split('T');
-  const [year, month, day] = datePart.split('-').map(Number);
-  const clock = timePart.replace(/(?:Z|[+-]\d{2}:\d{2})$/, '');
-  const [hour, minute, second = 0] = clock.split(':').map(Number);
-
-  if (
-    Number.isNaN(year) ||
-    Number.isNaN(month) ||
-    Number.isNaN(day) ||
-    Number.isNaN(hour) ||
-    Number.isNaN(minute) ||
-    Number.isNaN(second)
-  ) {
-    return false;
-  }
-  if (hour > 23 || minute > 59 || second > 59) {
-    return false;
-  }
-
-  const probe = new Date(Date.UTC(year, month - 1, day));
-  return (
-    probe.getUTCFullYear() === year &&
-    probe.getUTCMonth() === month - 1 &&
-    probe.getUTCDate() === day &&
-    !Number.isNaN(new Date(value).getTime())
-  );
-}
-
 /**
  * Convierte `movedAt` a `Date` rechazando valores sin zona horaria o con
  * componentes de calendario inválidos (por ejemplo 31 de febrero).
  */
 export function parseMovedAt(value: string): Date {
-  if (!isValidCalendarInstant(value)) {
-    throw ApiError.unprocessable(
-      ErrorCodes.VALIDATION_ERROR,
-      'La fecha del movimiento debe ser un instante ISO 8601 válido con zona horaria.',
-      { field: 'movedAt' },
-    );
-  }
-  return new Date(value);
+  return parseInstant(value, 'movedAt');
 }
 
 export function validateMovedAt(
@@ -134,30 +98,27 @@ export function validateMovedAt(
   asset: Pick<AssetMovementState, 'createdAt' | 'lastMovementAt'>,
   now: Date = new Date(),
 ): void {
-  if (movedAt.getTime() > now.getTime() + CLOCK_TOLERANCE_MS) {
-    throw ApiError.unprocessable(
-      ErrorCodes.DATE_IN_FUTURE,
-      'La fecha del movimiento no puede estar en el futuro.',
-      { field: 'movedAt' },
-    );
-  }
+  assertNotFuture(
+    movedAt,
+    'movedAt',
+    'La fecha del movimiento no puede estar en el futuro.',
+    now,
+    CLOCK_TOLERANCE_MS,
+  );
 
-  if (movedAt.getTime() < asset.createdAt.getTime()) {
-    throw ApiError.unprocessable(
-      ErrorCodes.DATE_BEFORE_EVENT,
-      'La fecha del movimiento no puede ser anterior al alta del extintor.',
-      { field: 'movedAt' },
-    );
-  }
+  assertNotBefore(
+    movedAt,
+    asset.createdAt,
+    'movedAt',
+    'La fecha del movimiento no puede ser anterior al alta del extintor.',
+  );
 
-  if (
-    asset.lastMovementAt !== null &&
-    movedAt.getTime() < asset.lastMovementAt.getTime()
-  ) {
-    throw ApiError.unprocessable(
-      ErrorCodes.DATE_BEFORE_EVENT,
+  if (asset.lastMovementAt !== null) {
+    assertNotBefore(
+      movedAt,
+      asset.lastMovementAt,
+      'movedAt',
       'La fecha del movimiento no puede ser anterior al último movimiento. Usa un ajuste si necesitas corregir el historial.',
-      { field: 'movedAt' },
     );
   }
 }
