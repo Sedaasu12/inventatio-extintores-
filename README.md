@@ -5,12 +5,12 @@ ubicación actual y conservar el historial de movimientos, inspecciones y servic
 
 ## Estado del proyecto
 
-**Fases 0 a 5 y bloque 6A implementados y verificados:** modelo de datos,
+**Fases 0 a 5 y bloques 6A/6B implementados y verificados:** modelo de datos,
 autenticación y auditoría, ubicaciones y catálogos, alta transaccional de
 extintores con QR y etiqueta, carga inicial CSV/JSON con dry-run, motor de
-movimientos con baja e historial, y ciclo de mantenimiento con servicios y
-proyección de vencimientos. Inspecciones, alertas y el frontend de negocio
-corresponden a las fases siguientes.
+movimientos con baja e historial, ciclo de mantenimiento con servicios y
+proyección de vencimientos, e inspecciones con fecha objetivo. Alertas y el
+frontend de negocio corresponden a las fases siguientes.
 
 La evidencia completa, con los comandos y su salida real, está en
 `docs/evidencias/` y en `docs/plan-implementacion.md`.
@@ -264,6 +264,29 @@ Reglas aplicadas por el servidor:
 - Costo y moneda son opcionales y coherentes entre sí; no se asume moneda por
   defecto.
 
+### Inspecciones (fase 6B)
+
+| Endpoint | Uso |
+|---|---|
+| `POST /api/v1/extinguishers/:id/inspections` | Registra la inspección y actualiza la fecha objetivo `INSPECCION`. |
+| `GET /api/v1/inspections` | Lista con filtros por extintor, código, resultado y rango de fecha. |
+| `GET /api/v1/inspections/:id` | Detalle de la inspección. |
+
+Reglas aplicadas por el servidor:
+
+- La escritura exige `Idempotency-Key`; un reintento idéntico responde `200`
+  con `Idempotent-Replay: true`.
+- `inspectedAt` exige zona horaria y no puede superar 5 minutos en el futuro ni
+  ser anterior al alta. `inspectedOn` se deriva en `America/Lima` y no lo envía
+  el cliente. `nextDueDate` debe ser posterior a `inspectedOn`.
+- El `checklist` es un objeto JSON libre de hasta 20 KB; no se impone un
+  catálogo reglamentario.
+- El resultado es evidencia: no cambia la condición técnica (D-28), el estado
+  logístico, la colocación ni `rowVersion`.
+- Cada inspección reemplaza solo la categoría `INSPECCION` y no reemplaza una
+  fecha más reciente.
+- La ficha del extintor incluye `lastInspection` y `openMaintenanceOrder`.
+
 ## Verificación
 
 Desde la raíz:
@@ -282,7 +305,7 @@ salida. La evidencia de la fase 0 está en `docs/evidencias/fase-0.md`.
 ## Estructura
 
 ```text
-backend/          NestJS: API REST, autenticación, catálogos, extintores, importación, movimientos y mantenimiento
+backend/          NestJS: API REST, autenticación, catálogos, extintores, importación, movimientos, mantenimiento e inspecciones
 frontend/         Angular: esqueleto con routing
 docs/             Visión, requerimientos, reglas, modelo, API y evidencias
 scripts/          Verificación y reset de base de datos

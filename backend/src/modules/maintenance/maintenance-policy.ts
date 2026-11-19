@@ -1,12 +1,15 @@
 import { LocationType, LogisticsStatus } from '@prisma/client';
 import { ApiError } from '../../common/errors/api-error';
 import { ErrorCodes } from '../../common/errors/error-codes';
-import { dateInTimeZone, parseCalendarDate } from '../../common/time/calendar';
-import {
-  assertNotBefore,
-  assertNotFuture,
-  parseInstant,
-} from '../../common/time/instant';
+import { assertNotBefore, assertNotFuture } from '../../common/time/instant';
+
+export {
+  calendarDateOf,
+  parseEventInstant,
+  parseOptionalCalendarDate,
+  validateEventInstant,
+  validateNextDueDate,
+} from '../../common/time/event-dates';
 
 /**
  * Reglas puras del ciclo de mantenimiento (fase 6).
@@ -14,55 +17,6 @@ import {
  * El servicio transaccional resuelve entidades y persiste; aquí viven las
  * validaciones que deben poder probarse sin base de datos.
  */
-
-export function parseEventInstant(value: string, field: string): Date {
-  return parseInstant(value, field);
-}
-
-/**
- * Fecha calendario local (`DATE` en UTC) del instante del hecho, derivada en
- * el servidor con la zona configurada (BR-114).
- */
-export function calendarDateOf(instant: Date, timeZone: string): Date {
-  return new Date(`${dateInTimeZone(instant, timeZone)}T00:00:00.000Z`);
-}
-
-/** Fecha calendario opcional; rechaza formatos y fechas irreales. */
-export function parseOptionalCalendarDate(
-  value: string | undefined,
-  field: string,
-): Date | null {
-  if (value === undefined || value.trim() === '') {
-    return null;
-  }
-  const parsed = parseCalendarDate(value.trim());
-  if (parsed === null) {
-    throw ApiError.unprocessable(
-      ErrorCodes.VALIDATION_ERROR,
-      'La fecha debe tener el formato AAAA-MM-DD y ser una fecha real.',
-      { field },
-    );
-  }
-  return parsed;
-}
-
-/**
- * La próxima fecha indicada debe ser posterior a la fecha local del hecho
- * (BR-101 / BR-113). El sistema no calcula intervalos (BR-108A).
- */
-export function validateNextDueDate(
-  nextDueDate: Date | null,
-  performedOn: Date,
-  field = 'nextDueDate',
-): void {
-  if (nextDueDate !== null && nextDueDate.getTime() <= performedOn.getTime()) {
-    throw ApiError.unprocessable(
-      ErrorCodes.PRESCRIPTION_INVALID,
-      'La próxima fecha debe ser posterior a la fecha del servicio.',
-      { field },
-    );
-  }
-}
 
 /**
  * El costo y la moneda son opcionales y deben ser coherentes: ambos nulos o
@@ -112,41 +66,6 @@ export function normalizeCostCurrency(
   }
 
   return { cost: numericCost, currency: normalizedCurrency };
-}
-
-/**
- * Fecha del hecho técnico: no futura, no anterior al alta y, cuando existe
- * orden, no anterior a su apertura.
- */
-export function validateEventInstant(
-  instant: Date,
-  options: {
-    assetCreatedAt: Date;
-    orderOpenedAt?: Date | null;
-    field: string;
-    now?: Date;
-  },
-): void {
-  assertNotFuture(
-    instant,
-    options.field,
-    'La fecha del hecho no puede estar en el futuro.',
-    options.now ?? new Date(),
-  );
-  assertNotBefore(
-    instant,
-    options.assetCreatedAt,
-    options.field,
-    'La fecha del hecho no puede ser anterior al alta del extintor.',
-  );
-  if (options.orderOpenedAt !== undefined && options.orderOpenedAt !== null) {
-    assertNotBefore(
-      instant,
-      options.orderOpenedAt,
-      options.field,
-      'La fecha del hecho no puede ser anterior a la apertura de la orden.',
-    );
-  }
 }
 
 /**

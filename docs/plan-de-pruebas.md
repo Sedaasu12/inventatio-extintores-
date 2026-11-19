@@ -262,6 +262,8 @@ Estructura D-02: `SEDE` es la raíz; `ALMACEN`, `TALLER` y `AREA` son hijos. Los
 
 > **Implementación (fase 6A):** T-MAN-01 a T-MAN-14, T-MAN-17 a T-MAN-19 y T-CON-02 están cubiertos por `backend/test/maintenance.e2e-spec.ts`; T-MAN-15 y T-MAN-16 por unitarios de `maintenance-policy` y `due-date-projection`. T-MAN-20 (reportes) se difiere a la fase de reportes.
 
+> **Implementación (fase 6B):** T-INS-01 a T-INS-06, T-INS-09 y T-CON-04 están cubiertos por `backend/test/inspections.e2e-spec.ts`; T-INS-08 por `inspection-policy.spec.ts` (inspección a las 02:00 UTC = 21:00 del día anterior en Lima). T-INS-07 (correcciones) se difiere a una fase posterior.
+
 > **Regresión (instantes con milisegundos):** al interpretar `movedAt`/`performedAt` se confundía la fracción de segundo con el campo de segundos y se rechazaban instantes válidos cuando el segundo era `59` y había milisegundos. `instant.spec.ts` cubre `59.120`, `59.999`, sin fracción y con offset; las pruebas e2e se anclan al mayor valor entre `movedAt` del alta y `createdAt` para no depender de la latencia de la inserción.
 
 ### 4.7 Inspecciones

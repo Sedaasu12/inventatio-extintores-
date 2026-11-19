@@ -818,7 +818,17 @@ Completado el bloque de mantenimiento y proyección de vencimientos; las inspecc
 - **Incidente corregido:** `parseInstant` confundía la fracción de segundo con los segundos y rechazaba instantes válidos cuando el segundo era `59` con milisegundos (por ejemplo `14:35:59.120Z`). Se corrigió el parseo y se añadió `instant.spec.ts` como regresión. Las pruebas e2e anclan sus fechas al mayor valor entre `movedAt` del alta y `createdAt` para no depender de la latencia de la inserción.
 - **Limitación conocida:** un `AJUSTE` de fase 5 hacia `TALLER` o `EXTERNAL_PARTY` deja el extintor en `EN_MANTENIMIENTO` sin orden asociada; solo se corrige con otro `AJUSTE`. Se documentará en la ficha y se evaluará al cerrar la fase 6.
 - **Verificación:** `./scripts/verify.ps1` en verde (backend: 122 unitarias, 141 e2e, 33 de integración, lint, typecheck, build y `prisma validate`; frontend: lint, typecheck, 2 pruebas y build).
-- **Pendiente 6B:** módulo de inspecciones, `lastInspection` y `openMaintenanceOrder` en la ficha, y T-INS-01..06/08/09 + T-CON-04.
+
+### Estado de ejecución (fase 6B, 2026-11-19)
+
+Completado el módulo de inspecciones y las extensiones de ficha.
+
+- **Reglas compartidas:** `common/time/event-dates.ts` concentra el parseo de instantes, la fecha local (`calendarDateOf`), la próxima fecha y la validación del hecho; `maintenance-policy.ts` lo reexporta para no duplicar reglas.
+- **Inspecciones:** `InspectionsModule` expone `POST /extinguishers/:id/inspections`, `GET /inspections` y `GET /inspections/:id`. La escritura usa DTO validado, `Idempotency-Key`, bloqueo `FOR UPDATE` del extintor, auditoría `INSPECTION_CREATED` y proyección `INSPECCION` en la misma transacción `Serializable`.
+- **Checklist:** objeto JSON libre de hasta 20 KB (`inspection-policy.ts`); no se impone un catálogo reglamentario. El resultado es evidencia y no cambia la condición técnica (D-28).
+- **Ficha:** `GET /extinguishers/:id` añade `lastInspection` y `openMaintenanceOrder`.
+- **Diferido:** correcciones de inspección (`POST /inspections/:id/corrections`, T-INS-07).
+- **Verificación:** `./scripts/verify.ps1` en verde (backend: 127 unitarias, 151 e2e, 33 de integración, lint, typecheck, build y `prisma validate`; frontend: lint, typecheck, 2 pruebas y build).
 
 ---
 

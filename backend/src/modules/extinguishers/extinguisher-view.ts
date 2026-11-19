@@ -63,6 +63,30 @@ export const EXTINGUISHER_DETAIL_SELECT = {
     orderBy: { eventType: 'asc' },
   },
   _count: { select: { movements: true } },
+  inspections: {
+    select: {
+      id: true,
+      inspectedAt: true,
+      inspectedOn: true,
+      inspectorName: true,
+      result: true,
+      nextDueDate: true,
+    },
+    orderBy: [{ inspectedAt: 'desc' }, { createdAt: 'desc' }],
+    take: 1,
+  },
+  maintenanceOrders: {
+    where: { status: { in: ['ABIERTA', 'EN_PROVEEDOR'] } },
+    select: {
+      id: true,
+      status: true,
+      providerId: true,
+      workshopLocationId: true,
+      openedAt: true,
+      expectedReturnDate: true,
+    },
+    take: 1,
+  },
 } satisfies Prisma.ExtinguisherSelect;
 
 export type ExtinguisherBaseRow = Prisma.ExtinguisherGetPayload<{
@@ -133,5 +157,29 @@ export function toExtinguisherDetail(row: ExtinguisherDetailRow) {
       updatedAt: dueDate.updatedAt.toISOString(),
     })),
     movementCount: row._count.movements,
+    lastInspection:
+      row.inspections.length === 0
+        ? null
+        : {
+            id: row.inspections[0].id,
+            inspectedAt: row.inspections[0].inspectedAt.toISOString(),
+            inspectedOn: formatCalendarDate(row.inspections[0].inspectedOn),
+            inspectorName: row.inspections[0].inspectorName,
+            result: row.inspections[0].result,
+            nextDueDate: formatCalendarDate(row.inspections[0].nextDueDate),
+          },
+    openMaintenanceOrder:
+      row.maintenanceOrders.length === 0
+        ? null
+        : {
+            id: row.maintenanceOrders[0].id,
+            status: row.maintenanceOrders[0].status,
+            providerId: row.maintenanceOrders[0].providerId,
+            workshopLocationId: row.maintenanceOrders[0].workshopLocationId,
+            openedAt: row.maintenanceOrders[0].openedAt.toISOString(),
+            expectedReturnDate: formatCalendarDate(
+              row.maintenanceOrders[0].expectedReturnDate,
+            ),
+          },
   };
 }

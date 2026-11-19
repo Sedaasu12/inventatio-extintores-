@@ -551,6 +551,14 @@ POST /api/v1/extinguishers/a1b2.../inspections
 
 Respuesta `201` con inspección y fecha objetivo actualizada; no cambia la condición técnica.
 
+> **Implementación (fase 6B):** están disponibles `POST /extinguishers/:id/inspections`, `GET /inspections` (filtros por extintor, código, resultado y rango de `inspectedOn`) y `GET /inspections/:id`. La escritura exige `Idempotency-Key` y comparte el contrato de §6.1; un reintento idéntico responde `200` con `Idempotent-Replay: true`.
+>
+> - **Fechas:** `inspectedAt` es un instante ISO 8601 con zona, se guarda en UTC y no puede superar los 5 minutos de tolerancia ni ser anterior al alta. `inspectedOn` se deriva en `America/Lima` y no lo envía el cliente. `nextDueDate` debe ser posterior a `inspectedOn` (`422 PRESCRIPTION_INVALID`).
+> - **Proyección:** cada inspección reemplaza únicamente la categoría `INSPECCION` y solo si su `inspectedAt` es posterior al evento vigente; sin `nextDueDate`, la categoría queda sin fecha. La proyección y la auditoría (`INSPECTION_CREATED`) se confirman en la misma transacción `Serializable` que bloquea el extintor.
+> - **Checklist:** objeto JSON libre de hasta 20 KB; no se impone un catálogo reglamentario. El resultado (`APROBADO`, `APROBADO_CON_OBSERVACIONES`, `RECHAZADO`) es evidencia y **no** cambia la condición técnica (D-28). La inspección no incrementa `rowVersion` ni modifica la colocación.
+> - **Ficha:** `GET /extinguishers/:id` incluye `lastInspection` (última inspección) y `openMaintenanceOrder` (orden activa, si existe).
+> - **Diferido:** `POST /inspections/:id/corrections` queda para una fase posterior (T-INS-07).
+
 ### 4.6 Alertas y configuración
 
 | Método | Ruta | Permiso | Descripción |
@@ -737,6 +745,8 @@ Al cambiar `usefulLifeYears`, el servidor recalcula la fecha objetivo `EQUIPO` d
 - `cost` opcional y ≥ 0; `currency` ISO 4217 de 3 letras, obligatoria si hay costo y nula si no lo hay (D-29).
 
 > **Servicio de mantenimiento implementado (fase 6A):** `serviceType` (`MANTENIMIENTO`, `RECARGA`, `REPARACION`, `PRUEBA_HIDROSTATICA`), `performedAt` (instante con zona), `result` (`APROBADO`, `RECHAZADO`, `CON_OBSERVACIONES`), `certificateNo` (≤ 100), `certificateDate` (`AAAA-MM-DD`), `nextDueDate` (`AAAA-MM-DD`, posterior a `performedOn`), `cost`/`currency`, `notes` (≤ 2000) y `documentRef` (≤ 100) son opcionales salvo las reglas de actor indicadas en §4.4. No se acepta `checklist` en esta fase.
+
+> **Inspección implementada (fase 6B):** `inspectedAt` (instante con zona), `inspectorName` (2..150), `inspectorUserId` opcional (usuario activo), `result` (`APROBADO`, `APROBADO_CON_OBSERVACIONES`, `RECHAZADO`), `checklist` opcional (objeto JSON de hasta 20 KB), `nextDueDate` (`AAAA-MM-DD`, posterior a `inspectedOn`), `notes` (≤ 2000) y `documentRef` (≤ 100). `inspectedOn` lo deriva el servidor y la inspección no admite `cost`/`currency`.
 
 ### 5.4a DTO de envío y retorno de mantenimiento
 
