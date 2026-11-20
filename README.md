@@ -5,12 +5,13 @@ ubicación actual y conservar el historial de movimientos, inspecciones y servic
 
 ## Estado del proyecto
 
-**Fases 0 a 5 y bloques 6A/6B implementados y verificados:** modelo de datos,
+**Fases 0 a 5 y bloques 6A/6B/7A/7B/7C implementados y verificados:** modelo de datos,
 autenticación y auditoría, ubicaciones y catálogos, alta transaccional de
 extintores con QR y etiqueta, carga inicial CSV/JSON con dry-run, motor de
 movimientos con baja e historial, ciclo de mantenimiento con servicios y
-proyección de vencimientos, e inspecciones con fecha objetivo. Alertas y el
-frontend de negocio corresponden a las fases siguientes.
+proyección de vencimientos, inspecciones con fecha objetivo, alertas y umbrales,
+dashboard operativo y reportes con exportación CSV. El frontend de negocio
+corresponde a las fases siguientes.
 
 La evidencia completa, con los comandos y su salida real, está en
 `docs/evidencias/` y en `docs/plan-implementacion.md`.
@@ -286,6 +287,35 @@ Reglas aplicadas por el servidor:
 - Cada inspección reemplaza solo la categoría `INSPECCION` y no reemplaza una
   fecha más reciente.
 - La ficha del extintor incluye `lastInspection` y `openMaintenanceOrder`.
+
+### Alertas, dashboard y reportes (fase 7)
+
+| Endpoint | Uso |
+|---|---|
+| `GET /api/v1/alerts` | Alertas calculadas por activo y categoría, con filtros y paginación. |
+| `GET /api/v1/alerts/summary` | Conteos por categoría y estado. |
+| `GET /api/v1/alert-settings` | Umbrales configurados (`daysBefore` puede ser nulo). |
+| `PUT /api/v1/alert-settings/:eventType` | Configura `daysBefore` y `enabled`; solo `ADMIN`. |
+| `GET /api/v1/dashboard/summary` | Totales operativos, ubicación, mantenimiento y alertas. |
+| `GET /api/v1/reports/:type` | Inventario, movimientos, mantenimiento, inspecciones y bajas. |
+| `GET /api/v1/reports/:type/export` | CSV con los mismos filtros; exige `reports.export`. |
+
+Reglas aplicadas por el servidor:
+
+- Estados de alerta: `VENCIDO` (fecha anterior a hoy), `POR_VENCER` (solo con
+  umbral configurado), `VIGENTE` y `SIN_FECHA_CONFIGURADA`. Sin umbral no se
+  inventa un periodo.
+- Los días restantes se miden contra el día calendario en `America/Lima`.
+- `EQUIPO` usa la proyección de vencimientos ya calculada; las categorías de
+  inspección y servicio solo usan la fecha indicada.
+- Las bajas se excluyen por defecto; `includeRetired=true` las incluye. Una
+  categoría deshabilitada desaparece de alertas, resumen y dashboard.
+- El dashboard excluye bajas de los conteos operativos y cuenta los retornos
+  previstos vencidos de órdenes abiertas.
+- Solo se exporta CSV (UTF-8 con BOM, coma, CRLF, comillas y protección contra
+  inyección de fórmulas). No existen PDF, Excel ni archivos persistentes.
+- El reporte de mantenimiento muestra el costo por servicio, sin totales
+  financieros (D-29).
 
 ## Verificación
 

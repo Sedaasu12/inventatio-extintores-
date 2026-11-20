@@ -23,6 +23,7 @@ import { InspectionsModule } from './modules/inspections/inspections.module';
 import { LocationsModule } from './modules/locations/locations.module';
 import { MaintenanceModule } from './modules/maintenance/maintenance.module';
 import { MovementsModule } from './modules/movements/movements.module';
+import { ReportsModule } from './modules/reports/reports.module';
 import { UsersModule } from './modules/users/users.module';
 import { PrismaModule } from './prisma/prisma.module';
 
@@ -56,6 +57,7 @@ import { PrismaModule } from './prisma/prisma.module';
     MaintenanceModule,
     InspectionsModule,
     DashboardModule,
+    ReportsModule,
     HealthModule,
   ],
   providers: [

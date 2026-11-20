@@ -919,6 +919,14 @@ npm run lint && npm run typecheck && npm run build
 - **Alertas:** el bloque `alerts` reutiliza `/alerts/summary`, de modo que respeta umbrales, categorías deshabilitadas y la exclusión de bajas.
 - **Pruebas:** T-DASH-01 valida los conteos contra datos reales y T-DASH-02 cubre autenticación y permiso.
 
+### Implementación 7C (reportes y CSV)
+
+- **API:** `ReportsModule` expone `GET /reports/inventory`, `/reports/movements`, `/reports/maintenance`, `/reports/inspections`, `/reports/retired` (`reports.read`) y `GET /reports/:type/export` (`reports.export`).
+- **Reutilización:** inventario, movimientos e inspecciones usan los servicios y filtros ya probados de sus módulos; mantenimiento devuelve órdenes con `services` y costo por servicio, sin totales financieros (D-29); bajas devuelve `BAJA` y `AJUSTE` con su motivo.
+- **CSV:** UTF-8 con BOM, coma, CRLF, comillas y protección contra inyección de fórmulas; mismos filtros que el JSON, sin archivos persistentes y con límite de 100 000 filas.
+- **Formatos:** solo CSV; `format` distinto de `csv`, tipos desconocidos y rutas PDF/Excel responden `404` (D-19).
+- **Pruebas:** T-REP-01 a T-REP-08 cubren inventario, movimientos, ambos permisos de CSV, formatos no soportados, mantenimiento con costos, inspecciones y bajas/ajustes.
+
 ---
 
 ## 11. Fase 8 — Frontend: base, login y shell

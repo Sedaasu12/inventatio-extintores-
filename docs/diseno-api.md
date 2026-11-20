@@ -665,6 +665,13 @@ Todos los reportes usan filtros de servidor y paginación; los totales se calcul
 
 > **Sin reporte financiero (D-29):** `/reports/maintenance` puede mostrar el costo de cada servicio, pero el MVP no expone totales de gasto, comparativas por proveedor ni exportación financiera. El costo es un dato opcional de consulta.
 
+> **Implementación (fase 7C):** están disponibles `GET /reports/inventory`, `/reports/movements`, `/reports/maintenance`, `/reports/inspections`, `/reports/retired` y `GET /reports/:type/export`.
+>
+> - **JSON:** los reportes de inventario, movimientos e inspecciones reutilizan los filtros y la paginación de sus listados operativos (`reports.read`). El de mantenimiento devuelve cada orden con su arreglo `services` (incluido el costo por servicio, sin totales) y el de bajas devuelve movimientos `BAJA` y `AJUSTE` con motivo, autorización y movimiento corregido.
+> - **CSV:** `reports.export` con los mismos filtros; UTF-8 con BOM, separador coma, fin de línea CRLF, comillas cuando corresponde y prefijo `'` en valores que empiezan con `=`, `+`, `-`, `@`, tabulador o retorno de carro para evitar inyección de fórmulas. No se generan archivos persistentes.
+> - **Límites:** la exportación no pagina y admite hasta 100 000 filas por reporte, dentro del volumen D-22.
+> - **Formatos:** solo `csv`; `format` distinto de `csv`, un tipo de reporte desconocido o una ruta PDF/Excel responden `404`. No hay endpoints de PDF ni Excel (D-19).
+
 ### 4.8 Auditoría y salud
 
 | Método | Ruta | Permiso | Descripción |
