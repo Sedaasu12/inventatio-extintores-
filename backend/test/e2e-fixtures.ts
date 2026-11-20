@@ -10,6 +10,7 @@ export const TEST_PASSWORD = 'ClaveDePruebas#2026';
 export const TEST_NEW_PASSWORD = 'OtraClaveLarga2026';
 
 export const PERMISSIONS = [
+  'dashboard.read',
   'users.read',
   'users.manage',
   'roles.manage',
@@ -21,6 +22,10 @@ export const PERMISSIONS = [
   'maintenance.manage',
   'inspections.read',
   'inspections.create',
+  'alerts.read',
+  'alerts.settings',
+  'reports.read',
+  'reports.export',
   'extinguishers.read',
   'extinguishers.create',
   'extinguishers.update',
@@ -35,14 +40,18 @@ export const PERMISSIONS = [
 const ROLE_MATRIX: Record<string, readonly string[]> = {
   ADMIN: PERMISSIONS,
   CONSULTA: [
+    'dashboard.read',
     'extinguishers.read',
     'movements.read',
     'maintenance.read',
     'inspections.read',
+    'alerts.read',
+    'reports.read',
     'locations.read',
     'catalogs.read',
   ],
   ALMACEN: [
+    'dashboard.read',
     'extinguishers.read',
     'extinguishers.create',
     'extinguishers.update',
@@ -51,10 +60,13 @@ const ROLE_MATRIX: Record<string, readonly string[]> = {
     'maintenance.read',
     'maintenance.manage',
     'inspections.read',
+    'alerts.read',
+    'reports.read',
     'locations.read',
     'catalogs.read',
   ],
   SEGURIDAD: [
+    'dashboard.read',
     'extinguishers.read',
     'extinguishers.update',
     'extinguishers.condition',
@@ -65,6 +77,9 @@ const ROLE_MATRIX: Record<string, readonly string[]> = {
     'maintenance.manage',
     'inspections.read',
     'inspections.create',
+    'alerts.read',
+    'reports.read',
+    'reports.export',
     'locations.read',
   ],
 };

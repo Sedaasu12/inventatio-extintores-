@@ -11,6 +11,7 @@ import { IdempotencyModule } from './common/idempotency/idempotency.module';
 import { RequestIdMiddleware } from './common/middleware/request-id.middleware';
 import { APP_ENV, AppConfigModule } from './config/config.module';
 import type { AppEnv } from './config/env';
+import { AlertsModule } from './modules/alerts/alerts.module';
 import { AuditModule } from './modules/audit/audit.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { ExternalPartiesModule } from './modules/catalogs/external-parties/external-parties.module';
@@ -42,6 +43,7 @@ import { PrismaModule } from './prisma/prisma.module';
     }),
     AuditModule,
     AuthModule,
+    AlertsModule,
     UsersModule,
     CodeCounterModule,
     IdempotencyModule,

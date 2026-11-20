@@ -605,6 +605,14 @@ GET /api/v1/alerts?eventType=INSPECCION&status=POR_VENCER&page=1&pageSize=20
 
 > **Sin cálculo de intervalos (D-11):** las categorías `INSPECCION`, `MANTENIMIENTO`, `RECARGA` y `PRUEBA_HIDROSTATICA` usan solo el `nextDueDate` indicado; el servidor no calcula la próxima fecha sumando periodos. Si no se indica, la categoría queda sin fecha.
 
+> **Implementación (fase 7A):** están disponibles `GET /alerts`, `GET /alerts/summary`, `GET /alert-settings` y `PUT /alert-settings/:eventType`.
+>
+> - **Filtros y paginación:** `eventType`, `status`, `locationId`, `assetCode`, `includeRetired`, `sort` (`dueDate`, `daysRemaining`, `assetCode`, `status`, con prefijo `-` para descendente), `page` y `pageSize` (máximo 100). Las bajas se excluyen por defecto; `includeRetired=true` las incluye.
+> - **Cálculo:** `daysRemaining` se mide contra el día calendario en `America/Lima`. Sin umbral configurado no se genera `POR_VENCER`; una fecha de ayer es `VENCIDO` y la de hoy sin umbral es `VIGENTE`.
+> - **Configuración:** una categoría sin fila en `alert_settings` se presenta habilitada y con `daysBefore = null`; `daysBefore` admite entero ≥ 0 o `null`, y `enabled` booleano. Cada cambio se audita como `ALERT_SETTING_UPDATED` dentro de la misma transacción que el upsert.
+> - **Categorías deshabilitadas:** se excluyen de `/alerts`, de `/alerts/summary` y del dashboard, incluida su variante `SIN_FECHA_CONFIGURADA`.
+> - **Sin persistencia:** las alertas se calculan en cada consulta; no se guardan filas ni se duplican al repetir la petición.
+
 ### 4.7 Reportes
 
 | Método | Ruta | Permiso | Descripción |

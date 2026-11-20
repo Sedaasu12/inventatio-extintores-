@@ -902,6 +902,15 @@ npm run test:perf
 npm run lint && npm run typecheck && npm run build
 ```
 
+### Implementación 7A (alertas y umbrales)
+
+- **Reglas puras:** `alert-policy.ts` clasifica cada fecha con `VENCIDO` (`daysRemaining < 0`), `POR_VENCER` (solo con umbral configurado), `VIGENTE` y `SIN_FECHA_CONFIGURADA`; `EQUIPO` lee la proyección `due_dates`, que ya resuelve la fecha documentada/calculada más temprana.
+- **API:** `AlertsModule` expone `GET /alerts`, `GET /alerts/summary`, `GET /alert-settings` (`alerts.read`) y `PUT /alert-settings/:eventType` (`alerts.settings`). Los umbrales sin fila se devuelven habilitados y con `daysBefore = null`; nunca se siembran valores.
+- **Cálculo y volumen:** las filas se ensamblan en memoria sobre el volumen D-22 (10k activos × 5 categorías) y se ordenan/paginan en el servidor; no se persisten alertas.
+- **Bajas y categorías deshabilitadas:** las bajas se excluyen por defecto (`includeRetired=true` las incluye) y una categoría deshabilitada desaparece de listado y resumen.
+- **Auditoría:** cada cambio de umbral registra `ALERT_SETTING_UPDATED` con el estado anterior y posterior en la misma transacción.
+- **Verificación:** 137 unitarias y 13 e2e nuevas de alertas en verde; lint, typecheck y build sin errores.
+
 ---
 
 ## 11. Fase 8 — Frontend: base, login y shell

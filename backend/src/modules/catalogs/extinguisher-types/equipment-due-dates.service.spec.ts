@@ -4,7 +4,7 @@ import {
 } from './equipment-due-dates.service';
 
 describe('fechas de vencimiento del equipo (D-12 / BR-107B)', () => {
-  it('no inventa una fecha cuando faltan ambos datos', () => {
+  it('T-ALE-15: no inventa una fecha cuando faltan ambos datos', () => {
     expect(earliestEquipmentExpiry(null, null, 10)).toBeNull();
     expect(earliestEquipmentExpiry(null, null, null)).toBeNull();
   });
@@ -17,7 +17,7 @@ describe('fechas de vencimiento del equipo (D-12 / BR-107B)', () => {
     ).toEqual(new Date('2030-01-01T00:00:00.000Z'));
   });
 
-  it('usa la más temprana entre la documentada y la calculada', () => {
+  it('T-ALE-13: usa la más temprana entre la documentada y la calculada', () => {
     const manufacture = new Date('2020-01-01T00:00:00.000Z');
 
     expect(
