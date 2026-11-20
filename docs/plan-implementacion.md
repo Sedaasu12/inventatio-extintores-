@@ -911,6 +911,14 @@ npm run lint && npm run typecheck && npm run build
 - **Auditoría:** cada cambio de umbral registra `ALERT_SETTING_UPDATED` con el estado anterior y posterior en la misma transacción.
 - **Verificación:** 137 unitarias y 13 e2e nuevas de alertas en verde; lint, typecheck y build sin errores.
 
+### Implementación 7B (dashboard)
+
+- **API:** `DashboardModule` expone `GET /dashboard/summary` con permiso `dashboard.read`.
+- **Activos:** `operationalTotal` excluye `DADO_DE_BAJA`; las bajas se informan en `retiredTotal` y `byLogisticsStatus.DADO_DE_BAJA`. Se incluyen conteos por condición técnica, colocación y ubicación (`byLocation`) más `withoutLocation`.
+- **Mantenimiento:** `openOrders` suma `ABIERTA` y `EN_PROVEEDOR`; `overdueReturns` cuenta órdenes abiertas con retorno previsto anterior al día calendario en `America/Lima`.
+- **Alertas:** el bloque `alerts` reutiliza `/alerts/summary`, de modo que respeta umbrales, categorías deshabilitadas y la exclusión de bajas.
+- **Pruebas:** T-DASH-01 valida los conteos contra datos reales y T-DASH-02 cubre autenticación y permiso.
+
 ---
 
 ## 11. Fase 8 — Frontend: base, login y shell

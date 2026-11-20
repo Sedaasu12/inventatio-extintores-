@@ -16,6 +16,7 @@ import { AuditModule } from './modules/audit/audit.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { ExternalPartiesModule } from './modules/catalogs/external-parties/external-parties.module';
 import { ExtinguisherTypesModule } from './modules/catalogs/extinguisher-types/extinguisher-types.module';
+import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { ExtinguishersModule } from './modules/extinguishers/extinguishers.module';
 import { HealthModule } from './modules/health/health.module';
 import { InspectionsModule } from './modules/inspections/inspections.module';
@@ -54,6 +55,7 @@ import { PrismaModule } from './prisma/prisma.module';
     MovementsModule,
     MaintenanceModule,
     InspectionsModule,
+    DashboardModule,
     HealthModule,
   ],
   providers: [

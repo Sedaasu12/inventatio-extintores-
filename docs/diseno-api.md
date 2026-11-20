@@ -613,6 +613,43 @@ GET /api/v1/alerts?eventType=INSPECCION&status=POR_VENCER&page=1&pageSize=20
 > - **Categorías deshabilitadas:** se excluyen de `/alerts`, de `/alerts/summary` y del dashboard, incluida su variante `SIN_FECHA_CONFIGURADA`.
 > - **Sin persistencia:** las alertas se calculan en cada consulta; no se guardan filas ni se duplican al repetir la petición.
 
+#### Dashboard
+
+`GET /dashboard/summary` (`dashboard.read`) devuelve un único objeto con los agregados del inicio:
+
+```json
+{
+  "generatedAt": "2026-11-20T02:40:00.000Z",
+  "assets": {
+    "operationalTotal": 3,
+    "retiredTotal": 1,
+    "byLogisticsStatus": {
+      "EN_ALMACEN": 1,
+      "ASIGNADO": 1,
+      "EN_MANTENIMIENTO": 1,
+      "DADO_DE_BAJA": 1
+    },
+    "byTechnicalCondition": { "OPERATIVO": 1, "OBSERVADO": 1, "NO_OPERATIVO": 1, "PENDIENTE_INSPECCION": 0 },
+    "byPlacement": { "INTERNAL": 2, "EXTERNAL": 1, "NONE": 0 },
+    "byLocation": [
+      { "id": "7e4c...", "code": "UBI-000101", "name": "Almacén Central", "type": "ALMACEN", "count": 1 }
+    ],
+    "withoutLocation": 1
+  },
+  "maintenance": {
+    "openOrders": 1,
+    "byStatus": { "ABIERTA": 0, "EN_PROVEEDOR": 1, "CERRADA": 0, "CANCELADA": 0 },
+    "overdueReturns": 1
+  },
+  "alerts": {
+    "totals": { "VENCIDO": 1, "POR_VENCER": 0, "VIGENTE": 3, "SIN_FECHA_CONFIGURADA": 11 },
+    "byEventType": []
+  }
+}
+```
+
+> **Implementación (fase 7B):** los conteos operativos excluyen `DADO_DE_BAJA`; las bajas se informan aparte en `retiredTotal` y en `byLogisticsStatus.DADO_DE_BAJA`. `byLocation` agrupa solo activos operativos con ubicación interna y `withoutLocation` cuenta los que no tienen ubicación. `maintenance.openOrders` suma `ABIERTA` y `EN_PROVEEDOR`, y `overdueReturns` cuenta las órdenes abiertas con `expectedReturnDate` anterior al día calendario en `America/Lima`. El bloque `alerts` reutiliza el resumen de `/alerts/summary`, por lo que respeta umbrales, categorías deshabilitadas y la exclusión de bajas.
+
 ### 4.7 Reportes
 
 | Método | Ruta | Permiso | Descripción |
