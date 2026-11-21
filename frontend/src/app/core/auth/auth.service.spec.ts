@@ -88,6 +88,21 @@ describe('AuthService', () => {
     expect(service.status()).toBe('anonymous');
     expect(service.accessToken()).toBeNull();
     expect(service.user()).toBeNull();
+    expect(service.sessionExpired()).toBe(true);
+  });
+
+  it('no marca caducidad cuando el arranque no tiene sesión previa', async () => {
+    const restoring = service.restoreSession();
+    http
+      .expectOne('/api/v1/auth/refresh')
+      .flush(
+        { error: { code: 'UNAUTHENTICATED', message: 'Sin cookie' } },
+        { status: 401, statusText: 'Unauthorized' },
+      );
+    await restoring;
+
+    expect(service.status()).toBe('anonymous');
+    expect(service.sessionExpired()).toBe(false);
   });
 
   it('cierra la sesión local aunque el servidor falle al cerrar', () => {

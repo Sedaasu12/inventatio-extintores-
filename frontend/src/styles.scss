@@ -1,6 +1,168 @@
-/* Estilos globales de SITE. Los estilos de componentes viven junto a cada componente. */
+/* Estilos globales de SITE: tokens, reinicio mínimo y utilidades accesibles. */
+
+:root {
+  --site-bg: #f4f6f8;
+  --site-surface: #ffffff;
+  --site-text: #1b1f24;
+  --site-muted: #53605f;
+  --site-border: #d5dbe2;
+  --site-primary: #0b5cad;
+  --site-primary-strong: #094a8b;
+  --site-primary-soft: #e7f0fa;
+  --site-danger: #b3261e;
+  --site-danger-soft: #fbeceb;
+  --site-success: #1e6b3a;
+  --site-success-soft: #e8f5ec;
+  --site-warning: #7a4b00;
+  --site-warning-soft: #fdf1dc;
+  --site-focus: #b45309;
+  --site-radius: 10px;
+  --site-radius-sm: 6px;
+  --site-shadow: 0 1px 2px rgba(16, 24, 40, 0.08), 0 8px 24px rgba(16, 24, 40, 0.06);
+  --site-font: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
 body {
   margin: 0;
-  background: #fafafa;
-  color: #1a1a1a;
+  background: var(--site-bg);
+  color: var(--site-text);
+  font-family: var(--site-font);
+  font-size: 1rem;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+a {
+  color: var(--site-primary);
+}
+
+a:hover {
+  color: var(--site-primary-strong);
+}
+
+:focus-visible {
+  outline: 3px solid var(--site-focus);
+  outline-offset: 2px;
+  border-radius: var(--site-radius-sm);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.site-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  padding: 0.5rem 1.1rem;
+  border-radius: var(--site-radius-sm);
+  border: 1px solid transparent;
+  background: var(--site-primary);
+  color: #ffffff;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.site-button:hover:not(:disabled) {
+  background: var(--site-primary-strong);
+  color: #ffffff;
+}
+
+.site-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.site-button--secondary {
+  background: var(--site-surface);
+  border-color: var(--site-border);
+  color: var(--site-text);
+}
+
+.site-button--secondary:hover:not(:disabled) {
+  background: var(--site-primary-soft);
+  color: var(--site-text);
+}
+
+.site-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.site-field label {
+  font-weight: 600;
+}
+
+.site-field input {
+  min-height: 2.75rem;
+  padding: 0.5rem 0.7rem;
+  border: 1px solid var(--site-border);
+  border-radius: var(--site-radius-sm);
+  background: var(--site-surface);
+}
+
+.site-field input[aria-invalid='true'] {
+  border-color: var(--site-danger);
+}
+
+.site-field__error {
+  color: var(--site-danger);
+  font-size: 0.875rem;
+}
+
+.site-field__hint {
+  color: var(--site-muted);
+  font-size: 0.875rem;
+}
+
+.site-alert {
+  padding: 0.75rem 1rem;
+  border-radius: var(--site-radius-sm);
+  border-left: 4px solid var(--site-danger);
+  background: var(--site-danger-soft);
+  color: #6b1510;
+}
+
+.site-alert--success {
+  border-left-color: var(--site-success);
+  background: var(--site-success-soft);
+  color: #124424;
 }

@@ -1,0 +1,103 @@
+<section class="auth-card" aria-labelledby="login-title">
+  <div class="auth-card__brand">
+    <span class="auth-card__logo" aria-hidden="true">S</span>
+    <p class="auth-card__name">{{ 'app.name' | t }}</p>
+  </div>
+
+  <h1 id="login-title" class="auth-card__title">
+    {{ 'auth.login.title' | t }}
+  </h1>
+  <p class="auth-card__subtitle">{{ 'auth.login.subtitle' | t }}</p>
+
+  @if (sessionExpired) {
+    <p class="site-alert" role="status">
+      {{ 'auth.login.sessionExpired' | t }}
+    </p>
+  }
+
+  @if (errorMessage(); as message) {
+    <div class="site-alert" role="alert">
+      <p>{{ message }}</p>
+      @if (errorReference(); as reference) {
+        <p class="auth-card__reference">
+          {{ 'errors.requestId' | t: { requestId: reference } }}
+        </p>
+      }
+    </div>
+  }
+
+  <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <div class="site-field">
+      <label for="email">{{ 'auth.login.email' | t }}</label>
+      <input
+        id="email"
+        type="email"
+        formControlName="email"
+        autocomplete="username"
+        inputmode="email"
+        spellcheck="false"
+        [attr.placeholder]="'auth.login.emailPlaceholder' | t"
+        [attr.aria-invalid]="showError(form.controls.email)"
+        [attr.aria-describedby]="
+          showError(form.controls.email) ? 'email-error' : null
+        "
+      />
+      @if (showError(form.controls.email)) {
+        <p id="email-error" class="site-field__error">
+          @if (form.controls.email.errors?.['required']) {
+            {{ 'auth.errors.emailRequired' | t }}
+          } @else if (form.controls.email.errors?.['maxlength']) {
+            {{ 'common.tooLong' | t }}
+          } @else {
+            {{ 'auth.errors.emailInvalid' | t }}
+          }
+        </p>
+      }
+    </div>
+
+    <div class="site-field">
+      <label for="password">{{ 'auth.login.password' | t }}</label>
+      <div class="auth-card__password">
+        <input
+          id="password"
+          [type]="showPassword() ? 'text' : 'password'"
+          formControlName="password"
+          autocomplete="current-password"
+          [attr.placeholder]="'auth.login.passwordPlaceholder' | t"
+          [attr.aria-invalid]="showError(form.controls.password)"
+          [attr.aria-describedby]="
+            showError(form.controls.password) ? 'password-error' : null
+          "
+        />
+        <button
+          type="button"
+          class="auth-card__toggle"
+          [attr.aria-pressed]="showPassword()"
+          (click)="togglePassword()"
+        >
+          {{
+            (showPassword()
+              ? 'auth.login.hidePassword'
+              : 'auth.login.showPassword'
+            ) | t
+          }}
+        </button>
+      </div>
+      @if (showError(form.controls.password)) {
+        <p id="password-error" class="site-field__error">
+          @if (form.controls.password.errors?.['maxlength']) {
+            {{ 'common.tooLong' | t }}
+          } @else {
+            {{ 'auth.errors.passwordRequired' | t }}
+          }
+        </p>
+      }
+    </div>
+
+    <button type="submit" class="site-button auth-card__submit" [disabled]="submitting()">
+      {{ (submitting() ? 'auth.login.submitting' : 'auth.login.submit') | t }}
+    </button>
+  </form>
+
+  <p class="auth-card__note">{{ 'auth.login.recoveryNote' | t }}</p>
+</section>

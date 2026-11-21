@@ -1,0 +1,77 @@
+<a class="skip-link" href="#main-content" (click)="focusMain($event)">
+  {{ 'shell.skipToContent' | t }}
+</a>
+
+<div class="shell" [class.shell--menu-open]="menuOpen()">
+  <div
+    class="shell__backdrop"
+    aria-hidden="true"
+    (click)="closeMenu()"
+  ></div>
+
+  <aside class="sidebar" id="main-navigation">
+    <div class="sidebar__brand">
+      <span class="sidebar__logo" aria-hidden="true">S</span>
+      <span class="sidebar__name">{{ 'app.name' | t }}</span>
+    </div>
+    <nav [attr.aria-label]="'shell.mainNavigation' | t">
+      <ul class="sidebar__list">
+        @for (item of navItems(); track item.path) {
+          <li>
+            <a
+              class="sidebar__link"
+              [routerLink]="item.path"
+              routerLinkActive="sidebar__link--active"
+              [routerLinkActiveOptions]="{ exact: item.exact }"
+              (click)="closeMenu()"
+            >
+              {{ item.labelKey | t }}
+            </a>
+          </li>
+        }
+      </ul>
+    </nav>
+  </aside>
+
+  <div class="shell__body">
+    <header class="topbar">
+      <button
+        type="button"
+        class="topbar__menu"
+        [attr.aria-expanded]="menuOpen()"
+        aria-controls="main-navigation"
+        (click)="toggleMenu()"
+      >
+        <span class="visually-hidden">
+          {{ (menuOpen() ? 'shell.closeMenu' : 'shell.openMenu') | t }}
+        </span>
+        <span aria-hidden="true">☰</span>
+      </button>
+
+      <p class="topbar__user">
+        {{ 'shell.currentUser' | t: { name: user()?.fullName ?? '' } }}
+      </p>
+
+      <button
+        type="button"
+        class="site-button site-button--secondary"
+        (click)="logoutOpen.set(true)"
+      >
+        {{ 'auth.logout' | t }}
+      </button>
+    </header>
+
+    <main #mainContent id="main-content" class="shell__main" tabindex="-1">
+      <router-outlet />
+    </main>
+  </div>
+</div>
+
+<app-confirm-dialog
+  [open]="logoutOpen()"
+  [title]="'auth.logout' | t"
+  [message]="'shell.logoutConfirm' | t"
+  [confirmLabel]="'auth.logout' | t"
+  (confirmed)="logout()"
+  (cancelled)="logoutOpen.set(false)"
+/>

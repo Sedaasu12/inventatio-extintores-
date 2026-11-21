@@ -29,12 +29,15 @@ export class AuthService {
   private readonly token = signal<string | null>(null);
   private readonly currentUser = signal<AuthUser | null>(null);
   private readonly currentStatus = signal<AuthStatus>('unknown');
+  private readonly expiredSession = signal(false);
 
   private refreshInFlight: Observable<AuthSession> | null = null;
   private refreshTimer: ReturnType<typeof setTimeout> | null = null;
 
   readonly user = this.currentUser.asReadonly();
   readonly status = this.currentStatus.asReadonly();
+  /** `true` cuando una sesión activa terminó porque el refresh falló. */
+  readonly sessionExpired = this.expiredSession.asReadonly();
   readonly isAuthenticated = computed(
     () => this.currentStatus() === 'authenticated',
   );
@@ -91,6 +94,11 @@ export class AuthService {
       .pipe(
         tap((session) => this.applySession(session)),
         catchError((error: unknown) => {
+          // Solo es una caducidad si había sesión: el arranque anónimo no
+          // debe mostrar el aviso de "sesión expirada".
+          if (this.token() !== null || this.currentStatus() === 'authenticated') {
+            this.expiredSession.set(true);
+          }
           this.clearSession();
           return throwError(() => error);
         }),
@@ -124,10 +132,16 @@ export class AuthService {
     this.currentStatus.set('anonymous');
   }
 
+  /** Marca el aviso de caducidad como ya mostrado por la interfaz. */
+  acknowledgeSessionExpiry(): void {
+    this.expiredSession.set(false);
+  }
+
   private applySession(session: AuthSession): void {
     this.token.set(session.accessToken);
     this.currentUser.set(session.user);
     this.currentStatus.set('authenticated');
+    this.expiredSession.set(false);
     this.scheduleRefresh(session.expiresIn);
   }
 

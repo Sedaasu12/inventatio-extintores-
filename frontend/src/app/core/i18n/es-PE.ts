@@ -20,11 +20,22 @@ export const ES_PE = {
   'common.yes': 'Sí',
   'common.no': 'No',
   'common.required': 'Este campo es obligatorio.',
+  'common.tooLong': 'El texto es demasiado largo.',
   'common.unknown': 'Desconocido',
   'common.notAvailable': 'No disponible',
   'common.actions': 'Acciones',
   'common.name': 'Nombre',
   'common.email': 'Correo electrónico',
+  'common.continue': 'Continuar',
+  'common.backHome': 'Volver al inicio',
+
+  'pagination.label': 'Paginación',
+  'pagination.previous': 'Página anterior',
+  'pagination.next': 'Página siguiente',
+  'pagination.status': 'Página {page} de {totalPages}',
+  'table.empty': 'No hay registros para mostrar.',
+  'dialog.cancel': 'Cancelar',
+  'dialog.confirm': 'Confirmar',
 
   'auth.login.title': 'Iniciar sesión',
   'auth.login.subtitle': 'Ingresa con tu correo y contraseña.',
@@ -57,7 +68,9 @@ export const ES_PE = {
   'auth.changePassword.mismatch': 'Las contraseñas no coinciden.',
   'auth.changePassword.sameAsCurrent':
     'La nueva contraseña debe ser distinta de la actual.',
-  'auth.changePassword.success': 'Contraseña actualizada.',
+  'auth.changePassword.success':
+    'Contraseña actualizada. Ya puedes continuar.',
+  'auth.changePassword.currentInvalid': 'La contraseña actual no es correcta.',
   'auth.changePassword.forced':
     'Debes cambiar la contraseña para continuar.',
 
@@ -87,6 +100,7 @@ export const ES_PE = {
   'shell.userMenu': 'Menú de usuario',
   'shell.currentUser': 'Sesión de {name}',
   'shell.sessionClosing': 'Cerrando sesión…',
+  'shell.logoutConfirm': '¿Cerrar la sesión actual?',
 
   'page.home.title': 'Bienvenido a SITE',
   'page.home.message':
@@ -119,6 +133,8 @@ export const ES_PE = {
     'La operación ya se registró con otros datos. Recarga e inténtalo de nuevo.',
   'errors.codes.CONCURRENCY_CONFLICT':
     'Otro usuario modificó este registro. Recarga e inténtalo de nuevo.',
+  'errors.codes.INVALID_CURRENT_PASSWORD':
+    'La contraseña actual no es correcta.',
 } as const;
 
 export type TranslationKey = keyof typeof ES_PE;

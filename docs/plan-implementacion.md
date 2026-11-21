@@ -1000,6 +1000,35 @@ npm run lint && npm run typecheck && npm run test && npm run build
 npm run e2e -- auth
 ```
 
+### Estado de ejecución (2026-11-20)
+
+Implementado en 8A:
+
+- Entornos de API con `apiBaseUrl = /api/v1` y proxy de desarrollo para que la
+  cookie de refresh sea del mismo origen.
+- `ApiClient`, normalización de errores (`ApiClientError`), `requestId` y
+  interceptores de sesión/renovación *single-flight*.
+- `AuthService` con token en memoria, `restoreSession`, cambio de contraseña y
+  detección de sesión caducada.
+- `PermissionService`, directiva `hasPermission`, diccionario `es-PE`, pipes de
+  fecha/número/moneda y configuración de la aplicación.
+
+Implementado en 8B:
+
+- Guards de autenticación, anónimo, permisos y cambio de contraseña pendiente.
+- Armazón responsive con menú por permisos, enlace de salto, foco al contenido
+  y cierre de sesión confirmado.
+- Pantallas de login, cambio de contraseña, bienvenida, 403 y 404.
+- Componentes compartidos: tabla, paginación, chips, vacío y confirmación.
+- Rutas lazy y títulos resueltos por clave de traducción.
+- 54 pruebas unitarias; lint, typecheck y build verificados.
+
+Suposición registrada: `/app/inicio` es una bienvenida sin llamadas a la API;
+los indicadores del tablero llegan en la fase 10.
+
+Pendiente para 8C: pruebas E2E con Playwright/axe contra la API real y trabajo
+de CI dedicado.
+
 ---
 
 ## 12. Fase 9 — Frontend: inventario, QR y etiquetas
