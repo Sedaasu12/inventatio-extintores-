@@ -131,7 +131,8 @@ a:hover {
   font-weight: 600;
 }
 
-.site-field input {
+.site-field input,
+.site-field select {
   min-height: 2.75rem;
   padding: 0.5rem 0.7rem;
   border: 1px solid var(--site-border);
@@ -139,7 +140,8 @@ a:hover {
   background: var(--site-surface);
 }
 
-.site-field input[aria-invalid='true'] {
+.site-field input[aria-invalid='true'],
+.site-field select[aria-invalid='true'] {
   border-color: var(--site-danger);
 }
 

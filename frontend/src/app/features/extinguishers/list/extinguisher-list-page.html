@@ -1,0 +1,196 @@
+<section class="inventory" aria-labelledby="inventory-title">
+  <header class="inventory__header">
+    <h1 id="inventory-title" class="inventory__title">
+      {{ 'inventory.title' | t }}
+    </h1>
+    <p class="inventory__subtitle">{{ 'inventory.subtitle' | t }}</p>
+  </header>
+
+  <form
+    class="inventory__filters"
+    [formGroup]="form"
+    (ngSubmit)="applyFilters()"
+    aria-labelledby="inventory-filters-title"
+  >
+    <h2 id="inventory-filters-title" class="inventory__filters-title">
+      {{ 'inventory.filters.title' | t }}
+    </h2>
+
+    <div class="inventory__filters-grid">
+      <div class="site-field inventory__search">
+        <label for="filter-q">{{ 'inventory.filters.search' | t }}</label>
+        <input
+          id="filter-q"
+          type="search"
+          formControlName="q"
+          autocomplete="off"
+          [placeholder]="'inventory.filters.searchPlaceholder' | t"
+        />
+      </div>
+
+      @if (canReadCatalogs()) {
+        <div class="site-field">
+          <label for="filter-type">{{ 'inventory.filters.type' | t }}</label>
+          <select id="filter-type" formControlName="typeId">
+            <option value="">{{ 'inventory.filters.allTypes' | t }}</option>
+            @for (type of types(); track type.id) {
+              <option [value]="type.id">{{ type.name }} ({{ type.code }})</option>
+            }
+          </select>
+        </div>
+      }
+
+      @if (canReadLocations()) {
+        <div class="site-field">
+          <label for="filter-location">
+            {{ 'inventory.filters.location' | t }}
+          </label>
+          <select id="filter-location" formControlName="locationId">
+            <option value="">{{ 'inventory.filters.allLocations' | t }}</option>
+            @for (group of locationGroups(); track group.sede.id) {
+              <optgroup [label]="group.sede.name">
+                @for (option of group.options; track option.id) {
+                  <option [value]="option.id">
+                    {{ option.name }} ({{ option.code }})
+                  </option>
+                }
+              </optgroup>
+            }
+          </select>
+        </div>
+      }
+
+      <div class="site-field">
+        <label for="filter-status">
+          {{ 'inventory.filters.logisticsStatus' | t }}
+        </label>
+        <select id="filter-status" formControlName="logisticsStatus">
+          <option value="">{{ 'inventory.filters.allStatuses' | t }}</option>
+          @for (option of logisticsOptions; track option.value) {
+            <option [value]="option.value">{{ option.labelKey | t }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="site-field">
+        <label for="filter-condition">
+          {{ 'inventory.filters.technicalCondition' | t }}
+        </label>
+        <select id="filter-condition" formControlName="technicalCondition">
+          <option value="">{{ 'inventory.filters.allConditions' | t }}</option>
+          @for (option of conditionOptions; track option.value) {
+            <option [value]="option.value">{{ option.labelKey | t }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="site-field">
+        <label for="filter-sort">{{ 'inventory.filters.sort' | t }}</label>
+        <select id="filter-sort" formControlName="sort">
+          @for (option of sortOptions; track option.value) {
+            <option [value]="option.value">{{ option.labelKey | t }}</option>
+          }
+        </select>
+      </div>
+
+      <label class="inventory__check">
+        <input type="checkbox" formControlName="includeRetired" />
+        <span>{{ 'inventory.filters.includeRetired' | t }}</span>
+      </label>
+    </div>
+
+    @if (filterOptionsError(); as message) {
+      <div class="site-alert inventory__filters-error" role="alert">
+        <p>{{ message }}</p>
+        <button
+          type="button"
+          class="site-button site-button--secondary"
+          (click)="retryFilterOptions()"
+        >
+          {{ 'common.retry' | t }}
+        </button>
+      </div>
+    }
+
+    <div class="inventory__filters-actions">
+      <button type="submit" class="site-button">
+        {{ 'inventory.filters.apply' | t }}
+      </button>
+      <button
+        type="button"
+        class="site-button site-button--secondary"
+        [disabled]="!hasActiveFilters()"
+        (click)="clearFilters()"
+      >
+        {{ 'inventory.filters.clear' | t }}
+      </button>
+    </div>
+  </form>
+
+  <section
+    class="inventory__results"
+    aria-live="polite"
+    [attr.aria-busy]="loading()"
+  >
+    @if (errorMessage(); as message) {
+      <div class="site-alert" role="alert">
+        <p>{{ message }}</p>
+        <button
+          type="button"
+          class="site-button site-button--secondary"
+          (click)="retry()"
+        >
+          {{ 'common.retry' | t }}
+        </button>
+      </div>
+    } @else if (loading()) {
+      <p class="inventory__loading" role="status">
+        {{ 'inventory.loading' | t }}
+      </p>
+    } @else if (items().length === 0) {
+      <app-empty-state [title]="emptyTitle()" [message]="emptyMessage()" />
+    } @else {
+      <p class="inventory__summary">{{ resultsSummary() }}</p>
+
+      <app-data-table
+        [caption]="tableCaption()"
+        [columns]="columns()"
+        [rows]="items()"
+        [rowTemplate]="row"
+      />
+
+      <app-pagination
+        [page]="meta().page"
+        [pageSize]="meta().pageSize"
+        [total]="meta().total"
+        (pageChange)="changePage($event)"
+      />
+    }
+  </section>
+
+  <ng-template #row let-item>
+    @let row = $any(item);
+    <tr>
+      <td><span class="inventory__code">{{ row.assetCode }}</span></td>
+      <td>
+        <span class="inventory__type">{{ row.type.name }}</span>
+        <span class="inventory__muted">{{ row.type.code }}</span>
+      </td>
+      <td>{{ locationLabel(row) }}</td>
+      <td>
+        <app-status-chip
+          [label]="logisticsKey(row.logisticsStatus) | t"
+          [tone]="logisticsTone(row.logisticsStatus)"
+        />
+      </td>
+      <td>
+        <app-status-chip
+          [label]="conditionKey(row.technicalCondition) | t"
+          [tone]="conditionTone(row.technicalCondition)"
+        />
+      </td>
+      <td>{{ row.serialNumber ?? '—' }}</td>
+      <td>{{ row.updatedAt | appDate: 'dd/MM/yyyy HH:mm' }}</td>
+    </tr>
+  </ng-template>
+</section>

@@ -33,6 +33,12 @@ const NAV_ITEMS: readonly NavItem[] = [
     permission: 'dashboard.read',
     exact: true,
   },
+  {
+    labelKey: 'nav.inventory',
+    path: '/app/extintores',
+    permission: 'extinguishers.read',
+    exact: false,
+  },
 ];
 
 @Component({

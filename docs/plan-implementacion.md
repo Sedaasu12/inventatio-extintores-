@@ -1108,6 +1108,31 @@ npm run lint && npm run typecheck && npm run test && npm run build
 npm run e2e -- extinguishers scan
 ```
 
+### Estado de ejecución (2026-11-23)
+
+Implementado en 9A:
+
+- Contrato tipado del listado (`ExtinguisherSummary`, filtros, paginación y
+  catálogos de tipos y ubicaciones).
+- `ExtinguishersApi` para listar activos, consultar tipos activos y el árbol de
+  ubicaciones; todos los filtros y la paginación se aplican en el servidor.
+- Pantalla `/app/extintores` con búsqueda por código, serial, marca o modelo;
+  filtros por tipo, ubicación, estado logístico, condición técnica, inclusión de
+  dados de baja y orden. El estado vive en query params para compartir o recargar.
+- Paginación de 20 elementos, estados de carga, error con reintento, vacío y
+  resumen de resultados; tabla con código, tipo, ubicación, estados, serial y
+  actualización.
+- Ruta lazy protegida con `extinguishers.read` y entrada de menú condicionada por
+  permiso; el backend sigue siendo la autoridad.
+- Pruebas: 6 unitarias nuevas (3 de API y 3 de la pantalla) y E2E de listado,
+  filtros, limpieza, 360 px y axe. Total: 60 unitarias y 5 E2E en verde.
+
+Suposición registrada: la lista no navega todavía a una ficha ni ofrece acciones
+de alta; llegan en 9B para no publicar enlaces o botones sin implementación.
+
+Pendiente: 9B (ficha, alta/edición y cambio de condición) y 9C (escaneo QR,
+entrada manual/USB y etiqueta imprimible).
+
 ---
 
 ## 13. Fase 10 — Frontend: operaciones y administración

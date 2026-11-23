@@ -12,9 +12,9 @@ movimientos con baja e historial, ciclo de mantenimiento con servicios y
 proyección de vencimientos, inspecciones con fecha objetivo, alertas y umbrales,
 dashboard operativo y reportes con exportación CSV. El frontend incluye inicio de
 sesión, renovación y cierre de sesión, cambio obligatorio de contraseña, armazón
-responsive con menú por permisos y pruebas E2E con Playwright y axe contra la API
-real. El frontend de negocio (inventario, operaciones y administración) corresponde
-a las fases 9 y 10.
+responsive con menú por permisos, el listado de inventario con filtros y
+paginación de servidor (fase 9A) y pruebas E2E con Playwright y axe contra la API
+real. Las fichas, el alta y las operaciones corresponden a 9B/9C y a la fase 10.
 
 La evidencia completa, con los comandos y su salida real, está en
 `docs/evidencias/` y en `docs/plan-implementacion.md`.
@@ -157,10 +157,10 @@ npm run e2e
 
 La suite cubre protección de rutas, credenciales inválidas, cambio obligatorio de
 contraseña, renovación de sesión, cierre de sesión, 403 sin permiso, menú oculto,
-uso a 360 px y navegación por teclado con foco visible. axe valida WCAG 2.1/2.2 AA.
-En CI, el trabajo `e2e` levanta MySQL 8.4, migra, siembra, compila el backend,
-instala Chromium y ejecuta la suite; si falla, publica el reporte HTML como
-artefacto.
+listado de inventario con filtros del servidor, uso a 360 px y navegación por
+teclado con foco visible. axe valida WCAG 2.1/2.2 AA. En CI, el trabajo `e2e`
+levanta MySQL 8.4, migra, siembra, compila el backend, instala Chromium y ejecuta
+la suite; si falla, publica el reporte HTML como artefacto.
 
 Endpoints disponibles:
 

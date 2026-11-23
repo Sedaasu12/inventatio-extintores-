@@ -1112,7 +1112,8 @@ export interface QrScannerPort {
   los permisos. No deben apuntar a una base con datos reales.
 - **Cobertura actual:** protección de rutas, credenciales inválidas traducidas,
   cambio obligatorio de contraseña, renovación de sesión tras recargar, cierre de
-  sesión, 403 sin permiso, menú oculto, uso a 360 px y navegación por teclado.
+  sesión, 403 sin permiso, menú oculto, listado de inventario con filtros del
+  servidor, uso a 360 px y navegación por teclado.
 - **Accesibilidad:** axe con etiquetas WCAG 2.1/2.2 A y AA; enlace de salto, foco
   al contenido principal, foco visible y campos con etiqueta.
 - **CI:** el trabajo `e2e` usa MySQL 8.4 como servicio, migra, siembra, compila el

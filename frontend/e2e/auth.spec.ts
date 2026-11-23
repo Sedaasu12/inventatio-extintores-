@@ -184,7 +184,18 @@ test('muestra sin permiso y oculta el menú sin permiso', async ({ page }) => {
   const navigation = page.getByRole('navigation', {
     name: 'Navegación principal',
   });
-  await expect(navigation.getByRole('link')).toHaveCount(0);
+  await expect(
+    navigation.getByRole('link', { name: 'Inicio' }),
+  ).toHaveCount(0);
+  await expect(
+    navigation.getByRole('link', { name: 'Inventario' }),
+  ).toHaveCount(1);
+
+  await navigation.getByRole('link', { name: 'Inventario' }).click();
+  await expect(page).toHaveURL(/\/app\/extintores/);
+  await expect(
+    page.getByRole('heading', { name: 'Inventario de extintores' }),
+  ).toBeVisible();
 
   await expectNoA11yViolations(page);
 });

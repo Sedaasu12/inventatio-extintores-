@@ -45,6 +45,16 @@ export const routes: Routes = [
           import('./features/home/home-page').then((m) => m.HomePage),
       },
       {
+        path: 'extintores',
+        title: 'page.title.inventory',
+        canActivate: [permissionGuard],
+        data: { permission: 'extinguishers.read' },
+        loadComponent: () =>
+          import(
+            './features/extinguishers/list/extinguisher-list-page'
+          ).then((m) => m.ExtinguisherListPage),
+      },
+      {
         path: 'cambiar-contrasena',
         title: 'page.title.changePassword',
         loadComponent: () =>
