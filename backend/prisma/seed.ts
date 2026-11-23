@@ -501,9 +501,24 @@ async function seedCounters(): Promise<void> {
   });
 }
 
+async function seedAdminRole(adminRoleId: string): Promise<void> {
+  await prisma.userRole.upsert({
+    where: {
+      userId_roleId: { userId: ADMIN_USER_ID, roleId: adminRoleId },
+    },
+    update: {},
+    create: {
+      userId: ADMIN_USER_ID,
+      roleId: adminRoleId,
+      assignedById: ADMIN_USER_ID,
+    },
+  });
+}
+
 async function main(): Promise<void> {
   await seedAdminUser();
   const roleIds = await seedRbac();
+  await seedAdminRole(roleIds.ADMIN);
   const locationIds = await seedLocations();
   const catalogs = await seedCatalogs();
   await seedExtinguishers(locationIds, catalogs);

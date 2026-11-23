@@ -5,13 +5,16 @@ ubicación actual y conservar el historial de movimientos, inspecciones y servic
 
 ## Estado del proyecto
 
-**Fases 0 a 5 y bloques 6A/6B/7A/7B/7C implementados y verificados:** modelo de datos,
-autenticación y auditoría, ubicaciones y catálogos, alta transaccional de
+**Fases 0 a 7C y fase 8 (bloques 8A, 8B y 8C) implementadas y verificadas:** modelo
+de datos, autenticación y auditoría, ubicaciones y catálogos, alta transaccional de
 extintores con QR y etiqueta, carga inicial CSV/JSON con dry-run, motor de
 movimientos con baja e historial, ciclo de mantenimiento con servicios y
 proyección de vencimientos, inspecciones con fecha objetivo, alertas y umbrales,
-dashboard operativo y reportes con exportación CSV. El frontend de negocio
-corresponde a las fases siguientes.
+dashboard operativo y reportes con exportación CSV. El frontend incluye inicio de
+sesión, renovación y cierre de sesión, cambio obligatorio de contraseña, armazón
+responsive con menú por permisos y pruebas E2E con Playwright y axe contra la API
+real. El frontend de negocio (inventario, operaciones y administración) corresponde
+a las fases 9 y 10.
 
 La evidencia completa, con los comandos y su salida real, está en
 `docs/evidencias/` y en `docs/plan-implementacion.md`.
@@ -112,6 +115,52 @@ npm run start:dev
 cd ../frontend
 npm start
 ```
+
+El frontend compila `apiBaseUrl: '/api/v1'` y `proxy.conf.json` redirige `/api`
+hacia `http://localhost:3000` durante `ng serve`. Así la cookie de refresh es del
+mismo origen y no se depende de CORS en desarrollo. En producción, el servidor web
+que publique el frontend debe aplicar la misma regla de proxy o servir API y
+aplicación bajo el mismo origen.
+
+### Pruebas E2E del frontend
+
+La suite usa Playwright y `@axe-core/playwright` contra la API real. Cambia la
+contraseña del administrador y retira temporalmente `dashboard.read` al rol
+`CONSULTA`, por lo que **exige una base desechable** ya migrada y sembrada. No la
+ejecutes contra una base con datos reales.
+
+```bash
+cd backend
+npm run db:migrate
+
+# PowerShell: contraseña conocida para la semilla de E2E
+$env:SEED_ADMIN_PASSWORD='E2eAdmin#2026seed'
+# Linux/macOS/Git Bash: export SEED_ADMIN_PASSWORD='E2eAdmin#2026seed'
+npm run db:seed
+npm run build
+
+cd ../frontend
+npx playwright install chromium
+
+$env:E2E_SEED_ADMIN_PASSWORD='E2eAdmin#2026seed'
+npm run e2e
+```
+
+| Variable | Valor por defecto | Uso |
+|---|---|---|
+| `E2E_DATABASE_URL` | `mysql://site:site@localhost:3307/site_e2e` | Base desechable que usa el backend levantado por Playwright. |
+| `E2E_API_URL` | `http://localhost:3000/api/v1` | API que consumen los ayudantes de las pruebas. |
+| `E2E_BASE_URL` | `http://127.0.0.1:4200` | Dirección del frontend. |
+| `E2E_BACKEND_URL` | `http://localhost:3000` | Dirección del backend. |
+| `E2E_SEED_ADMIN_PASSWORD` | `E2eAdmin#2026seed` | Contraseña con la que se sembró el administrador. |
+| `E2E_ADMIN_PASSWORD` | `E2eAdmin#2026final` | Contraseña definitiva que dejan las pruebas. |
+
+La suite cubre protección de rutas, credenciales inválidas, cambio obligatorio de
+contraseña, renovación de sesión, cierre de sesión, 403 sin permiso, menú oculto,
+uso a 360 px y navegación por teclado con foco visible. axe valida WCAG 2.1/2.2 AA.
+En CI, el trabajo `e2e` levanta MySQL 8.4, migra, siembra, compila el backend,
+instala Chromium y ejecuta la suite; si falla, publica el reporte HTML como
+artefacto.
 
 Endpoints disponibles:
 
@@ -336,10 +385,10 @@ salida. La evidencia de la fase 0 está en `docs/evidencias/fase-0.md`.
 
 ```text
 backend/          NestJS: API REST, autenticación, catálogos, extintores, importación, movimientos, mantenimiento e inspecciones
-frontend/         Angular: esqueleto con routing
+frontend/         Angular: login, shell, permisos y pruebas E2E
 docs/             Visión, requerimientos, reglas, modelo, API y evidencias
 scripts/          Verificación y reset de base de datos
-.github/          CI con lint, typecheck, pruebas y build
+.github/          CI con lint, typecheck, pruebas, build y E2E
 ```
 
 ## Documentación

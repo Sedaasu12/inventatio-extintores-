@@ -92,3 +92,84 @@ jobs:
       - name: Frontend - build
         working-directory: frontend
         run: npm run build
+
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_ROOT_HOST: "%"
+          MYSQL_DATABASE: site
+          MYSQL_USER: site
+          MYSQL_PASSWORD: site
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -u site -psite --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+    env:
+      NODE_ENV: test
+      TZ: America/Lima
+      # Base desechable: el flujo cambia la contraseña del administrador y los
+      # permisos del rol CONSULTA. Nunca apuntar a una base con datos reales.
+      DATABASE_URL: mysql://site:site@127.0.0.1:3306/site
+      E2E_DATABASE_URL: mysql://site:site@127.0.0.1:3306/site
+      E2E_API_URL: http://localhost:3000/api/v1
+      SEED_ADMIN_PASSWORD: "E2eAdmin#2026seed"
+      E2E_SEED_ADMIN_PASSWORD: "E2eAdmin#2026seed"
+      E2E_ADMIN_PASSWORD: "E2eAdmin#2026final"
+      RATE_LIMIT_LOGIN: "200"
+      COOKIE_SECURE: "false"
+      CORS_ORIGINS: http://127.0.0.1:4200
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            backend/package-lock.json
+            frontend/package-lock.json
+
+      - name: Backend - instalar dependencias
+        working-directory: backend
+        run: npm ci
+
+      - name: Base de datos - migrar
+        working-directory: backend
+        run: npm run db:migrate
+
+      - name: Base de datos - sembrar
+        working-directory: backend
+        run: npm run db:seed
+
+      - name: Backend - build
+        working-directory: backend
+        run: npm run build
+
+      - name: Frontend - instalar dependencias
+        working-directory: frontend
+        run: npm ci
+
+      - name: Frontend - instalar Chromium
+        working-directory: frontend
+        run: npx playwright install --with-deps chromium
+
+      - name: Frontend - pruebas E2E y accesibilidad
+        working-directory: frontend
+        run: npm run e2e
+
+      - name: Frontend - publicar reporte E2E
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: frontend/playwright-report
+          retention-days: 7

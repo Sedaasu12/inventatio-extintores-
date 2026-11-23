@@ -1042,7 +1042,10 @@ frontend/
 
 | Ruta | Componente | Guard |
 |---|---|---|
-| `/login` | Login | Público |
+| `/login` | Login | Público (redirige si ya hay sesión) |
+| `/app/inicio` | Bienvenida | Autenticado + `dashboard.read` |
+| `/app/cambiar-contrasena` | Cambio obligatorio | Autenticado |
+| `/app/sin-permiso` | 403 | Autenticado |
 | `/app/dashboard` | Dashboard | Autenticado + `dashboard.read` |
 | `/app/extintores` | Lista | `extinguishers.read` |
 | `/app/extintores/nuevo` | Alta | `extinguishers.create` |
@@ -1056,6 +1059,10 @@ frontend/
 | `/app/alertas` | Alertas | `alerts.read` |
 | `/app/reportes` | Reportes | `reports.read` |
 | `/app/admin/...` | Administración | Permisos específicos |
+
+`pendingPasswordChangeGuard` se aplica como `canActivateChild` de `/app`: mientras
+`mustChangePassword` sea verdadero solo permite `/app/cambiar-contrasena`. Cualquier
+ruta no reconocida muestra la página 404 sin romper la sesión vigente.
 
 ### 9.2 Servicios y estado
 
@@ -1092,6 +1099,27 @@ export interface QrScannerPort {
 - No incluye ubicación, fechas, responsables ni PII.
 - Impresión HTML/CSS con tamaño configurable; PDF en fase 2.
 - Verificar legibilidad y contraste.
+
+### 9.5 Pruebas E2E y accesibilidad
+
+- **Herramientas:** Playwright y `@axe-core/playwright`; la suite vive en
+  `frontend/e2e/` y usa `frontend/playwright.config.ts`.
+- **Servidores:** Playwright levanta el backend compilado (`node dist/src/main.js`
+  en `backend/`) y el frontend (`ng serve`) si no están ya en ejecución. En CI
+  siempre los levanta.
+- **Base desechable:** las pruebas cambian la contraseña del administrador y
+  retiran temporalmente `dashboard.read` al rol `CONSULTA`; al terminar restauran
+  los permisos. No deben apuntar a una base con datos reales.
+- **Cobertura actual:** protección de rutas, credenciales inválidas traducidas,
+  cambio obligatorio de contraseña, renovación de sesión tras recargar, cierre de
+  sesión, 403 sin permiso, menú oculto, uso a 360 px y navegación por teclado.
+- **Accesibilidad:** axe con etiquetas WCAG 2.1/2.2 A y AA; enlace de salto, foco
+  al contenido principal, foco visible y campos con etiqueta.
+- **CI:** el trabajo `e2e` usa MySQL 8.4 como servicio, migra, siembra, compila el
+  backend, instala Chromium y publica `frontend/playwright-report` si falla.
+- **Seguridad:** el access token permanece en memoria; la cookie de refresh es
+  `HttpOnly` y `SameSite=Strict`, por lo que no se expone a JavaScript ni a
+  `localStorage`.
 
 ---
 

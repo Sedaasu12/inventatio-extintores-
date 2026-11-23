@@ -1026,8 +1026,19 @@ Implementado en 8B:
 Suposición registrada: `/app/inicio` es una bienvenida sin llamadas a la API;
 los indicadores del tablero llegan en la fase 10.
 
-Pendiente para 8C: pruebas E2E con Playwright/axe contra la API real y trabajo
-de CI dedicado.
+Implementado en 8C:
+
+- Suite Playwright con `@axe-core/playwright` contra la API real: protección de
+  rutas, credenciales inválidas, cambio obligatorio de contraseña, renovación de
+  sesión, cierre de sesión, 403 sin permiso, menú oculto, uso a 360 px y
+  navegación por teclado con foco visible.
+- axe valida WCAG 2.1/2.2 AA sin violaciones en las pantallas cubiertas.
+- Trabajo `e2e` dedicado en CI con MySQL 8.4 desechable, migración, semilla,
+  compilación del backend, Chromium y publicación del reporte al fallar.
+- La semilla asigna el rol `ADMIN` al administrador; sin ese rol, el flujo E2E
+  recibía 403 al consultar `/roles`.
+- Verificación: 4 pruebas E2E en 18,9 s; lint, typecheck, 54 pruebas unitarias y
+  build del frontend en verde.
 
 ---
 
