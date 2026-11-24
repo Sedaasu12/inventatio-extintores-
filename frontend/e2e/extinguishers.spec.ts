@@ -17,6 +17,7 @@ interface TypeListResponse {
   data: Array<{
     id: string;
     code: string;
+    nominalCapacity: string;
     capacityUnit: 'KG' | 'L' | 'LB';
   }>;
 }
@@ -25,11 +26,25 @@ interface LocationTreeResponse {
   data: Array<{
     id: string;
     type: string;
-    children: Array<{ id: string; type: string }>;
+    code: string;
+    name: string;
+    children: Array<{
+      id: string;
+      type: string;
+      code: string;
+      name: string;
+    }>;
   }>;
 }
 
 let assetCode = '';
+let typeId = '';
+let typeCapacity = '';
+let typeCapacityUnit = '';
+let warehouseId = '';
+let warehouseLabel = '';
+let createdExtinguisherId = '';
+let createdAssetCode = '';
 
 async function expectNoA11yViolations(page: Page): Promise<void> {
   const results = await new AxeBuilder({ page })
@@ -73,6 +88,12 @@ test.beforeAll(async ({ request }) => {
 
   expect(type, 'debe existir al menos un tipo de extintor').toBeDefined();
   expect(warehouse, 'debe existir al menos un almacén').toBeDefined();
+
+  typeId = type.id;
+  typeCapacity = type.nominalCapacity;
+  typeCapacityUnit = type.capacityUnit;
+  warehouseId = warehouse!.id;
+  warehouseLabel = `${warehouse!.name} (${warehouse!.code})`;
 
   const created = await request.post(`${API_URL}/extinguishers`, {
     headers: {
@@ -122,7 +143,7 @@ test('lista, filtra y limpia el inventario con paginación del servidor', async 
 
   await expect(page).toHaveURL(new RegExp(`q=${assetCode}`));
   await expect(
-    page.getByRole('cell', { name: assetCode, exact: true }),
+    page.getByRole('link', { name: `Abrir la ficha de ${assetCode}` }),
   ).toBeVisible();
   await expect(page.getByText('Mostrando 1 de 1 extintores.')).toBeVisible();
 
@@ -145,3 +166,113 @@ test('lista, filtra y limpia el inventario con paginación del servidor', async 
     page.getByRole('heading', { name: 'Inventario de extintores' }),
   ).toBeVisible();
 });
+
+test('abre la ficha del extintor desde el listado', async ({ page }) => {
+  await loginAsAdmin(page);
+  await page.goto(`/app/extintores?q=${assetCode}`);
+
+  await page
+    .getByRole('link', { name: `Abrir la ficha de ${assetCode}` })
+    .click();
+
+  await expect(page).toHaveURL(/\/app\/extintores\/[0-9a-f-]{36}/);
+  await expect(
+    page.getByRole('heading', { name: assetCode, level: 1 }),
+  ).toBeVisible();
+  await expect(page.getByText('Ubicación y estado')).toBeVisible();
+  await expect(page.getByText('Trazabilidad')).toBeVisible();
+  await expect(page.getByText(warehouseLabel)).toBeVisible();
+
+  await expectNoA11yViolations(page);
+});
+
+test('registra un extintor desde la interfaz y muestra su ficha', async ({
+  page,
+}) => {
+  await loginAsAdmin(page);
+  await page.goto('/app/extintores/nuevo');
+
+  await expect(
+    page.getByRole('heading', { name: 'Nuevo extintor', level: 1 }),
+  ).toBeVisible();
+
+  await page.getByLabel('Tipo de extintor').selectOption(typeId);
+  await expect(page.getByLabel('Capacidad', { exact: true })).toHaveValue(
+    typeCapacity,
+  );
+  await expect(page.getByLabel('Unidad')).toHaveValue(typeCapacityUnit);
+
+  await page.getByLabel('Número de serie').fill(`UI-${runId}`);
+  await page.getByLabel('Marca').fill('Marca UI');
+  await page.getByLabel('Ubicación inicial').selectOption(warehouseId);
+  await page.getByLabel('Origen del ingreso').selectOption('COMPRA_LOCAL');
+  await page.getByLabel('Condición inicial').selectOption('OPERATIVO');
+  await page.getByLabel('Recibido por').fill('Recepción UI');
+  await page.getByLabel('Referencia documental').fill(`ACTA-UI-${runId}`);
+  await page
+    .getByLabel('Motivo del ingreso')
+    .fill('Alta de prueba E2E desde la interfaz');
+
+  await page.getByRole('button', { name: 'Registrar extintor' }).click();
+
+  await expect(page).toHaveURL(/\/app\/extintores\/[0-9a-f-]{36}/);
+  const match = /\/app\/extintores\/([0-9a-f-]{36})/.exec(page.url());
+  expect(match, 'la ficha debe exponer el identificador').not.toBeNull();
+  createdExtinguisherId = match![1];
+
+  await expect(
+    page.getByText('Extintor registrado correctamente.'),
+  ).toBeVisible();
+
+  const heading = page.getByRole('heading', { level: 1 });
+  createdAssetCode = (await heading.textContent())?.trim() ?? '';
+  expect(createdAssetCode).toMatch(/^EXT-\d{6}$/);
+  await expect(page.getByText('En almacén', { exact: true }).first()).toBeVisible();
+  await expect(page.getByText('Operativo', { exact: true }).first()).toBeVisible();
+});
+
+test('edita los datos técnicos del extintor', async ({ page }) => {
+  await loginAsAdmin(page);
+  await page.goto(`/app/extintores/${createdExtinguisherId}/editar`);
+
+  await expect(
+    page.getByRole('heading', { name: 'Editar extintor', level: 1 }),
+  ).toBeVisible();
+
+  const brand = `Marca UI ${runId}`;
+  await page.getByLabel('Marca').fill(brand);
+  await page.getByLabel('Modelo').fill('Modelo UI');
+  await page.getByRole('button', { name: 'Guardar cambios' }).click();
+
+  await expect(
+    page.getByText('Datos del extintor actualizados.'),
+  ).toBeVisible();
+  await expect(page.getByText(brand, { exact: true })).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: createdAssetCode, level: 1 }),
+  ).toBeVisible();
+});
+
+test('cambia la condición técnica con motivo auditado', async ({ page }) => {
+  await loginAsAdmin(page);
+  await page.goto(`/app/extintores/${createdExtinguisherId}/condicion`);
+
+  await expect(
+    page.getByRole('heading', {
+      name: 'Cambiar condición técnica',
+      level: 1,
+    }),
+  ).toBeVisible();
+
+  await page.getByLabel('Nueva condición').selectOption('OBSERVADO');
+  await page
+    .getByLabel('Motivo del cambio')
+    .fill('Observación detectada en la verificación E2E');
+  await page.getByRole('button', { name: 'Cambiar condición' }).click();
+
+  await expect(
+    page.getByText('Condición técnica actualizada.'),
+  ).toBeVisible();
+  await expect(page.getByText('Observado', { exact: true }).first()).toBeVisible();
+});
+

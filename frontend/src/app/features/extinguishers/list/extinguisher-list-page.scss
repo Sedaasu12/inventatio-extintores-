@@ -6,8 +6,10 @@
 
 .inventory__header {
   display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
 }
 
 .inventory__title {
@@ -97,6 +99,12 @@
   font-family: ui-monospace, SFMono-Regular, Consolas, 'Liberation Mono', monospace;
   font-weight: 600;
   white-space: nowrap;
+  color: var(--site-primary);
+  text-decoration: none;
+}
+
+.inventory__code:hover {
+  text-decoration: underline;
 }
 
 .inventory__type {

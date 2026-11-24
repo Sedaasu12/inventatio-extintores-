@@ -1,0 +1,164 @@
+<section class="condition" aria-labelledby="condition-title">
+  <a class="condition__back" [routerLink]="['/app/extintores', id]">
+    <span aria-hidden="true">←</span>
+    {{ 'extinguisherForm.backToDetail' | t }}
+  </a>
+
+  <header class="condition__header">
+    <h1 id="condition-title" class="condition__title">
+      {{ 'extinguisherCondition.title' | t }}
+    </h1>
+    <p class="condition__subtitle">
+      {{ 'extinguisherCondition.subtitle' | t }}
+    </p>
+  </header>
+
+  @if (loading()) {
+    <p class="condition__loading" role="status">
+      {{ 'extinguisherCondition.loading' | t }}
+    </p>
+  } @else if (errorMessage(); as message) {
+    <div class="site-alert" role="alert">
+      <p>{{ message }}</p>
+      @if (errorReference(); as reference) {
+        <p class="condition__reference">
+          {{ 'errors.requestId' | t: { requestId: reference } }}
+        </p>
+      }
+      <div class="condition__alert-actions">
+        <button
+          type="button"
+          class="site-button site-button--secondary"
+          (click)="retry()"
+        >
+          {{ 'common.retry' | t }}
+        </button>
+        @if (showReload()) {
+          <button
+            type="button"
+            class="site-button site-button--secondary"
+            (click)="reload()"
+          >
+            {{ 'extinguisherCondition.reload' | t }}
+          </button>
+        }
+      </div>
+    </div>
+  } @else if (detail(); as item) {
+    <div class="condition__summary">
+      <div>
+        <p class="condition__label">
+          {{ 'extinguisherDetail.fields.assetCode' | t }}
+        </p>
+        <p class="condition__code">{{ item.assetCode }}</p>
+        <p class="condition__type">
+          {{ item.type.name }} ({{ item.type.code }})
+        </p>
+      </div>
+      <div>
+        <p class="condition__label">
+          {{ 'extinguisherCondition.current' | t }}
+        </p>
+        <app-status-chip
+          [label]="conditionKey(item.technicalCondition) | t"
+          [tone]="conditionTone(item.technicalCondition)"
+        />
+      </div>
+    </div>
+
+    <form class="condition__form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <div class="site-field">
+        <label for="condition">{{ 'extinguisherCondition.new' | t }}</label>
+        <select
+          id="condition"
+          formControlName="condition"
+          [attr.aria-invalid]="showError('condition')"
+          [attr.aria-describedby]="
+            showError('condition') ? 'condition-error' : null
+          "
+        >
+          <option value="">
+            {{ 'extinguisherCondition.placeholder' | t }}
+          </option>
+          @for (option of conditionOptions; track option) {
+            <option [value]="option">{{ conditionKey(option) | t }}</option>
+          }
+        </select>
+        @if (showError('condition')) {
+          <p id="condition-error" class="site-field__error">
+            {{ errorKey('condition') | t }}
+          </p>
+        }
+      </div>
+
+      @if (isNotAssignable()) {
+        <div class="site-alert" role="alert">
+          {{ 'extinguisherCondition.notAssignable' | t }}
+        </div>
+      }
+
+      <div class="site-field">
+        <label for="reason">{{ 'extinguisherCondition.reason' | t }}</label>
+        <textarea
+          id="reason"
+          rows="4"
+          formControlName="reason"
+          [attr.aria-invalid]="showError('reason')"
+          [attr.aria-describedby]="
+            'reason-hint' + (showError('reason') ? ' reason-error' : '')
+          "
+        ></textarea>
+        <p id="reason-hint" class="site-field__hint">
+          {{ 'extinguisherCondition.reasonHint' | t }}
+        </p>
+        @if (showError('reason')) {
+          <p id="reason-error" class="site-field__error">
+            {{ errorKey('reason') | t }}
+          </p>
+        }
+      </div>
+
+      <div class="site-field">
+        <label for="documentRef">
+          {{ 'extinguisherCondition.documentRef' | t }}
+        </label>
+        <input
+          id="documentRef"
+          type="text"
+          formControlName="documentRef"
+          autocomplete="off"
+          [attr.aria-invalid]="showError('documentRef')"
+          [attr.aria-describedby]="
+            showError('documentRef') ? 'documentRef-error' : null
+          "
+        />
+        @if (showError('documentRef')) {
+          <p id="documentRef-error" class="site-field__error">
+            {{ errorKey('documentRef') | t }}
+          </p>
+        }
+      </div>
+
+      <div class="condition__actions">
+        <a
+          class="site-button site-button--secondary"
+          [routerLink]="['/app/extintores', item.id]"
+        >
+          {{ 'common.cancel' | t }}
+        </a>
+        <button
+          type="submit"
+          class="site-button"
+          [disabled]="submitting() || isNotAssignable()"
+        >
+          {{
+            (submitting()
+              ? 'extinguisherCondition.submitting'
+              : 'extinguisherCondition.submit'
+            ) | t
+          }}
+        </button>
+      </div>
+    </form>
+  }
+</section>

@@ -1124,14 +1124,39 @@ Implementado en 9A:
   actualización.
 - Ruta lazy protegida con `extinguishers.read` y entrada de menú condicionada por
   permiso; el backend sigue siendo la autoridad.
-- Pruebas: 6 unitarias nuevas (3 de API y 3 de la pantalla) y E2E de listado,
-  filtros, limpieza, 360 px y axe. Total: 60 unitarias y 5 E2E en verde.
 
-Suposición registrada: la lista no navega todavía a una ficha ni ofrece acciones
-de alta; llegan en 9B para no publicar enlaces o botones sin implementación.
+Implementado en 9B:
 
-Pendiente: 9B (ficha, alta/edición y cambio de condición) y 9C (escaneo QR,
-entrada manual/USB y etiqueta imprimible).
+- Contrato de ficha (`ExtinguisherDetail` con `dueDates`, `movementCount`,
+  `lastInspection` y `openMaintenanceOrder`), payloads de alta, edición y cambio
+  de condición, y mapas de etiquetas para los enums del backend.
+- `ExtinguishersApi` amplía `get`, `create` (con `Idempotency-Key`), `update` y
+  `changeCondition`.
+- Ficha `/app/extintores/:id` con identificación, ubicación y estado, fechas y
+  vencimientos por categoría, última inspección, orden de mantenimiento abierta,
+  conteo de movimientos y notas. Las acciones de edición y condición solo se
+  muestran con permiso; los avisos de alta/edición/condición se limpian de la URL.
+- Formulario compartido `/app/extintores/nuevo` y `/app/extintores/:id/editar`.
+  El tipo completa capacidad y unidad; se validan el orden de fechas y los
+  límites del backend. En el alta se reutiliza la clave de idempotencia mientras
+  los datos no cambien y se renueva si cambian. En edición se envían solo los
+  campos técnicos con `rowVersion`, los campos de ingreso quedan deshabilitados y
+  un 409 ofrece recargar.
+- Cambio de condición `/app/extintores/:id/condicion` con motivo obligatorio,
+  referencia opcional y `rowVersion`. La regla D-26b (`NO_OPERATIVO` no permitido
+  en un activo `ASIGNADO`) se bloquea en la interfaz y se vuelve a validar en el
+  backend.
+- La lista enlaza cada código con su ficha y publica “Nuevo extintor” solo con
+  `extinguishers.create`. Rutas lazy con permisos `all`: alta
+  (`create` + `catalogs.read` + `locations.read`), edición (`update` + `read` +
+  `catalogs.read`) y condición (`condition` + `read`).
+- Pruebas: 20 unitarias nuevas (7 de API, 4 de ficha, 7 de formulario, 4 de
+  condición y 1 de enlaces del listado) y E2E de navegación desde la lista, alta
+  desde la interfaz, edición y cambio de condición. Total: 80 unitarias y 9 E2E en
+  verde.
+
+Pendiente: 9C (escaneo QR, entrada manual/USB y etiqueta imprimible).
+
 
 ---
 

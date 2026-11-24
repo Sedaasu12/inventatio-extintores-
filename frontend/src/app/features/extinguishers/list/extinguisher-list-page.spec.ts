@@ -65,7 +65,15 @@ const LIST_RESPONSE: ExtinguisherListResponse = {
 
 const TYPES_RESPONSE: ExtinguisherTypeListResponse = {
   data: [
-    { id: 'type-1', code: 'PQS-6', name: 'Polvo químico seco 6 kg', active: true },
+    {
+      id: 'type-1',
+      code: 'PQS-6',
+      name: 'Polvo químico seco 6 kg',
+      nominalCapacity: '6.00',
+      capacityUnit: 'KG',
+      usefulLifeYears: 10,
+      active: true,
+    },
   ],
   meta: { page: 1, pageSize: 100, total: 1, totalPages: 1 },
 };
@@ -227,5 +235,16 @@ describe('ExtinguisherListPage', () => {
         'button.site-button--secondary',
       ),
     ).not.toBeNull();
+  });
+
+  it('enlaza el código con la ficha y ofrece el alta', () => {
+    const { fixture } = setup();
+    const host = fixture.nativeElement as HTMLElement;
+
+    expect(
+      host.querySelector('a[href="/app/extintores/ext-1"]'),
+    ).not.toBeNull();
+    expect(host.querySelector('a[href="/app/extintores/nuevo"]')).not.toBeNull();
+    expect(text(fixture)).toContain('Nuevo extintor');
   });
 });

@@ -8,6 +8,7 @@ import {
   ActivatedRoute,
   ParamMap,
   Router,
+  RouterLink,
 } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ApiClientError } from '../../../core/api/api-error';
@@ -21,9 +22,9 @@ import { EmptyStateComponent } from '../../../shared/components/empty-state/empt
 import { PaginationComponent } from '../../../shared/components/pagination/pagination';
 import {
   StatusChipComponent,
-  StatusTone,
 } from '../../../shared/components/status-chip/status-chip';
 import { ExtinguishersApi } from '../extinguishers.api';
+import { conditionTone, logisticsTone } from '../extinguisher-status';
 import {
   CONDITION_LABEL_KEYS,
   EXTINGUISHER_SORTS,
@@ -135,6 +136,7 @@ function queryKey(params: Record<string, string>): string {
   selector: 'app-extinguisher-list-page',
   imports: [
     ReactiveFormsModule,
+    RouterLink,
     TPipe,
     AppDatePipe,
     DataTableComponent,
@@ -158,6 +160,9 @@ export class ExtinguisherListPage {
   );
   readonly canReadLocations = computed(() =>
     this.permissions.has('locations.read'),
+  );
+  readonly canCreate = computed(() =>
+    this.permissions.has('extinguishers.create'),
   );
 
   readonly form = this.formBuilder.nonNullable.group({
@@ -340,31 +345,8 @@ export class ExtinguisherListPage {
     return CONDITION_LABEL_KEYS[condition];
   }
 
-  logisticsTone(status: LogisticsStatus): StatusTone {
-    switch (status) {
-      case 'ASIGNADO':
-        return 'success';
-      case 'EN_MANTENIMIENTO':
-        return 'warning';
-      case 'DADO_DE_BAJA':
-        return 'danger';
-      default:
-        return 'info';
-    }
-  }
-
-  conditionTone(condition: TechnicalCondition): StatusTone {
-    switch (condition) {
-      case 'OPERATIVO':
-        return 'success';
-      case 'OBSERVADO':
-        return 'warning';
-      case 'NO_OPERATIVO':
-        return 'danger';
-      default:
-        return 'info';
-    }
-  }
+  readonly logisticsTone = logisticsTone;
+  readonly conditionTone = conditionTone;
 
   locationLabel(item: ExtinguisherSummary): string {
     if (item.currentLocation !== null) {

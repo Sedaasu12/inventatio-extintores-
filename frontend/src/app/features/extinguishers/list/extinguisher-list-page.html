@@ -1,9 +1,16 @@
 <section class="inventory" aria-labelledby="inventory-title">
   <header class="inventory__header">
-    <h1 id="inventory-title" class="inventory__title">
-      {{ 'inventory.title' | t }}
-    </h1>
-    <p class="inventory__subtitle">{{ 'inventory.subtitle' | t }}</p>
+    <div>
+      <h1 id="inventory-title" class="inventory__title">
+        {{ 'inventory.title' | t }}
+      </h1>
+      <p class="inventory__subtitle">{{ 'inventory.subtitle' | t }}</p>
+    </div>
+    @if (canCreate()) {
+      <a class="site-button" routerLink="/app/extintores/nuevo">
+        {{ 'inventory.new' | t }}
+      </a>
+    }
   </header>
 
   <form
@@ -171,7 +178,17 @@
   <ng-template #row let-item>
     @let row = $any(item);
     <tr>
-      <td><span class="inventory__code">{{ row.assetCode }}</span></td>
+      <td>
+        <a
+          class="inventory__code"
+          [routerLink]="['/app/extintores', row.id]"
+          [attr.aria-label]="
+            'inventory.openDetail' | t: { assetCode: row.assetCode }
+          "
+        >
+          {{ row.assetCode }}
+        </a>
+      </td>
       <td>
         <span class="inventory__type">{{ row.type.name }}</span>
         <span class="inventory__muted">{{ row.type.code }}</span>

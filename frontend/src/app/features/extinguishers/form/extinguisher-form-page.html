@@ -1,0 +1,485 @@
+<section class="form-page" aria-labelledby="extinguisher-form-title">
+  <a class="form-page__back" [routerLink]="cancelLink()">
+    <span aria-hidden="true">←</span>
+    {{ backKey | t }}
+  </a>
+
+  <header class="form-page__header">
+    <div>
+      <h1 id="extinguisher-form-title" class="form-page__title">
+        {{ titleKey | t }}
+      </h1>
+      <p class="form-page__subtitle">{{ subtitleKey | t }}</p>
+    </div>
+    @if (detail(); as item) {
+      <p class="form-page__code">{{ item.assetCode }}</p>
+    }
+  </header>
+
+  @if (loading()) {
+    <p class="form-page__loading" role="status">
+      {{ 'extinguisherForm.loading' | t }}
+    </p>
+  } @else {
+    @if (errorMessage(); as message) {
+      <div class="site-alert" role="alert">
+        <p>{{ message }}</p>
+        @if (errorReference(); as reference) {
+          <p class="form-page__reference">
+            {{ 'errors.requestId' | t: { requestId: reference } }}
+          </p>
+        }
+        <div class="form-page__alert-actions">
+          <button
+            type="button"
+            class="site-button site-button--secondary"
+            (click)="retryLoad()"
+          >
+            {{ 'common.retry' | t }}
+          </button>
+          @if (showReload()) {
+            <button
+              type="button"
+              class="site-button site-button--secondary"
+              (click)="reload()"
+            >
+              {{ 'extinguisherForm.reload' | t }}
+            </button>
+          }
+        </div>
+      </div>
+    }
+
+    <form class="form-page__form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <section class="form-page__section" aria-labelledby="form-identity-title">
+        <h2 id="form-identity-title" class="form-page__section-title">
+          {{ 'extinguisherForm.sections.identity' | t }}
+        </h2>
+
+        <div class="form-page__grid">
+          <div class="site-field">
+            <label for="typeId">{{ 'extinguisherForm.fields.type' | t }}</label>
+            <select
+              id="typeId"
+              formControlName="typeId"
+              [attr.aria-invalid]="showError('typeId')"
+              [attr.aria-describedby]="showError('typeId') ? 'typeId-error' : null"
+              (change)="onTypeChange($event)"
+            >
+              <option value="">{{ 'extinguisherForm.typePlaceholder' | t }}</option>
+              @for (type of typeOptions(); track type.id) {
+                <option [value]="type.id">{{ typeLabel(type) }}</option>
+              }
+            </select>
+            @if (showError('typeId')) {
+              <p id="typeId-error" class="site-field__error">
+                {{ errorKey('typeId') | t }}
+              </p>
+            }
+          </div>
+
+          <div class="site-field">
+            <label for="capacityValue">
+              {{ 'extinguisherForm.fields.capacityValue' | t }}
+            </label>
+            <input
+              id="capacityValue"
+              type="number"
+              inputmode="decimal"
+              min="0.01"
+              max="99999999.99"
+              step="0.01"
+              formControlName="capacityValue"
+              [attr.aria-invalid]="showError('capacityValue')"
+              [attr.aria-describedby]="
+                showError('capacityValue')
+                  ? 'capacityValue-error'
+                  : 'capacityValue-hint'
+              "
+            />
+            <p id="capacityValue-hint" class="site-field__hint">
+              {{ 'extinguisherForm.hintCapacity' | t }}
+            </p>
+            @if (showError('capacityValue')) {
+              <p id="capacityValue-error" class="site-field__error">
+                {{ errorKey('capacityValue') | t }}
+              </p>
+            }
+          </div>
+
+          <div class="site-field">
+            <label for="capacityUnit">
+              {{ 'extinguisherForm.fields.capacityUnit' | t }}
+            </label>
+            <select
+              id="capacityUnit"
+              formControlName="capacityUnit"
+              [attr.aria-invalid]="showError('capacityUnit')"
+              [attr.aria-describedby]="
+                showError('capacityUnit') ? 'capacityUnit-error' : null
+              "
+            >
+              <option value="">
+                {{ 'extinguisherForm.fields.capacityUnit' | t }}
+              </option>
+              @for (unit of capacityUnitOptions; track unit) {
+                <option [value]="unit">{{ capacityUnitKey(unit) | t }}</option>
+              }
+            </select>
+            @if (showError('capacityUnit')) {
+              <p id="capacityUnit-error" class="site-field__error">
+                {{ errorKey('capacityUnit') | t }}
+              </p>
+            }
+          </div>
+
+          <div class="site-field">
+            <label for="serialNumber">
+              {{ 'extinguisherForm.fields.serialNumber' | t }}
+            </label>
+            <input
+              id="serialNumber"
+              type="text"
+              formControlName="serialNumber"
+              autocomplete="off"
+              [attr.aria-invalid]="showError('serialNumber')"
+              [attr.aria-describedby]="
+                showError('serialNumber') ? 'serialNumber-error' : null
+              "
+            />
+            <p class="site-field__hint">
+              {{ 'extinguisherForm.hintOptional' | t }}
+            </p>
+            @if (showError('serialNumber')) {
+              <p id="serialNumber-error" class="site-field__error">
+                {{ errorKey('serialNumber') | t }}
+              </p>
+            }
+          </div>
+
+          <div class="site-field">
+            <label for="brand">{{ 'extinguisherForm.fields.brand' | t }}</label>
+            <input
+              id="brand"
+              type="text"
+              formControlName="brand"
+              autocomplete="off"
+              [attr.aria-invalid]="showError('brand')"
+              [attr.aria-describedby]="showError('brand') ? 'brand-error' : null"
+            />
+            <p class="site-field__hint">
+              {{ 'extinguisherForm.hintOptional' | t }}
+            </p>
+            @if (showError('brand')) {
+              <p id="brand-error" class="site-field__error">
+                {{ errorKey('brand') | t }}
+              </p>
+            }
+          </div>
+
+          <div class="site-field">
+            <label for="model">{{ 'extinguisherForm.fields.model' | t }}</label>
+            <input
+              id="model"
+              type="text"
+              formControlName="model"
+              autocomplete="off"
+              [attr.aria-invalid]="showError('model')"
+              [attr.aria-describedby]="showError('model') ? 'model-error' : null"
+            />
+            <p class="site-field__hint">
+              {{ 'extinguisherForm.hintOptional' | t }}
+            </p>
+            @if (showError('model')) {
+              <p id="model-error" class="site-field__error">
+                {{ errorKey('model') | t }}
+              </p>
+            }
+          </div>
+        </div>
+      </section>
+
+      <section class="form-page__section" aria-labelledby="form-dates-title">
+        <h2 id="form-dates-title" class="form-page__section-title">
+          {{ 'extinguisherForm.sections.dates' | t }}
+        </h2>
+
+        <div class="form-page__grid">
+          <div class="site-field">
+            <label for="manufactureDate">
+              {{ 'extinguisherForm.fields.manufactureDate' | t }}
+            </label>
+            <input
+              id="manufactureDate"
+              type="date"
+              formControlName="manufactureDate"
+              [attr.aria-invalid]="showDateError()"
+              [attr.aria-describedby]="showDateError() ? 'dates-error' : null"
+            />
+          </div>
+
+          <div class="site-field">
+            <label for="acquiredAt">
+              {{ 'extinguisherForm.fields.acquiredAt' | t }}
+            </label>
+            <input
+              id="acquiredAt"
+              type="date"
+              formControlName="acquiredAt"
+              [attr.aria-invalid]="showDateError()"
+              [attr.aria-describedby]="showDateError() ? 'dates-error' : null"
+            />
+          </div>
+
+          <div class="site-field">
+            <label for="commissionedAt">
+              {{ 'extinguisherForm.fields.commissionedAt' | t }}
+            </label>
+            <input
+              id="commissionedAt"
+              type="date"
+              formControlName="commissionedAt"
+              [attr.aria-invalid]="showDateError()"
+              [attr.aria-describedby]="showDateError() ? 'dates-error' : null"
+            />
+          </div>
+
+          <div class="site-field">
+            <label for="manufacturerExpiryDate">
+              {{ 'extinguisherForm.fields.manufacturerExpiryDate' | t }}
+            </label>
+            <input
+              id="manufacturerExpiryDate"
+              type="date"
+              formControlName="manufacturerExpiryDate"
+              [attr.aria-invalid]="showDateError()"
+              [attr.aria-describedby]="showDateError() ? 'dates-error' : null"
+            />
+          </div>
+        </div>
+
+        @if (showDateError()) {
+          <p id="dates-error" class="site-field__error">
+            @if (dateErrorKey(); as key) {
+              {{ key | t }}
+            }
+          </p>
+        }
+      </section>
+
+      @if (mode === 'create') {
+        <section class="form-page__section" aria-labelledby="form-entry-title">
+          <h2 id="form-entry-title" class="form-page__section-title">
+            {{ 'extinguisherForm.sections.entry' | t }}
+          </h2>
+
+          <div class="form-page__grid">
+            <div class="site-field">
+              <label for="initialLocationId">
+                {{ 'extinguisherForm.fields.initialLocation' | t }}
+              </label>
+              <select
+                id="initialLocationId"
+                formControlName="initialLocationId"
+                [attr.aria-invalid]="showError('initialLocationId')"
+                [attr.aria-describedby]="
+                  showError('initialLocationId')
+                    ? 'initialLocationId-error'
+                    : null
+                "
+              >
+                <option value="">
+                  {{ 'extinguisherForm.locationPlaceholder' | t }}
+                </option>
+                @for (group of locationGroups(); track group.sede.id) {
+                  <optgroup [label]="group.sede.name">
+                    @for (option of group.options; track option.id) {
+                      <option [value]="option.id">
+                        {{ option.name }} ({{ option.code }})
+                      </option>
+                    }
+                  </optgroup>
+                }
+              </select>
+              @if (showError('initialLocationId')) {
+                <p id="initialLocationId-error" class="site-field__error">
+                  {{ errorKey('initialLocationId') | t }}
+                </p>
+              }
+            </div>
+
+            <div class="site-field">
+              <label for="entrySource">
+                {{ 'extinguisherForm.fields.entrySource' | t }}
+              </label>
+              <select
+                id="entrySource"
+                formControlName="entrySource"
+                [attr.aria-invalid]="showError('entrySource')"
+                [attr.aria-describedby]="
+                  showError('entrySource') ? 'entrySource-error' : null
+                "
+              >
+                <option value="">
+                  {{ 'extinguisherForm.entrySourcePlaceholder' | t }}
+                </option>
+                @for (source of entrySourceOptions; track source) {
+                  <option [value]="source">{{ entrySourceKey(source) | t }}</option>
+                }
+              </select>
+              @if (showError('entrySource')) {
+                <p id="entrySource-error" class="site-field__error">
+                  {{ errorKey('entrySource') | t }}
+                </p>
+              }
+            </div>
+
+            <div class="site-field">
+              <label for="technicalCondition">
+                {{ 'extinguisherForm.fields.technicalCondition' | t }}
+              </label>
+              <select
+                id="technicalCondition"
+                formControlName="technicalCondition"
+                [attr.aria-invalid]="showError('technicalCondition')"
+                [attr.aria-describedby]="
+                  showError('technicalCondition')
+                    ? 'technicalCondition-error'
+                    : null
+                "
+              >
+                <option value="">
+                  {{ 'extinguisherForm.conditionPlaceholder' | t }}
+                </option>
+                @for (condition of conditionOptions; track condition) {
+                  <option [value]="condition">
+                    {{ conditionKey(condition) | t }}
+                  </option>
+                }
+              </select>
+              @if (showError('technicalCondition')) {
+                <p id="technicalCondition-error" class="site-field__error">
+                  {{ errorKey('technicalCondition') | t }}
+                </p>
+              }
+            </div>
+
+            <div class="site-field">
+              <label for="receivedBy">
+                {{ 'extinguisherForm.fields.receivedBy' | t }}
+              </label>
+              <input
+                id="receivedBy"
+                type="text"
+                formControlName="receivedBy"
+                autocomplete="off"
+                [attr.aria-invalid]="showError('receivedBy')"
+                [attr.aria-describedby]="
+                  showError('receivedBy') ? 'receivedBy-error' : null
+                "
+              />
+              @if (showError('receivedBy')) {
+                <p id="receivedBy-error" class="site-field__error">
+                  {{ errorKey('receivedBy') | t }}
+                </p>
+              }
+            </div>
+
+            <div class="site-field">
+              <label for="documentRef">
+                {{ 'extinguisherForm.fields.documentRef' | t }}
+              </label>
+              <input
+                id="documentRef"
+                type="text"
+                formControlName="documentRef"
+                autocomplete="off"
+                [attr.aria-invalid]="showError('documentRef')"
+                [attr.aria-describedby]="
+                  showError('documentRef') ? 'documentRef-error' : null
+                "
+              />
+              @if (showError('documentRef')) {
+                <p id="documentRef-error" class="site-field__error">
+                  {{ errorKey('documentRef') | t }}
+                </p>
+              }
+            </div>
+
+            <div class="site-field form-page__field--wide">
+              <label for="initialReason">
+                {{ 'extinguisherForm.fields.initialReason' | t }}
+              </label>
+              <textarea
+                id="initialReason"
+                rows="3"
+                formControlName="initialReason"
+                [attr.aria-invalid]="showError('initialReason')"
+                [attr.aria-describedby]="
+                  'initialReason-hint' +
+                  (showError('initialReason') ? ' initialReason-error' : '')
+                "
+              ></textarea>
+              <p id="initialReason-hint" class="site-field__hint">
+                {{ 'extinguisherForm.hintReason' | t }}
+              </p>
+              @if (showError('initialReason')) {
+                <p id="initialReason-error" class="site-field__error">
+                  {{ errorKey('initialReason') | t }}
+                </p>
+              }
+            </div>
+          </div>
+
+          @if (isCreateConditionNotAssignable()) {
+            <div class="site-alert" role="alert">
+              {{ 'extinguisherForm.conditionNotAssignable' | t }}
+            </div>
+          }
+        </section>
+      }
+
+      <section class="form-page__section" aria-labelledby="form-notes-title">
+        <h2 id="form-notes-title" class="form-page__section-title">
+          {{ 'extinguisherForm.sections.notes' | t }}
+        </h2>
+        <div class="site-field">
+          <label for="notes">{{ 'extinguisherForm.fields.notes' | t }}</label>
+          <textarea
+            id="notes"
+            rows="4"
+            formControlName="notes"
+            [attr.aria-invalid]="showError('notes')"
+            [attr.aria-describedby]="showError('notes') ? 'notes-error' : null"
+          ></textarea>
+          <p class="site-field__hint">
+            {{ 'extinguisherForm.hintOptional' | t }}
+          </p>
+          @if (showError('notes')) {
+            <p id="notes-error" class="site-field__error">
+              {{ errorKey('notes') | t }}
+            </p>
+          }
+        </div>
+      </section>
+
+      <div class="form-page__actions">
+        <a class="site-button site-button--secondary" [routerLink]="cancelLink()">
+          {{ 'common.cancel' | t }}
+        </a>
+        <button
+          type="submit"
+          class="site-button"
+          [disabled]="submitting() || isCreateConditionNotAssignable()"
+        >
+          {{
+            (submitting()
+              ? 'extinguisherForm.submitting'
+              : submitKey
+            ) | t
+          }}
+        </button>
+      </div>
+    </form>
+  }
+</section>

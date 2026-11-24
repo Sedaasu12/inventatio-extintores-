@@ -1006,6 +1006,7 @@ frontend/
           list/
           detail/
           form/
+          condition/
           label/
         movements/
           movement-wizard/
@@ -1048,8 +1049,10 @@ frontend/
 | `/app/sin-permiso` | 403 | Autenticado |
 | `/app/dashboard` | Dashboard | Autenticado + `dashboard.read` |
 | `/app/extintores` | Lista | `extinguishers.read` |
-| `/app/extintores/nuevo` | Alta | `extinguishers.create` |
+| `/app/extintores/nuevo` | Alta | `extinguishers.create` + `catalogs.read` + `locations.read` |
 | `/app/extintores/:id` | Ficha | `extinguishers.read` |
+| `/app/extintores/:id/editar` | Edición técnica | `extinguishers.update` + `extinguishers.read` + `catalogs.read` |
+| `/app/extintores/:id/condicion` | Cambio de condición | `extinguishers.condition` + `extinguishers.read` |
 | `/app/extintores/:id/movimiento/:tipo` | Wizard de movimiento | Según tipo |
 | `/app/escanear` | Escáner | `extinguishers.read` |
 | `/app/movimientos` | Historial global | `movements.read` |
@@ -1073,6 +1076,8 @@ ruta no reconocida muestra la página 404 sin romper la sesión vigente.
 - `PermissionService` expone `has(permission)`; `hasPermission` directive oculta acciones, pero el backend decide.
 - `AuthService` mantiene el access token en memoria y programa refresh antes de expirar; evita bucles de refresh.
 - `ErrorInterceptor` traduce códigos estables a mensajes; no muestra trazas.
+- El alta reutiliza la `Idempotency-Key` mientras el payload no cambie y la renueva cuando cambia; el botón se bloquea durante el envío. La edición y el cambio de condición envían `rowVersion` y un 409 ofrece recargar el registro.
+- Los formularios replican las reglas del backend (orden de fechas y `NO_OPERATIVO` en un área) solo como ayuda; el servidor vuelve a validarlas.
 
 ### 9.3 Servicio de escaneo QR (puerto/adaptador)
 
@@ -1113,7 +1118,9 @@ export interface QrScannerPort {
 - **Cobertura actual:** protección de rutas, credenciales inválidas traducidas,
   cambio obligatorio de contraseña, renovación de sesión tras recargar, cierre de
   sesión, 403 sin permiso, menú oculto, listado de inventario con filtros del
-  servidor, uso a 360 px y navegación por teclado.
+  servidor, navegación desde la lista a la ficha, alta desde la interfaz, edición
+  de datos técnicos, cambio de condición con motivo, uso a 360 px y navegación
+  por teclado.
 - **Accesibilidad:** axe con etiquetas WCAG 2.1/2.2 A y AA; enlace de salto, foco
   al contenido principal, foco visible y campos con etiqueta.
 - **CI:** el trabajo `e2e` usa MySQL 8.4 como servicio, migra, siembra, compila el

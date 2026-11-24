@@ -3,9 +3,54 @@ import { Observable, of } from 'rxjs';
 import { ApiClient } from '../../core/api/api-client';
 import { ExtinguishersApi } from './extinguishers.api';
 import {
+  ChangeConditionPayload,
+  CreateExtinguisherPayload,
   ExtinguisherFilters,
+  UpdateExtinguisherPayload,
   defaultExtinguisherFilters,
 } from './extinguisher.models';
+
+const CREATE_PAYLOAD: CreateExtinguisherPayload = {
+  serialNumber: 'SN-001',
+  typeId: 'type-1',
+  brand: 'Marca',
+  model: 'Modelo',
+  capacityValue: 6,
+  capacityUnit: 'KG',
+  manufactureDate: null,
+  acquiredAt: null,
+  commissionedAt: null,
+  manufacturerExpiryDate: null,
+  initialLocationId: 'loc-1',
+  entrySource: 'COMPRA_LOCAL',
+  initialReason: 'Ingreso inicial de prueba',
+  receivedBy: 'Recepción',
+  documentRef: 'ACTA-1',
+  technicalCondition: 'OPERATIVO',
+  notes: null,
+};
+
+const UPDATE_PAYLOAD: UpdateExtinguisherPayload = {
+  serialNumber: 'SN-002',
+  typeId: 'type-1',
+  brand: 'Marca',
+  model: 'Modelo',
+  capacityValue: 6,
+  capacityUnit: 'KG',
+  manufactureDate: null,
+  acquiredAt: null,
+  commissionedAt: null,
+  manufacturerExpiryDate: null,
+  notes: null,
+  rowVersion: 2,
+};
+
+const CONDITION_PAYLOAD: ChangeConditionPayload = {
+  condition: 'OBSERVADO',
+  reason: 'Hallazgo en inspección visual',
+  documentRef: null,
+  rowVersion: 2,
+};
 
 function filters(
   overrides: Partial<ExtinguisherFilters> = {},
@@ -16,15 +61,19 @@ function filters(
 function setup(): {
   service: ExtinguishersApi;
   get: ReturnType<typeof vi.fn>;
+  post: ReturnType<typeof vi.fn>;
+  patch: ReturnType<typeof vi.fn>;
 } {
   const get = vi.fn(() => of({ data: [], meta: {} }));
+  const post = vi.fn(() => of({}));
+  const patch = vi.fn(() => of({}));
   TestBed.configureTestingModule({
     providers: [
       ExtinguishersApi,
-      { provide: ApiClient, useValue: { get } },
+      { provide: ApiClient, useValue: { get, post, patch } },
     ],
   });
-  return { service: TestBed.inject(ExtinguishersApi), get };
+  return { service: TestBed.inject(ExtinguishersApi), get, post, patch };
 }
 
 function subscribe(observable: Observable<unknown>): void {
@@ -93,5 +142,45 @@ describe('ExtinguishersApi', () => {
     expect(get).toHaveBeenCalledWith('/locations', {
       params: { tree: true, active: 'true' },
     });
+  });
+
+  it('consulta la ficha por identificador', () => {
+    const { service, get } = setup();
+
+    subscribe(service.get('ext-1'));
+
+    expect(get).toHaveBeenCalledWith('/extinguishers/ext-1');
+  });
+
+  it('envía el alta con la clave de idempotencia', () => {
+    const { service, post } = setup();
+
+    subscribe(service.create(CREATE_PAYLOAD, 'idem-1'));
+
+    expect(post).toHaveBeenCalledWith('/extinguishers', CREATE_PAYLOAD, {
+      headers: { 'Idempotency-Key': 'idem-1' },
+    });
+  });
+
+  it('actualiza solo los datos técnicos con rowVersion', () => {
+    const { service, patch } = setup();
+
+    subscribe(service.update('ext-1', UPDATE_PAYLOAD));
+
+    expect(patch).toHaveBeenCalledWith(
+      '/extinguishers/ext-1',
+      UPDATE_PAYLOAD,
+    );
+  });
+
+  it('cambia la condición con motivo y versión', () => {
+    const { service, post } = setup();
+
+    subscribe(service.changeCondition('ext-1', CONDITION_PAYLOAD));
+
+    expect(post).toHaveBeenCalledWith(
+      '/extinguishers/ext-1/condition',
+      CONDITION_PAYLOAD,
+    );
   });
 });

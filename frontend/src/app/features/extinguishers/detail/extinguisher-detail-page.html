@@ -1,0 +1,297 @@
+<section class="detail" aria-labelledby="detail-title">
+  <a class="detail__back" routerLink="/app/extintores">
+    <span aria-hidden="true">←</span>
+    {{ 'extinguisherDetail.back' | t }}
+  </a>
+
+  @if (successMessage(); as message) {
+    <div class="site-alert site-alert--success" role="status">
+      {{ message }}
+    </div>
+  }
+
+  @if (loading()) {
+    <p class="detail__loading" role="status">
+      {{ 'extinguisherDetail.loading' | t }}
+    </p>
+  } @else if (errorMessage(); as message) {
+    <div class="site-alert" role="alert">
+      <p>{{ message }}</p>
+      <button
+        type="button"
+        class="site-button site-button--secondary"
+        (click)="retry()"
+      >
+        {{ 'common.retry' | t }}
+      </button>
+    </div>
+  } @else if (detail(); as item) {
+    <header class="detail__header">
+      <div class="detail__identity">
+        <p class="detail__eyebrow">{{ item.type.name }}</p>
+        <h1 id="detail-title" class="detail__title">{{ item.assetCode }}</h1>
+        <p class="detail__subtitle">
+          {{ item.brand ?? '—' }}
+          @if (item.model !== null) {
+            · {{ item.model }}
+          }
+        </p>
+      </div>
+      <div class="detail__chips">
+        <app-status-chip
+          [label]="logisticsKey(item.logisticsStatus) | t"
+          [tone]="logisticsTone(item.logisticsStatus)"
+        />
+        <app-status-chip
+          [label]="conditionKey(item.technicalCondition) | t"
+          [tone]="conditionTone(item.technicalCondition)"
+        />
+      </div>
+    </header>
+
+    <div class="detail__actions">
+      @if (canEdit()) {
+        <a
+          class="site-button site-button--secondary"
+          [routerLink]="['/app/extintores', item.id, 'editar']"
+        >
+          {{ 'extinguisherDetail.edit' | t }}
+        </a>
+      }
+      @if (canChangeCondition()) {
+        <a
+          class="site-button site-button--secondary"
+          [routerLink]="['/app/extintores', item.id, 'condicion']"
+        >
+          {{ 'extinguisherDetail.changeCondition' | t }}
+        </a>
+      }
+    </div>
+
+    <div class="detail__grid">
+      <section class="detail__card" aria-labelledby="detail-identity-title">
+        <h2 id="detail-identity-title" class="detail__card-title">
+          {{ 'extinguisherDetail.sections.identity' | t }}
+        </h2>
+        <dl class="detail__list">
+          <div>
+            <dt>{{ 'extinguisherDetail.fields.assetCode' | t }}</dt>
+            <dd class="detail__mono">{{ item.assetCode }}</dd>
+          </div>
+          <div>
+            <dt>{{ 'extinguisherDetail.fields.type' | t }}</dt>
+            <dd>{{ item.type.name }} ({{ item.type.code }})</dd>
+          </div>
+          <div>
+            <dt>{{ 'extinguisherDetail.fields.agent' | t }}</dt>
+            <dd>{{ item.type.agent }}</dd>
+          </div>
+          <div>
+            <dt>{{ 'extinguisherDetail.fields.serialNumber' | t }}</dt>
+            <dd>{{ item.serialNumber ?? '—' }}</dd>
+          </div>
+          <div>
+            <dt>{{ 'extinguisherDetail.fields.brand' | t }}</dt>
+            <dd>{{ item.brand ?? '—' }}</dd>
+          </div>
+          <div>
+            <dt>{{ 'extinguisherDetail.fields.model' | t }}</dt>
+            <dd>{{ item.model ?? '—' }}</dd>
+          </div>
+          <div>
+            <dt>{{ 'extinguisherDetail.fields.capacity' | t }}</dt>
+            <dd>
+              {{ item.capacityValue }}
+              {{ capacityUnitKey(item.capacityUnit) | t }}
+            </dd>
+          </div>
+          <div>
+            <dt>{{ 'extinguisherDetail.fields.placementType' | t }}</dt>
+            <dd>{{ placementKey(item.placementType) | t }}</dd>
+          </div>
+        </dl>
+      </section>
+
+      <section class="detail__card" aria-labelledby="detail-placement-title">
+        <h2 id="detail-placement-title" class="detail__card-title">
+          {{ 'extinguisherDetail.sections.placement' | t }}
+        </h2>
+        <dl class="detail__list">
+          <div>
+            <dt>{{ 'extinguisherDetail.fields.currentLocation' | t }}</dt>
+            <dd>{{ locationLabel(item) }}</dd>
+          </div>
+          @if (item.currentExternalParty !== null) {
+            <div>
+              <dt>{{ 'extinguisherDetail.fields.externalParty' | t }}</dt>
+              <dd>
+                {{ item.currentExternalParty.name }}
+                ({{ item.currentExternalParty.code }})
+              </dd>
+            </div>
+          }
+          <div>
+            <dt>{{ 'extinguisherDetail.fields.currentSince' | t }}</dt>
+            <dd>
+              {{
+                item.currentSince
+                  | appDate: 'dd/MM/yyyy HH:mm'
+              }}
+            </dd>
+          </div>
+          <div>
+            <dt>{{ 'extinguisherDetail.fields.logisticsStatus' | t }}</dt>
+            <dd>
+              <app-status-chip
+                [label]="logisticsKey(item.logisticsStatus) | t"
+                [tone]="logisticsTone(item.logisticsStatus)"
+              />
+            </dd>
+          </div>
+          <div>
+            <dt>{{ 'extinguisherDetail.fields.technicalCondition' | t }}</dt>
+            <dd>
+              <app-status-chip
+                [label]="conditionKey(item.technicalCondition) | t"
+                [tone]="conditionTone(item.technicalCondition)"
+              />
+            </dd>
+          </div>
+          @if (item.retiredAt !== null) {
+            <div>
+              <dt>{{ 'extinguisherDetail.fields.retiredAt' | t }}</dt>
+              <dd>{{ item.retiredAt | appDate }}</dd>
+            </div>
+          }
+        </dl>
+      </section>
+
+      <section class="detail__card" aria-labelledby="detail-dates-title">
+        <h2 id="detail-dates-title" class="detail__card-title">
+          {{ 'extinguisherDetail.sections.dates' | t }}
+        </h2>
+        <dl class="detail__list">
+          <div>
+            <dt>{{ 'extinguisherDetail.fields.manufactureDate' | t }}</dt>
+            <dd>{{ item.manufactureDate | appDate }}</dd>
+          </div>
+          <div>
+            <dt>{{ 'extinguisherDetail.fields.acquiredAt' | t }}</dt>
+            <dd>{{ item.acquiredAt | appDate }}</dd>
+          </div>
+          <div>
+            <dt>{{ 'extinguisherDetail.fields.commissionedAt' | t }}</dt>
+            <dd>{{ item.commissionedAt | appDate }}</dd>
+          </div>
+          <div>
+            <dt>{{ 'extinguisherDetail.fields.manufacturerExpiryDate' | t }}</dt>
+            <dd>{{ item.manufacturerExpiryDate | appDate }}</dd>
+          </div>
+        </dl>
+
+        <h3 class="detail__subheading">
+          {{ 'extinguisherDetail.fields.dueDates' | t }}
+        </h3>
+        @if (item.dueDates.length === 0) {
+          <p class="detail__muted">{{ 'extinguisherDetail.noDueDates' | t }}</p>
+        } @else {
+          <ul class="detail__due-list">
+            @for (dueDate of item.dueDates; track dueDate.eventType) {
+              <li>
+                <span>{{ dueDateKey(dueDate.eventType) | t }}</span>
+                <strong>{{ dueDate.dueDate | appDate }}</strong>
+              </li>
+            }
+          </ul>
+        }
+      </section>
+
+      <section class="detail__card" aria-labelledby="detail-trace-title">
+        <h2 id="detail-trace-title" class="detail__card-title">
+          {{ 'extinguisherDetail.sections.traceability' | t }}
+        </h2>
+        <dl class="detail__list">
+          <div>
+            <dt>{{ 'extinguisherDetail.fields.movementCount' | t }}</dt>
+            <dd>
+              {{
+                'extinguisherDetail.movements'
+                  | t: { count: item.movementCount }
+              }}
+            </dd>
+          </div>
+          <div>
+            <dt>{{ 'extinguisherDetail.fields.updatedAt' | t }}</dt>
+            <dd>{{ item.updatedAt | appDate: 'dd/MM/yyyy HH:mm' }}</dd>
+          </div>
+        </dl>
+
+        <h3 class="detail__subheading">
+          {{ 'extinguisherDetail.fields.lastInspection' | t }}
+        </h3>
+        @if (item.lastInspection; as inspection) {
+          <dl class="detail__list">
+            <div>
+              <dt>{{ 'extinguisherDetail.fields.inspectedOn' | t }}</dt>
+              <dd>{{ inspection.inspectedOn | appDate }}</dd>
+            </div>
+            <div>
+              <dt>{{ 'extinguisherDetail.fields.inspector' | t }}</dt>
+              <dd>{{ inspection.inspectorName }}</dd>
+            </div>
+            <div>
+              <dt>{{ 'extinguisherDetail.fields.result' | t }}</dt>
+              <dd>{{ inspectionResultKey(inspection.result) | t }}</dd>
+            </div>
+            <div>
+              <dt>{{ 'extinguisherDetail.fields.nextDueDate' | t }}</dt>
+              <dd>{{ inspection.nextDueDate | appDate }}</dd>
+            </div>
+          </dl>
+        } @else {
+          <p class="detail__muted">
+            {{ 'extinguisherDetail.noInspection' | t }}
+          </p>
+        }
+
+        <h3 class="detail__subheading">
+          {{ 'extinguisherDetail.fields.openMaintenanceOrder' | t }}
+        </h3>
+        @if (item.openMaintenanceOrder; as order) {
+          <dl class="detail__list">
+            <div>
+              <dt>{{ 'extinguisherDetail.fields.maintenanceStatus' | t }}</dt>
+              <dd>{{ maintenanceStatusKey(order.status) | t }}</dd>
+            </div>
+            <div>
+              <dt>{{ 'extinguisherDetail.fields.openedAt' | t }}</dt>
+              <dd>{{ order.openedAt | appDate: 'dd/MM/yyyy HH:mm' }}</dd>
+            </div>
+            <div>
+              <dt>{{ 'extinguisherDetail.fields.expectedReturnDate' | t }}</dt>
+              <dd>{{ order.expectedReturnDate | appDate }}</dd>
+            </div>
+          </dl>
+        } @else {
+          <p class="detail__muted">
+            {{ 'extinguisherDetail.noOpenMaintenance' | t }}
+          </p>
+        }
+      </section>
+
+      <section
+        class="detail__card detail__card--wide"
+        aria-labelledby="detail-notes-title"
+      >
+        <h2 id="detail-notes-title" class="detail__card-title">
+          {{ 'extinguisherDetail.sections.notes' | t }}
+        </h2>
+        @if (item.notes !== null && item.notes !== '') {
+          <p class="detail__notes">{{ item.notes }}</p>
+        } @else {
+          <p class="detail__muted">{{ 'extinguisherDetail.noNotes' | t }}</p>
+        }
+      </section>
+    </div>
+  }
+</section>

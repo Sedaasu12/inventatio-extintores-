@@ -1,0 +1,113 @@
+.form-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 72rem;
+}
+
+.form-page__back {
+  align-self: flex-start;
+  color: var(--site-primary);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.form-page__back:hover {
+  text-decoration: underline;
+}
+
+.form-page__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.form-page__title {
+  font-size: 1.5rem;
+}
+
+.form-page__subtitle {
+  max-width: 70ch;
+  color: var(--site-muted);
+}
+
+.form-page__code {
+  padding: 0.35rem 0.65rem;
+  border: 1px solid var(--site-border);
+  border-radius: var(--site-radius-sm);
+  background: var(--site-surface);
+  font-family: ui-monospace, SFMono-Regular, Consolas, 'Liberation Mono', monospace;
+  font-weight: 600;
+}
+
+.form-page__loading {
+  padding: 1.5rem;
+  border: 1px dashed var(--site-border);
+  border-radius: var(--site-radius);
+  background: var(--site-surface);
+  color: var(--site-muted);
+  text-align: center;
+}
+
+.form-page__form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.form-page__section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  padding: 1.1rem;
+  border: 1px solid var(--site-border);
+  border-radius: var(--site-radius);
+  background: var(--site-surface);
+  box-shadow: var(--site-shadow);
+}
+
+.form-page__section-title {
+  font-size: 1.05rem;
+}
+
+.form-page__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.9rem;
+  align-items: start;
+}
+
+.form-page__field--wide {
+  grid-column: 1 / -1;
+}
+
+.form-page__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.6rem;
+}
+
+.form-page__alert-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.form-page__reference {
+  margin-top: 0.35rem;
+  font-size: 0.8125rem;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 480px) {
+  .form-page__actions {
+    flex-direction: column-reverse;
+  }
+
+  .form-page__actions .site-button {
+    width: 100%;
+  }
+}

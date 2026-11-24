@@ -2,10 +2,15 @@ import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ApiClient } from '../../core/api/api-client';
 import type {
+  ChangeConditionPayload,
+  CreateExtinguisherPayload,
+  CreateExtinguisherResponse,
+  ExtinguisherDetail,
   ExtinguisherFilters,
   ExtinguisherListResponse,
   ExtinguisherTypeListResponse,
   LocationTreeResponse,
+  UpdateExtinguisherPayload,
 } from './extinguisher.models';
 
 export const EXTINGUISHER_PAGE_SIZE = 20;
@@ -64,5 +69,42 @@ export class ExtinguishersApi {
         active: 'true',
       },
     });
+  }
+
+  get(id: string): Observable<ExtinguisherDetail> {
+    return this.api.get<ExtinguisherDetail>(
+      `/extinguishers/${encodeURIComponent(id)}`,
+    );
+  }
+
+  create(
+    payload: CreateExtinguisherPayload,
+    idempotencyKey: string,
+  ): Observable<CreateExtinguisherResponse> {
+    return this.api.post<CreateExtinguisherResponse>(
+      '/extinguishers',
+      payload,
+      { headers: { 'Idempotency-Key': idempotencyKey } },
+    );
+  }
+
+  update(
+    id: string,
+    payload: UpdateExtinguisherPayload,
+  ): Observable<ExtinguisherDetail> {
+    return this.api.patch<ExtinguisherDetail>(
+      `/extinguishers/${encodeURIComponent(id)}`,
+      payload,
+    );
+  }
+
+  changeCondition(
+    id: string,
+    payload: ChangeConditionPayload,
+  ): Observable<ExtinguisherDetail> {
+    return this.api.post<ExtinguisherDetail>(
+      `/extinguishers/${encodeURIComponent(id)}/condition`,
+      payload,
+    );
   }
 }

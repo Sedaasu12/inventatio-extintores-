@@ -55,6 +55,64 @@ export const routes: Routes = [
           ).then((m) => m.ExtinguisherListPage),
       },
       {
+        path: 'extintores/nuevo',
+        title: 'page.title.extinguisherCreate',
+        canActivate: [permissionGuard],
+        data: {
+          permission: [
+            'extinguishers.create',
+            'catalogs.read',
+            'locations.read',
+          ],
+          permissionMode: 'all',
+        },
+        loadComponent: () =>
+          import(
+            './features/extinguishers/form/extinguisher-form-page'
+          ).then((m) => m.ExtinguisherFormPage),
+      },
+      {
+        path: 'extintores/:id/editar',
+        title: 'page.title.extinguisherEdit',
+        canActivate: [permissionGuard],
+        data: {
+          mode: 'edit',
+          permission: [
+            'extinguishers.update',
+            'extinguishers.read',
+            'catalogs.read',
+          ],
+          permissionMode: 'all',
+        },
+        loadComponent: () =>
+          import(
+            './features/extinguishers/form/extinguisher-form-page'
+          ).then((m) => m.ExtinguisherFormPage),
+      },
+      {
+        path: 'extintores/:id/condicion',
+        title: 'page.title.extinguisherCondition',
+        canActivate: [permissionGuard],
+        data: {
+          permission: ['extinguishers.condition', 'extinguishers.read'],
+          permissionMode: 'all',
+        },
+        loadComponent: () =>
+          import(
+            './features/extinguishers/condition/extinguisher-condition-page'
+          ).then((m) => m.ExtinguisherConditionPage),
+      },
+      {
+        path: 'extintores/:id',
+        title: 'page.title.extinguisherDetail',
+        canActivate: [permissionGuard],
+        data: { permission: 'extinguishers.read' },
+        loadComponent: () =>
+          import(
+            './features/extinguishers/detail/extinguisher-detail-page'
+          ).then((m) => m.ExtinguisherDetailPage),
+      },
+      {
         path: 'cambiar-contrasena',
         title: 'page.title.changePassword',
         loadComponent: () =>
