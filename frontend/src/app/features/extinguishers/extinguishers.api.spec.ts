@@ -61,19 +61,21 @@ function filters(
 function setup(): {
   service: ExtinguishersApi;
   get: ReturnType<typeof vi.fn>;
+  getBlob: ReturnType<typeof vi.fn>;
   post: ReturnType<typeof vi.fn>;
   patch: ReturnType<typeof vi.fn>;
 } {
   const get = vi.fn(() => of({ data: [], meta: {} }));
+  const getBlob = vi.fn(() => of(new Blob(['qr'])));
   const post = vi.fn(() => of({}));
   const patch = vi.fn(() => of({}));
   TestBed.configureTestingModule({
     providers: [
       ExtinguishersApi,
-      { provide: ApiClient, useValue: { get, post, patch } },
+      { provide: ApiClient, useValue: { get, getBlob, post, patch } },
     ],
   });
-  return { service: TestBed.inject(ExtinguishersApi), get, post, patch };
+  return { service: TestBed.inject(ExtinguishersApi), get, getBlob, post, patch };
 }
 
 function subscribe(observable: Observable<unknown>): void {
@@ -150,6 +152,24 @@ describe('ExtinguishersApi', () => {
     subscribe(service.get('ext-1'));
 
     expect(get).toHaveBeenCalledWith('/extinguishers/ext-1');
+  });
+
+  it('resuelve el código escaneado o escrito', () => {
+    const { service, get } = setup();
+
+    subscribe(service.getByCode('EXT-000001'));
+
+    expect(get).toHaveBeenCalledWith('/extinguishers/by-code/EXT-000001');
+  });
+
+  it('descarga el PNG del QR del activo', () => {
+    const { service, getBlob } = setup();
+
+    subscribe(service.qrImage('ext-1'));
+
+    expect(getBlob).toHaveBeenCalledWith('/extinguishers/ext-1/qr', {
+      params: { format: 'png', size: 512 },
+    });
   });
 
   it('envía el alta con la clave de idempotencia', () => {

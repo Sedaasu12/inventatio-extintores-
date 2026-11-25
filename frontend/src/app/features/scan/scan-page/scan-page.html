@@ -1,0 +1,128 @@
+<section class="scan" aria-labelledby="scan-title">
+  <header class="scan__header">
+    <h1 id="scan-title" class="scan__title">{{ 'scan.title' | t }}</h1>
+    <p class="scan__subtitle">{{ 'scan.subtitle' | t }}</p>
+  </header>
+
+  @if (errorMessage(); as message) {
+    <div class="site-alert" role="alert">
+      <p>{{ message }}</p>
+      <button
+        type="button"
+        class="site-button site-button--secondary"
+        (click)="resetScan()"
+      >
+        {{ 'scan.another' | t }}
+      </button>
+    </div>
+  }
+
+  @if (resolving()) {
+    <p class="scan__status" role="status">{{ 'scan.resolving' | t }}</p>
+  }
+
+  <div class="scan__grid">
+    <section class="scan__card" aria-labelledby="scan-camera-title">
+      <h2 id="scan-camera-title" class="scan__card-title">
+        {{ 'scan.camera.title' | t }}
+      </h2>
+
+      <div
+        class="scan__viewport"
+        [class.scan__viewport--active]="cameraState() === 'scanning'"
+      >
+        <video
+          #video
+          class="scan__video"
+          [class.scan__video--hidden]="cameraState() !== 'scanning'"
+          autoplay
+          muted
+          playsinline
+        ></video>
+        @if (cameraState() !== 'scanning') {
+          <p class="scan__viewport-hint" aria-hidden="true">
+            {{ 'scan.camera.placeholder' | t }}
+          </p>
+        }
+      </div>
+
+      <p
+        class="scan__camera-status"
+        [class.scan__camera-status--warning]="cameraWarning()"
+        role="status"
+      >
+        {{ cameraHintKey() | t }}
+      </p>
+
+      <div class="scan__actions">
+        @if (cameraState() === 'scanning') {
+          <button
+            type="button"
+            class="site-button site-button--secondary"
+            (click)="stopCamera()"
+          >
+            {{ 'scan.camera.stop' | t }}
+          </button>
+        } @else {
+          <button
+            type="button"
+            class="site-button"
+            [disabled]="cameraState() === 'requesting' || resolving()"
+            (click)="startCamera()"
+          >
+            {{ 'scan.camera.start' | t }}
+          </button>
+        }
+      </div>
+    </section>
+
+    <section class="scan__card" aria-labelledby="scan-manual-title">
+      <h2 id="scan-manual-title" class="scan__card-title">
+        {{ 'scan.manual.title' | t }}
+      </h2>
+
+      <form
+        class="scan__form"
+        [formGroup]="form"
+        (ngSubmit)="submitManual()"
+        novalidate
+      >
+        <div class="site-field">
+          <label for="assetCode">{{ 'scan.manual.code' | t }}</label>
+          <input
+            #manualInput
+            id="assetCode"
+            type="text"
+            formControlName="assetCode"
+            autocomplete="off"
+            autocapitalize="characters"
+            spellcheck="false"
+            placeholder="EXT-000001"
+            [attr.aria-invalid]="showError()"
+            [attr.aria-describedby]="
+              'assetCode-hint' + (showError() ? ' assetCode-error' : '')
+            "
+          />
+          <p id="assetCode-hint" class="site-field__hint">
+            {{ 'scan.manual.hint' | t }}
+          </p>
+          @if (showError()) {
+            <p id="assetCode-error" class="site-field__error">
+              {{ 'common.required' | t }}
+            </p>
+          }
+        </div>
+
+        <button
+          type="submit"
+          class="site-button"
+          [disabled]="resolving()"
+        >
+          {{ 'scan.manual.submit' | t }}
+        </button>
+      </form>
+
+      <p class="scan__note">{{ 'scan.securityNote' | t }}</p>
+    </section>
+  </div>
+</section>

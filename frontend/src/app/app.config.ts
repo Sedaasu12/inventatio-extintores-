@@ -14,6 +14,8 @@ import { authInterceptor } from './core/auth/auth.interceptor';
 import { AuthService } from './core/auth/auth.service';
 import { sessionRefreshInterceptor } from './core/auth/session-refresh.interceptor';
 import { APP_LOCALE } from './core/i18n/locale';
+import { QR_SCANNER_PORT } from './core/qr/qr-scanner.port';
+import { ZxingQrScannerService } from './core/qr/zxing-qr-scanner.service';
 import { I18nTitleStrategy } from './layout/i18n-title.strategy';
 
 export const appConfig: ApplicationConfig = {
@@ -30,6 +32,7 @@ export const appConfig: ApplicationConfig = {
       ]),
     ),
     { provide: LOCALE_ID, useValue: APP_LOCALE },
+    { provide: QR_SCANNER_PORT, useClass: ZxingQrScannerService },
     provideAppInitializer(() => inject(AuthService).restoreSession()),
   ],
 };

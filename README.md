@@ -14,10 +14,10 @@ dashboard operativo y reportes con exportación CSV. El frontend incluye inicio 
 sesión, renovación y cierre de sesión, cambio obligatorio de contraseña, armazón
 responsive con menú por permisos, el listado de inventario con filtros y
 paginación de servidor (fase 9A), la ficha del activo, el alta, la edición técnica
-y el cambio de condición (fase 9B), y pruebas E2E con Playwright y axe contra la
-API real. El escaneo QR con cámara, la entrada manual/USB y la etiqueta imprimible
-corresponden a 9C; las operaciones de movimiento, mantenimiento, inspecciones,
-alertas, reportes y administración, a la fase 10.
+y el cambio de condición (fase 9B), y el escaneo QR con cámara, la entrada
+manual/USB y la etiqueta imprimible (fase 9C). Incluye pruebas E2E con Playwright y
+axe contra la API real. Las operaciones de movimiento, mantenimiento, inspecciones,
+alertas, reportes y administración corresponden a la fase 10.
 
 La evidencia completa, con los comandos y su salida real, está en
 `docs/evidencias/` y en `docs/plan-implementacion.md`.
@@ -162,9 +162,10 @@ La suite cubre protección de rutas, credenciales inválidas, cambio obligatorio
 contraseña, renovación de sesión, cierre de sesión, 403 sin permiso, menú oculto,
 listado de inventario con filtros del servidor, navegación desde la lista a la
 ficha, alta desde la interfaz, edición de datos técnicos, cambio de condición con
-motivo, uso a 360 px y navegación por teclado con foco visible. axe valida WCAG
-2.1/2.2 AA. En CI, el trabajo `e2e` levanta MySQL 8.4, migra, siembra, compila el
-backend, instala Chromium y ejecuta la suite; si falla, publica el reporte HTML
+motivo, resolución de un código escrito o leído por USB, etiqueta imprimible con el
+QR del activo, uso a 360 px y navegación por teclado con foco visible. axe valida
+WCAG 2.1/2.2 AA. En CI, el trabajo `e2e` levanta MySQL 8.4, migra, siembra, compila
+el backend, instala Chromium y ejecuta la suite; si falla, publica el reporte HTML
 como artefacto.
 
 Endpoints disponibles:

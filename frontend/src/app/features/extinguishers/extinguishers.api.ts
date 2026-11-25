@@ -77,6 +77,21 @@ export class ExtinguishersApi {
     );
   }
 
+  /** Resuelve el QR o un código escrito/leído por USB. */
+  getByCode(assetCode: string): Observable<ExtinguisherDetail> {
+    return this.api.get<ExtinguisherDetail>(
+      `/extinguishers/by-code/${encodeURIComponent(assetCode)}`,
+    );
+  }
+
+  /** PNG del QR que solo contiene el `assetCode` (D-05). */
+  qrImage(id: string): Observable<Blob> {
+    return this.api.getBlob(
+      `/extinguishers/${encodeURIComponent(id)}/qr`,
+      { params: { format: 'png', size: 512 } },
+    );
+  }
+
   create(
     payload: CreateExtinguisherPayload,
     idempotencyKey: string,

@@ -168,3 +168,29 @@ a:hover {
   background: var(--site-success-soft);
   color: #124424;
 }
+
+/* La etiqueta se imprime sola: se ocultan el armazón y los controles. */
+@media print {
+  body {
+    background: #ffffff;
+  }
+
+  .skip-link,
+  .sidebar,
+  .topbar,
+  .shell__backdrop {
+    display: none !important;
+  }
+
+  .shell,
+  .shell__body {
+    display: block;
+    min-height: auto;
+  }
+
+  .shell__main {
+    max-width: none;
+    margin: 0;
+    padding: 0;
+  }
+}

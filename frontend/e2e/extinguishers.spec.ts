@@ -276,3 +276,60 @@ test('cambia la condición técnica con motivo auditado', async ({ page }) => {
   await expect(page.getByText('Observado', { exact: true }).first()).toBeVisible();
 });
 
+test('resuelve el código escrito y abre la ficha desde el escaneo', async ({
+  page,
+}) => {
+  await loginAsAdmin(page);
+  await page.goto('/app/escanear');
+
+  await expect(
+    page.getByRole('heading', { name: 'Escanear extintor', level: 1 }),
+  ).toBeVisible();
+  await expect(page.getByLabel('Código del activo')).toBeVisible();
+
+  await expectNoA11yViolations(page);
+
+  await page.getByLabel('Código del activo').fill('EXT-999999');
+  await page.getByRole('button', { name: 'Buscar extintor' }).click();
+  await expect(
+    page.getByText('No existe un extintor con el código EXT-999999.'),
+  ).toBeVisible();
+
+  await page.getByRole('button', { name: 'Escanear otro' }).click();
+  await page.getByLabel('Código del activo').fill(createdAssetCode.toLowerCase());
+  await page.getByRole('button', { name: 'Buscar extintor' }).click();
+
+  await expect(page).toHaveURL(
+    new RegExp(`/app/extintores/${createdExtinguisherId}`),
+  );
+  await expect(
+    page.getByRole('heading', { name: createdAssetCode, level: 1 }),
+  ).toBeVisible();
+});
+
+test('muestra la etiqueta imprimible con el QR del activo', async ({ page }) => {
+  await loginAsAdmin(page);
+  await page.goto(`/app/extintores/${createdExtinguisherId}/etiqueta`);
+
+  await expect(
+    page.getByRole('heading', { name: createdAssetCode, level: 1 }),
+  ).toBeVisible();
+  await expect(page.getByText('Escanee para identificar el extintor')).toBeVisible();
+
+  const qr = page.getByRole('img', {
+    name: `Código QR del extintor ${createdAssetCode}`,
+  });
+  await expect(qr).toBeVisible();
+  await expect(qr).toHaveAttribute('src', /^blob:/);
+
+  await expect(
+    page.getByRole('button', { name: 'Imprimir etiqueta' }),
+  ).toBeVisible();
+
+  const content = (await page.locator('.label-card').textContent()) ?? '';
+  expect(content).toContain(createdAssetCode);
+  expect(content).not.toContain(warehouseLabel);
+
+  await expectNoA11yViolations(page);
+});
+

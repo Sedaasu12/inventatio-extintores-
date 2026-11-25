@@ -66,6 +66,12 @@
           {{ 'extinguisherDetail.changeCondition' | t }}
         </a>
       }
+      <a
+        class="site-button site-button--secondary"
+        [routerLink]="['/app/extintores', item.id, 'etiqueta']"
+      >
+        {{ 'extinguisherDetail.label' | t }}
+      </a>
     </div>
 
     <div class="detail__grid">

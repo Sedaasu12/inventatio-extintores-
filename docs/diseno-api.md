@@ -977,7 +977,7 @@ frontend/
         permissions/
           permission.service.ts
         qr/
-          qr-scanner.service.ts
+          zxing-qr-scanner.service.ts
           qr-scanner.port.ts
       shared/
         components/
@@ -1013,7 +1013,6 @@ frontend/
           history/
         scan/
           scan-page/
-          manual-code/
         locations/
         maintenance/
           order-list/
@@ -1053,6 +1052,7 @@ frontend/
 | `/app/extintores/:id` | Ficha | `extinguishers.read` |
 | `/app/extintores/:id/editar` | Edición técnica | `extinguishers.update` + `extinguishers.read` + `catalogs.read` |
 | `/app/extintores/:id/condicion` | Cambio de condición | `extinguishers.condition` + `extinguishers.read` |
+| `/app/extintores/:id/etiqueta` | Etiqueta imprimible | `extinguishers.read` |
 | `/app/extintores/:id/movimiento/:tipo` | Wizard de movimiento | Según tipo |
 | `/app/escanear` | Escáner | `extinguishers.read` |
 | `/app/movimientos` | Historial global | `movements.read` |
@@ -1084,7 +1084,7 @@ ruta no reconocida muestra la página 404 sin romper la sesión vigente.
 ```ts
 export interface QrScannerPort {
   start(video: HTMLVideoElement): Promise<void>;
-  stop(): Promise<void>;
+  stop(): void;
   results$: Observable<string>;
 }
 ```
@@ -1097,6 +1097,16 @@ export interface QrScannerPort {
 - Entrada manual siempre disponible.
 - Pausa de escaneo tras una lectura; botón “Escanear otro”.
 
+> **Implementación (fase 9C):** `ZxingQrScannerService` implementa el puerto con
+> `import('@zxing/browser')` diferido, por lo que el decodificador no entra en el
+> paquete inicial. Los errores de cámara se normalizan a `denied`, `unavailable` o
+> `error` mediante `QrScannerError`, y la pantalla `/app/escanear` los traduce sin
+> leer mensajes del navegador. El texto decodificado y la entrada manual/USB pasan
+> por el mismo camino: se recortan, se pasan a mayúsculas y se resuelven con
+> `GET /extinguishers/by-code/:assetCode`; un 404 muestra el código buscado y
+> permite reintentar. Escanear no concede acceso: la API vuelve a exigir sesión y
+> permiso `extinguishers.read`.
+
 ### 9.4 Etiqueta QR
 
 - Contenido: `asset_code` o URL estable aprobada (D-05).
@@ -1104,6 +1114,14 @@ export interface QrScannerPort {
 - No incluye ubicación, fechas, responsables ni PII.
 - Impresión HTML/CSS con tamaño configurable; PDF en fase 2.
 - Verificar legibilidad y contraste.
+
+> **Implementación (fase 9C):** la ruta `/app/extintores/:id/etiqueta` compone la
+> etiqueta en el frontend con el código, el tipo y el PNG que devuelve
+> `GET /extinguishers/:id/qr?format=png&size=512`. Se descarga como `Blob` con el
+> token en memoria y se muestra con `URL.createObjectURL`, que se revoca al salir o
+> recargar. La impresión usa `window.print()` y reglas `@media print` que ocultan
+> el armazón y los controles; el backend mantiene además su endpoint HTML para
+> integraciones futuras.
 
 ### 9.5 Pruebas E2E y accesibilidad
 
@@ -1119,8 +1137,9 @@ export interface QrScannerPort {
   cambio obligatorio de contraseña, renovación de sesión tras recargar, cierre de
   sesión, 403 sin permiso, menú oculto, listado de inventario con filtros del
   servidor, navegación desde la lista a la ficha, alta desde la interfaz, edición
-  de datos técnicos, cambio de condición con motivo, uso a 360 px y navegación
-  por teclado.
+  de datos técnicos, cambio de condición con motivo, resolución de un código
+  escrito o leído por USB con aviso de código inexistente, etiqueta imprimible con
+  el QR del activo, uso a 360 px y navegación por teclado.
 - **Accesibilidad:** axe con etiquetas WCAG 2.1/2.2 A y AA; enlace de salto, foco
   al contenido principal, foco visible y campos con etiqueta.
 - **CI:** el trabajo `e2e` usa MySQL 8.4 como servicio, migra, siembra, compila el

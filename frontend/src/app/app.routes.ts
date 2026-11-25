@@ -103,6 +103,16 @@ export const routes: Routes = [
           ).then((m) => m.ExtinguisherConditionPage),
       },
       {
+        path: 'extintores/:id/etiqueta',
+        title: 'page.title.extinguisherLabel',
+        canActivate: [permissionGuard],
+        data: { permission: 'extinguishers.read' },
+        loadComponent: () =>
+          import(
+            './features/extinguishers/label/extinguisher-label-page'
+          ).then((m) => m.ExtinguisherLabelPage),
+      },
+      {
         path: 'extintores/:id',
         title: 'page.title.extinguisherDetail',
         canActivate: [permissionGuard],
@@ -111,6 +121,16 @@ export const routes: Routes = [
           import(
             './features/extinguishers/detail/extinguisher-detail-page'
           ).then((m) => m.ExtinguisherDetailPage),
+      },
+      {
+        path: 'escanear',
+        title: 'page.title.scan',
+        canActivate: [permissionGuard],
+        data: { permission: 'extinguishers.read' },
+        loadComponent: () =>
+          import('./features/scan/scan-page/scan-page').then(
+            (m) => m.ScanPage,
+          ),
       },
       {
         path: 'cambiar-contrasena',

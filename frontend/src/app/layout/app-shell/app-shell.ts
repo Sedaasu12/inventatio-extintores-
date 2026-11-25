@@ -39,6 +39,12 @@ const NAV_ITEMS: readonly NavItem[] = [
     permission: 'extinguishers.read',
     exact: false,
   },
+  {
+    labelKey: 'nav.scan',
+    path: '/app/escanear',
+    permission: 'extinguishers.read',
+    exact: true,
+  },
 ];
 
 @Component({

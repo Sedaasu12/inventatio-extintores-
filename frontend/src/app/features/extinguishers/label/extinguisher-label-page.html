@@ -1,0 +1,51 @@
+<section
+  class="label-page"
+  [attr.aria-labelledby]="detail() ? 'label-title' : null"
+>
+  <div class="label-page__toolbar">
+    <a class="label-page__back" [routerLink]="['/app/extintores', id]">
+      <span aria-hidden="true">←</span>
+      {{ 'label.back' | t }}
+    </a>
+    @if (detail() !== null) {
+      <button type="button" class="site-button" (click)="print()">
+        {{ 'label.print' | t }}
+      </button>
+    }
+  </div>
+
+  @if (loading()) {
+    <p class="label-page__status" role="status">{{ 'label.loading' | t }}</p>
+  } @else if (errorMessage(); as message) {
+    <div class="site-alert" role="alert">
+      <p>{{ message }}</p>
+      <button
+        type="button"
+        class="site-button site-button--secondary"
+        (click)="retry()"
+      >
+        {{ 'common.retry' | t }}
+      </button>
+    </div>
+  } @else if (detail(); as item) {
+    <article class="label-card">
+      <p class="label-card__eyebrow">{{ 'app.name' | t }}</p>
+      <h1 id="label-title" class="label-card__code">{{ item.assetCode }}</h1>
+      <p class="label-card__type">
+        {{ item.type.name }} ({{ item.type.code }})
+      </p>
+      @if (qrUrl(); as url) {
+        <img
+          class="label-card__qr"
+          [src]="url"
+          width="512"
+          height="512"
+          [alt]="'label.qrAlt' | t: { assetCode: item.assetCode }"
+        />
+      }
+      <p class="label-card__hint">{{ 'label.hint' | t }}</p>
+    </article>
+
+    <p class="label-page__note">{{ 'label.note' | t }}</p>
+  }
+</section>

@@ -1073,7 +1073,6 @@ frontend/src/app/features/scan/
 frontend/src/app/core/qr/
 frontend/src/app/features/extinguishers/label/
 frontend/e2e/extinguishers.spec.ts
-frontend/e2e/scan.spec.ts
 ```
 
 ### Criterios de aceptación
@@ -1155,7 +1154,27 @@ Implementado en 9B:
   desde la interfaz, edición y cambio de condición. Total: 80 unitarias y 9 E2E en
   verde.
 
-Pendiente: 9C (escaneo QR, entrada manual/USB y etiqueta imprimible).
+Implementado en 9C:
+
+- Puerto de escaneo `QrScannerPort` con token `QR_SCANNER_PORT` y errores
+  normalizados (`denied`, `unavailable`, `error`). El adaptador
+  `ZxingQrScannerService` carga `@zxing/browser` de forma diferida, detiene la
+  cámara al primer resultado y al destruir la pantalla.
+- `ApiClient.getBlob` y `ExtinguishersApi.getByCode`/`qrImage` completan el
+  consumo de los endpoints de resolución por código y del PNG del QR.
+- Pantalla `/app/escanear` con cámara bajo gesto del usuario, estados de permiso y
+  disponibilidad, campo manual/lector USB siempre visible y mensajes traducidos.
+  El código se recorta y se pasa a mayúsculas; un código inexistente muestra el
+  valor buscado y “Escanear otro”. La resolución navega a la ficha real.
+- Etiqueta `/app/extintores/:id/etiqueta` con código, tipo y QR descargado como
+  `Blob` autenticado, impresión con `window.print()` y reglas `@media print` que
+  ocultan el armazón. No incluye ubicación, fechas, responsables ni PII.
+- Entrada “Escanear” en el menú y enlace “Ver etiqueta” en la ficha, ambos
+  condicionados por `extinguishers.read`. Rutas lazy protegidas.
+- Pruebas: 12 unitarias nuevas (2 de API, 5 de escaneo y 5 de etiqueta) y 2 E2E
+  nuevas (resolución manual/USB con código inexistente y etiqueta imprimible).
+  Total: 92 unitarias y 11 E2E en verde. Verificación ejecutada: lint, typecheck,
+  `test:ci`, build del frontend y `npm run e2e` con 11 pruebas aprobadas.
 
 
 ---

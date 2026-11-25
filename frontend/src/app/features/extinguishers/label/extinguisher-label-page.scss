@@ -1,0 +1,100 @@
+.label-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 48rem;
+}
+
+.label-page__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.label-page__back {
+  color: var(--site-primary);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.label-page__back:hover {
+  text-decoration: underline;
+}
+
+.label-page__status {
+  padding: 1.5rem;
+  border: 1px dashed var(--site-border);
+  border-radius: var(--site-radius);
+  background: var(--site-surface);
+  color: var(--site-muted);
+  text-align: center;
+}
+
+.label-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  width: 70mm;
+  max-width: 100%;
+  padding: 6mm;
+  border: 1px solid #111111;
+  background: #ffffff;
+  color: #111111;
+  text-align: center;
+}
+
+.label-card__eyebrow {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.label-card__code {
+  font-family: ui-monospace, SFMono-Regular, Consolas, 'Liberation Mono', monospace;
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  overflow-wrap: anywhere;
+}
+
+.label-card__type {
+  font-size: 0.8rem;
+}
+
+.label-card__qr {
+  width: 45mm;
+  height: 45mm;
+  max-width: 100%;
+  image-rendering: pixelated;
+}
+
+.label-card__hint {
+  font-size: 0.72rem;
+}
+
+.label-page__note {
+  max-width: 70ch;
+  color: var(--site-muted);
+  font-size: 0.875rem;
+}
+
+@media print {
+  .label-page {
+    max-width: none;
+  }
+
+  .label-page__toolbar,
+  .label-page__note {
+    display: none;
+  }
+
+  .label-card {
+    width: 70mm;
+    padding: 6mm;
+    box-shadow: none;
+  }
+}

@@ -298,6 +298,43 @@ export const ES_PE = {
     'Un extintor asignado a un área no puede marcarse como no operativo. Trasládalo a un almacén primero.',
   'extinguisherCondition.reload': 'Recargar ficha',
 
+  'extinguisherDetail.label': 'Ver etiqueta',
+
+  'scan.title': 'Escanear extintor',
+  'scan.subtitle':
+    'Usa la cámara, un lector USB 2D o escribe el código del activo. Escanear no concede acceso: la sesión y los permisos se validan siempre.',
+  'scan.camera.title': 'Escanear con la cámara',
+  'scan.camera.placeholder': 'La cámara se muestra aquí',
+  'scan.camera.idle': 'Activa la cámara para leer el QR de la etiqueta.',
+  'scan.camera.requesting': 'Solicitando permiso de cámara…',
+  'scan.camera.scanning': 'Apunta la cámara al QR de la etiqueta.',
+  'scan.camera.denied':
+    'No se pudo acceder a la cámara. Revisa el permiso del navegador o usa el campo manual.',
+  'scan.camera.unavailable':
+    'No hay una cámara disponible. Usa el lector USB o el campo manual.',
+  'scan.camera.error':
+    'No se pudo iniciar la cámara. Usa el lector USB o el campo manual.',
+  'scan.camera.start': 'Activar cámara',
+  'scan.camera.stop': 'Detener cámara',
+  'scan.manual.title': 'Lector USB o entrada manual',
+  'scan.manual.code': 'Código del activo',
+  'scan.manual.hint':
+    'Escribe el código o usa un lector USB 2D; el lector envía Enter al terminar.',
+  'scan.manual.submit': 'Buscar extintor',
+  'scan.securityNote':
+    'Escanear un QR solo identifica el activo. La ficha y las acciones requieren sesión y permisos.',
+  'scan.resolving': 'Buscando extintor…',
+  'scan.notFound': 'No existe un extintor con el código {code}.',
+  'scan.another': 'Escanear otro',
+
+  'label.back': 'Volver a la ficha',
+  'label.print': 'Imprimir etiqueta',
+  'label.loading': 'Preparando la etiqueta…',
+  'label.hint': 'Escanee para identificar el extintor',
+  'label.qrAlt': 'Código QR del extintor {assetCode}',
+  'label.note':
+    'La etiqueta solo contiene el código estable del activo y su tipo. No incluye ubicación, fechas ni datos personales.',
+
   'common.invalid': 'El valor no es válido.',
   'common.reload': 'Recargar',
 
@@ -324,6 +361,8 @@ export const ES_PE = {
   'page.title.extinguisherCreate': 'Nuevo extintor',
   'page.title.extinguisherEdit': 'Editar extintor',
   'page.title.extinguisherCondition': 'Cambiar condición',
+  'page.title.extinguisherLabel': 'Etiqueta del extintor',
+  'page.title.scan': 'Escanear extintor',
   'page.title.changePassword': 'Cambiar contraseña',
   'page.title.forbidden': 'Sin permiso',
   'page.title.notFound': 'Página no encontrada',
