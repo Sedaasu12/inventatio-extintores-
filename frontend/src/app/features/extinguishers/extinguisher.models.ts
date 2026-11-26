@@ -264,6 +264,13 @@ export const PLACEMENT_LABEL_KEYS: Record<PlacementType, TranslationKey> = {
   NONE: 'extinguisher.placement.NONE',
 };
 
+export const LOCATION_TYPE_LABEL_KEYS: Record<LocationType, TranslationKey> = {
+  SEDE: 'locationType.SEDE',
+  ALMACEN: 'locationType.ALMACEN',
+  AREA: 'locationType.AREA',
+  TALLER: 'locationType.TALLER',
+};
+
 export const DUE_DATE_LABEL_KEYS: Record<DueDateEventType, TranslationKey> = {
   EQUIPO: 'extinguisher.dueDate.EQUIPO',
   INSPECCION: 'extinguisher.dueDate.INSPECCION',

@@ -1,0 +1,277 @@
+<section class="dashboard" aria-labelledby="dashboard-title">
+  <header class="dashboard__header">
+    <div>
+      <h1 id="dashboard-title" class="dashboard__title">
+        {{ 'page.home.title' | t }}
+      </h1>
+      <p class="dashboard__subtitle">{{ 'dashboard.subtitle' | t }}</p>
+    </div>
+
+    <div class="dashboard__header-meta">
+      @if (summary(); as data) {
+        <p class="dashboard__updated">
+          {{ 'dashboard.updatedAt' | t }}:
+          {{ data.generatedAt | appDate: 'dd/MM/yyyy HH:mm' }}
+        </p>
+      }
+
+      <div class="dashboard__actions">
+        @if (canReadInventory()) {
+          <a class="site-button site-button--secondary" routerLink="/app/extintores">
+            {{ 'dashboard.actions.inventory' | t }}
+          </a>
+        }
+        @if (canCreate()) {
+          <a class="site-button" routerLink="/app/extintores/nuevo">
+            {{ 'inventory.new' | t }}
+          </a>
+        }
+      </div>
+    </div>
+  </header>
+
+  @if (loading()) {
+    <p class="dashboard__loading" role="status">{{ 'dashboard.loading' | t }}</p>
+  } @else if (errorMessage(); as message) {
+    <div class="dashboard__error" role="alert">
+      <p>{{ message }}</p>
+      <button
+        type="button"
+        class="site-button site-button--secondary"
+        (click)="retry()"
+      >
+        {{ 'common.retry' | t }}
+      </button>
+    </div>
+  } @else if (!hasAssets()) {
+    <app-empty-state
+      [title]="'dashboard.empty.title' | t"
+      [message]="'dashboard.empty.message' | t"
+    >
+      @if (canCreate()) {
+        <a class="site-button" routerLink="/app/extintores/nuevo">
+          {{ 'inventory.new' | t }}
+        </a>
+      } @else if (canReadInventory()) {
+        <a class="site-button site-button--secondary" routerLink="/app/extintores">
+          {{ 'dashboard.actions.inventory' | t }}
+        </a>
+      }
+    </app-empty-state>
+  } @else if (summary(); as data) {
+    <div class="dashboard__metrics">
+      <article class="dashboard__metric">
+        <h2 class="dashboard__metric-title">
+          {{ 'dashboard.metrics.operational' | t }}
+        </h2>
+        <p class="dashboard__metric-value">
+          {{ data.assets.operationalTotal | appNumber }}
+        </p>
+        <p class="dashboard__metric-hint">
+          {{ 'dashboard.metrics.operationalHint' | t }}
+        </p>
+      </article>
+
+      <article class="dashboard__metric">
+        <h2 class="dashboard__metric-title">
+          {{ 'dashboard.metrics.retired' | t }}
+        </h2>
+        <p class="dashboard__metric-value">
+          {{ data.assets.retiredTotal | appNumber }}
+        </p>
+        <p class="dashboard__metric-hint">
+          {{ 'dashboard.metrics.retiredHint' | t }}
+        </p>
+      </article>
+
+      <article class="dashboard__metric">
+        <h2 class="dashboard__metric-title">
+          {{ 'dashboard.metrics.openOrders' | t }}
+        </h2>
+        <p class="dashboard__metric-value">
+          {{ data.maintenance.openOrders | appNumber }}
+        </p>
+        <p class="dashboard__metric-hint">
+          {{ 'dashboard.metrics.openOrdersHint' | t }}
+        </p>
+      </article>
+
+      <article class="dashboard__metric">
+        <h2 class="dashboard__metric-title">
+          {{ 'dashboard.metrics.overdueReturns' | t }}
+        </h2>
+        <p class="dashboard__metric-value">
+          {{ data.maintenance.overdueReturns | appNumber }}
+        </p>
+        <p class="dashboard__metric-hint">
+          {{ 'dashboard.metrics.overdueReturnsHint' | t }}
+        </p>
+      </article>
+    </div>
+
+    <div class="dashboard__grid">
+      <section class="dashboard__panel" aria-labelledby="dashboard-logistics-title">
+        <h2 id="dashboard-logistics-title" class="dashboard__panel-title">
+          {{ 'dashboard.panels.logistics' | t }}
+        </h2>
+        <ul class="dashboard__list">
+          @for (row of logisticsRows(); track row.key) {
+            <li class="dashboard__list-item">
+              <span>{{ row.labelKey | t }}</span>
+              <span
+                [class]="
+                  'dashboard__count dashboard__count--' + (row.tone ?? 'neutral')
+                "
+              >
+                {{ row.count | appNumber }}
+              </span>
+            </li>
+          }
+        </ul>
+      </section>
+
+      <section class="dashboard__panel" aria-labelledby="dashboard-condition-title">
+        <h2 id="dashboard-condition-title" class="dashboard__panel-title">
+          {{ 'dashboard.panels.condition' | t }}
+        </h2>
+        <ul class="dashboard__list">
+          @for (row of conditionRows(); track row.key) {
+            <li class="dashboard__list-item">
+              <span>{{ row.labelKey | t }}</span>
+              <span
+                [class]="
+                  'dashboard__count dashboard__count--' + (row.tone ?? 'neutral')
+                "
+              >
+                {{ row.count | appNumber }}
+              </span>
+            </li>
+          }
+        </ul>
+      </section>
+
+      <section class="dashboard__panel" aria-labelledby="dashboard-placement-title">
+        <h2 id="dashboard-placement-title" class="dashboard__panel-title">
+          {{ 'dashboard.panels.placement' | t }}
+        </h2>
+        <ul class="dashboard__list">
+          @for (row of placementRows(); track row.key) {
+            <li class="dashboard__list-item">
+              <span>{{ row.labelKey | t }}</span>
+              <span class="dashboard__count">{{ row.count | appNumber }}</span>
+            </li>
+          }
+        </ul>
+      </section>
+
+      <section class="dashboard__panel" aria-labelledby="dashboard-maintenance-title">
+        <h2 id="dashboard-maintenance-title" class="dashboard__panel-title">
+          {{ 'dashboard.panels.maintenance' | t }}
+        </h2>
+
+        <div class="dashboard__callouts">
+          <p class="dashboard__callout">
+            <span>{{ 'dashboard.metrics.openOrders' | t }}</span>
+            <strong>{{ data.maintenance.openOrders | appNumber }}</strong>
+          </p>
+          <p class="dashboard__callout">
+            <span>{{ 'dashboard.metrics.overdueReturns' | t }}</span>
+            <strong>{{ data.maintenance.overdueReturns | appNumber }}</strong>
+          </p>
+        </div>
+
+        <ul class="dashboard__list">
+          @for (row of maintenanceRows(); track row.key) {
+            <li class="dashboard__list-item">
+              <span>{{ row.labelKey | t }}</span>
+              <span class="dashboard__count">{{ row.count | appNumber }}</span>
+            </li>
+          }
+        </ul>
+      </section>
+
+      <section class="dashboard__panel" aria-labelledby="dashboard-alerts-title">
+        <h2 id="dashboard-alerts-title" class="dashboard__panel-title">
+          {{ 'dashboard.panels.alerts' | t }}
+        </h2>
+        <ul class="dashboard__list">
+          @for (row of alertRows(); track row.key) {
+            <li class="dashboard__list-item">
+              <span>{{ row.labelKey | t }}</span>
+              <span
+                [class]="
+                  'dashboard__count dashboard__count--' + (row.tone ?? 'neutral')
+                "
+              >
+                {{ row.count | appNumber }}
+              </span>
+            </li>
+          }
+        </ul>
+        <p class="dashboard__note">{{ 'dashboard.alerts.note' | t }}</p>
+      </section>
+
+      <section
+        class="dashboard__panel dashboard__panel--wide"
+        aria-labelledby="dashboard-locations-title"
+      >
+        <h2 id="dashboard-locations-title" class="dashboard__panel-title">
+          {{ 'dashboard.panels.locations' | t }}
+        </h2>
+
+        <app-data-table
+          [caption]="'dashboard.locations.caption' | t"
+          [columns]="locationColumns"
+          [rows]="data.assets.byLocation"
+          [rowTemplate]="locationRow"
+        />
+
+        <p class="dashboard__note">
+          {{
+            'dashboard.locations.withoutLocation'
+              | t: { count: data.assets.withoutLocation }
+          }}
+        </p>
+      </section>
+
+      <section
+        class="dashboard__panel dashboard__panel--wide"
+        aria-labelledby="dashboard-events-title"
+      >
+        <h2 id="dashboard-events-title" class="dashboard__panel-title">
+          {{ 'dashboard.panels.events' | t }}
+        </h2>
+
+        <app-data-table
+          [caption]="'dashboard.events.caption' | t"
+          [columns]="eventColumns"
+          [rows]="data.alerts.byEventType"
+          [rowTemplate]="eventRow"
+        />
+      </section>
+    </div>
+  }
+</section>
+
+<ng-template #locationRow let-item>
+  @let row = $any(item);
+  <tr>
+    <td>
+      <span class="dashboard__location-code">{{ row.code }}</span>
+      {{ row.name }}
+    </td>
+    <td>{{ locationTypeKey(row.type) | t }}</td>
+    <td class="dashboard__cell-end">{{ row.count | appNumber }}</td>
+  </tr>
+</ng-template>
+
+<ng-template #eventRow let-item>
+  @let row = $any(item);
+  <tr>
+    <td>{{ dueDateKey(row.eventType) | t }}</td>
+    @for (status of alertStatuses; track status) {
+      <td class="dashboard__cell-end">{{ row.counts[status] | appNumber }}</td>
+    }
+    <td class="dashboard__cell-end">{{ row.total | appNumber }}</td>
+  </tr>
+</ng-template>

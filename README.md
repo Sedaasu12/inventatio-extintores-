@@ -160,13 +160,13 @@ npm run e2e
 
 La suite cubre protección de rutas, credenciales inválidas, cambio obligatorio de
 contraseña, renovación de sesión, cierre de sesión, 403 sin permiso, menú oculto,
-listado de inventario con filtros del servidor, navegación desde la lista a la
-ficha, alta desde la interfaz, edición de datos técnicos, cambio de condición con
-motivo, resolución de un código escrito o leído por USB, etiqueta imprimible con el
-QR del activo, uso a 360 px y navegación por teclado con foco visible. axe valida
-WCAG 2.1/2.2 AA. En CI, el trabajo `e2e` levanta MySQL 8.4, migra, siembra, compila
-el backend, instala Chromium y ejecuta la suite; si falla, publica el reporte HTML
-como artefacto.
+tablero de inicio con datos reales, listado de inventario con filtros del servidor,
+navegación desde la lista a la ficha, alta desde la interfaz, edición de datos
+técnicos, cambio de condición con motivo, resolución de un código escrito o leído
+por USB, etiqueta imprimible con el QR del activo, uso a 360 px y navegación por
+teclado con foco visible. axe valida WCAG 2.1/2.2 AA. En CI, el trabajo `e2e`
+levanta MySQL 8.4, migra, siembra, compila el backend, instala Chromium y ejecuta
+la suite; si falla, publica el reporte HTML como artefacto.
 
 Endpoints disponibles:
 

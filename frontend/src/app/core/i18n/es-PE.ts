@@ -144,6 +144,52 @@ export const ES_PE = {
   'inventory.new': 'Nuevo extintor',
   'inventory.openDetail': 'Abrir la ficha de {assetCode}',
 
+  'dashboard.subtitle':
+    'Resumen del inventario, el mantenimiento y las alertas calculadas por el servidor.',
+  'dashboard.loading': 'Cargando el tablero…',
+  'dashboard.updatedAt': 'Actualizado',
+  'dashboard.actions.inventory': 'Ver inventario',
+  'dashboard.empty.title': 'Aún no hay extintores',
+  'dashboard.empty.message':
+    'Registra el primer extintor para ver los indicadores del tablero.',
+  'dashboard.metrics.operational': 'Extintores operativos',
+  'dashboard.metrics.operationalHint': 'Activos que no están dados de baja.',
+  'dashboard.metrics.retired': 'Dados de baja',
+  'dashboard.metrics.retiredHint': 'Activos retirados del servicio.',
+  'dashboard.metrics.openOrders': 'Órdenes abiertas',
+  'dashboard.metrics.openOrdersHint':
+    'Órdenes de mantenimiento abiertas o en proveedor.',
+  'dashboard.metrics.overdueReturns': 'Retornos vencidos',
+  'dashboard.metrics.overdueReturnsHint':
+    'Órdenes cuya fecha de retorno prevista ya pasó.',
+  'dashboard.panels.logistics': 'Estado logístico',
+  'dashboard.panels.condition': 'Condición técnica',
+  'dashboard.panels.placement': 'Tipo de colocación',
+  'dashboard.panels.maintenance': 'Mantenimiento',
+  'dashboard.panels.alerts': 'Alertas por estado',
+  'dashboard.panels.locations': 'Extintores por ubicación',
+  'dashboard.panels.events': 'Alertas por categoría',
+  'dashboard.locations.caption': 'Extintores por ubicación actual',
+  'dashboard.locations.withoutLocation': 'Sin ubicación asignada: {count}',
+  'dashboard.events.caption': 'Alertas calculadas por categoría y estado',
+  'dashboard.columns.location': 'Ubicación',
+  'dashboard.columns.type': 'Tipo',
+  'dashboard.columns.count': 'Extintores',
+  'dashboard.columns.event': 'Categoría',
+  'dashboard.columns.total': 'Total',
+  'dashboard.alerts.note':
+    'Los estados se calculan en el servidor con los umbrales configurados.',
+
+  'alerts.status.VENCIDO': 'Vencido',
+  'alerts.status.POR_VENCER': 'Por vencer',
+  'alerts.status.VIGENTE': 'Vigente',
+  'alerts.status.SIN_FECHA_CONFIGURADA': 'Sin fecha configurada',
+
+  'locationType.SEDE': 'Sede',
+  'locationType.ALMACEN': 'Almacén',
+  'locationType.AREA': 'Área',
+  'locationType.TALLER': 'Taller',
+
   'extinguisher.capacityUnit.KG': 'kg',
   'extinguisher.capacityUnit.L': 'L',
   'extinguisher.capacityUnit.LB': 'lb',

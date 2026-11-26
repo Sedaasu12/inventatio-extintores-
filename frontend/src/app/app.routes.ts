@@ -42,7 +42,9 @@ export const routes: Routes = [
         canActivate: [permissionGuard],
         data: { permission: 'dashboard.read' },
         loadComponent: () =>
-          import('./features/home/home-page').then((m) => m.HomePage),
+          import('./features/dashboard/dashboard-page').then(
+            (m) => m.DashboardPage,
+          ),
       },
       {
         path: 'extintores',

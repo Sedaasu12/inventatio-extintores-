@@ -1043,10 +1043,9 @@ frontend/
 | Ruta | Componente | Guard |
 |---|---|---|
 | `/login` | Login | Público (redirige si ya hay sesión) |
-| `/app/inicio` | Bienvenida | Autenticado + `dashboard.read` |
+| `/app/inicio` | Dashboard | Autenticado + `dashboard.read` |
 | `/app/cambiar-contrasena` | Cambio obligatorio | Autenticado |
 | `/app/sin-permiso` | 403 | Autenticado |
-| `/app/dashboard` | Dashboard | Autenticado + `dashboard.read` |
 | `/app/extintores` | Lista | `extinguishers.read` |
 | `/app/extintores/nuevo` | Alta | `extinguishers.create` + `catalogs.read` + `locations.read` |
 | `/app/extintores/:id` | Ficha | `extinguishers.read` |

@@ -18,12 +18,15 @@ export interface DataTableColumn {
  *   <tr><td>{{ item.assetCode }}</td></tr>
  * </ng-template>
  * ```
+ *
+ * El contenedor con desplazamiento horizontal recibe `tabindex="0"` para que
+ * pueda recorrerse con el teclado aunque la tabla no tenga enlaces (WCAG 2.1.1).
  */
 @Component({
   selector: 'app-data-table',
   imports: [NgTemplateOutlet, TPipe],
   template: `
-    <div class="table-wrapper">
+    <div class="table-wrapper" tabindex="0">
       <table>
         <caption class="visually-hidden">{{ caption() }}</caption>
         <thead>

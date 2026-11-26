@@ -1248,6 +1248,26 @@ npm run lint && npm run typecheck && npm run test && npm run build
 npm run e2e
 ```
 
+### Implementación 10A (dashboard)
+
+- **Pantalla:** `/app/inicio` deja de ser una bienvenida estática y carga
+  `DashboardPage`, que consume `GET /dashboard/summary` con el permiso
+  `dashboard.read`. No recalcula estados ni alertas en el cliente.
+- **Contenido:** tarjetas de activos operativos, bajas, órdenes abiertas y
+  retornos vencidos; paneles de estado logístico, condición técnica, colocación,
+  mantenimiento y alertas por estado; tablas de extintores por ubicación (con
+  `withoutLocation`) y de alertas por categoría.
+- **Estados:** carga, error traducido con reintento, estado vacío cuando no hay
+  activos y acciones de inventario/alta condicionadas por permisos.
+- **Contratos y etiquetas:** `dashboard.models.ts` replica el contrato del
+  servidor; las etiquetas de estado de alerta y tipo de ubicación se resuelven
+  con mapas tipados (`alerts.status.*`, `locationType.*`).
+- **Accesibilidad:** la tabla compartida permite enfocar su contenedor con
+  desplazamiento horizontal (`tabindex="0"`), requisito detectado por axe a
+  360 px.
+- **Pruebas:** 6 unitarias nuevas (API y pantalla) y la suite E2E completa en
+  verde (11/11), incluida la comprobación WCAG AA a 360 px.
+
 ---
 
 ## 14. Fase 11 — Operación sin conexión (PWA)
